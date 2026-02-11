@@ -5,12 +5,12 @@ const SortSelect = ({
   value = 'newest',
   onChange,
   options = [
-    { value: 'newest', label: 'Newest', icon: '🆕' },
-    { value: 'price-low', label: 'Price: Low to High', icon: '💰' },
-    { value: 'price-high', label: 'Price: High to Low', icon: '💎' }
+    { value: 'newest', label: 'الأحدث', icon: '🆕' },
+    { value: 'price-low', label: 'السعر: من الأقل للأعلى', icon: '💰' },
+    { value: 'price-high', label: 'السعر: من الأعلى للأقل', icon: '💎' }
   ],
   className = '',
-  placeholder = 'Sort by'
+  placeholder = 'ترتيب حسب'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -106,7 +106,7 @@ const SortSelect = ({
               {selectedOption?.label || placeholder}
             </div>
             <div className="text-xs text-gray-500">
-              {selectedOption?.icon} Sort order
+              {selectedOption?.icon} ترتيب حسب
             </div>
           </div>
         </div>
@@ -150,8 +150,8 @@ const SortSelect = ({
                   <div className="flex-1">
                     <div className="font-medium">{option.label}</div>
                     <div className="text-xs text-gray-500">
-                      {option.icon} {option.value === 'newest' ? 'Latest items first' : 
-                        option.value === 'price-low' ? 'Lowest price first' : 'Highest price first'}
+                      {option.value === 'newest' ? 'أحدث العناصر أولاً' : 
+                        option.value === 'price-low' ? 'أقل سعر أولاً' : 'أعلى سعر أولاً'}
                     </div>
                   </div>
                   {isSelected && (

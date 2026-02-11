@@ -38,13 +38,13 @@ const ProductCard = ({ product }) => {
           </div>
 
           {/* Premium Badges */}
-          <div className="absolute top-6 left-6 flex flex-col gap-2">
+          <div className="absolute top-6 right-6 flex flex-col gap-2">
             <span className="glass px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-blue-900 shadow-sm">
-              Verified Importer
+              مستورد موثق
             </span>
             {stock < 5 && (
               <span className="bg-red-500 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg animate-pulse">
-                Low Stock
+                مخزون منخفض
               </span>
             )}
           </div>
@@ -69,17 +69,17 @@ const ProductCard = ({ product }) => {
           <div className="pt-5 border-t border-slate-100 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Wholesale Price</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">سعر الجملة</span>
                 <span className="text-3xl font-black text-blue-700 tracking-tighter">${price}</span>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Min. Order</span>
-                <p className="text-sm font-black text-blue-950">50 Units</p>
+              <div className="text-left">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">أدنى طلب</span>
+                <p className="text-sm font-black text-blue-950">50 وحدة</p>
               </div>
             </div>
 
             <button className="w-full py-4 bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-800 transition-all duration-500 shadow-lg shadow-blue-100 active:scale-95">
-              Request Quotation
+              طلب عرض سعر
             </button>
           </div>
         </div>

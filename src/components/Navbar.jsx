@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Search, User, Menu, X, ArrowRight } from 'lucide-react';
+import { Search, User, Menu, X, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const Navbar = ({ cartCount = 0 }) => {
@@ -8,24 +8,21 @@ const Navbar = ({ cartCount = 0 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Marketplace', href: '/#marketplace' },
-    { name: 'Categories', href: '/#categories' },
-    { name: 'Partners', href: '/#importers' },
-    { name: 'Pricing', href: '/#pricing' }
+    { name: 'السوق', href: '/#marketplace' },
+    { name: 'الفئات', href: '/#categories' },
+    { name: 'الشركاء', href: '/#importers' },
+    { name: 'الأسعار', href: '/#pricing' }
   ];
 
   return (
     <header className="sticky top-0 z-50 glass py-3 border-b border-white/20 transition-all duration-500">
       <div className="container mx-auto px-4 md:px-8 h-18 lg:h-22 flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <div className="flex items-center gap-3 group">
-            <div className="h-11 w-11 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center text-yellow-400 shadow-lg shadow-blue-200 group-hover:rotate-12 transition-all duration-500">
-              <ShoppingBag size={26} strokeWidth={2.5} />
-            </div>
-            <span className="text-2xl sm:text-3xl font-black tracking-tight text-blue-950 uppercase">
-              Electra<span className="text-blue-600">Hub</span>
-            </span>
-          </div>
+              <img 
+                src="/logo.png" 
+                alt="ElectraHub" 
+                className="w-full h-full object-contain max-w-[100px]"
+              />
         </Link>
 
         {/* Desktop Nav */}
@@ -34,10 +31,10 @@ const Navbar = ({ cartCount = 0 }) => {
             <a
               key={item.name}
               href={item.href}
-              className="text-xs font-black uppercase tracking-widest text-blue-950 hover:text-blue-600 transition-colors relative group py-2"
+              className="text-xl font-black uppercase tracking-widest text-blue-950 hover:text-blue-600 transition-colors relative group py-2"
             >
               {item.name}
-              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute right-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
             </a>
           ))}
         </nav>
@@ -48,7 +45,7 @@ const Navbar = ({ cartCount = 0 }) => {
               <Search size={18} />
             </button>
             <Link to="/login" className="h-11 px-6 glass rounded-xl flex items-center justify-center text-xs font-black uppercase tracking-widest text-blue-950 hover:bg-white transition-all">
-              Sign In
+              تسجيل الدخول
             </Link>
           </div>
 
@@ -84,7 +81,7 @@ const Navbar = ({ cartCount = 0 }) => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {item.name}
-              <ArrowRight size={16} className="text-blue-200" />
+              <ArrowRight size={16} className="text-blue-200 rotate-180" />
             </a>
           ))}
           <div className="pt-4 border-t border-blue-50 flex flex-col gap-3">
@@ -93,7 +90,7 @@ const Navbar = ({ cartCount = 0 }) => {
               className="w-full py-5 bg-blue-700 text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Become an Importer
+              أصبح مستورداً
             </Link>
           </div>
         </div>

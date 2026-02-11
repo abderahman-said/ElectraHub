@@ -62,14 +62,14 @@ const TagFilter = ({
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-900 flex items-center gap-2">
           <Hash className="w-4 h-4" />
-          Tags
+          الوسوم
         </h3>
         {clearable && selectedTags.length > 0 && (
           <button
             onClick={handleClearAll}
             className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
-            Clear all
+            مسح الكل
           </button>
         )}
       </div>
@@ -81,7 +81,7 @@ const TagFilter = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tags..."
+            placeholder="البحث في الوسوم..."
             className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -90,7 +90,7 @@ const TagFilter = ({
       <div className="space-y-2">
         {popularTags.length > 0 && (
           <div>
-            <p className="text-xs text-gray-600 font-medium mb-2">Popular</p>
+            <p className="text-xs text-gray-600 font-medium mb-2">الأكثر شيوعاً</p>
             <div className="flex flex-wrap gap-2">
               {popularTags.map((tag) => (
                 <TagButton
@@ -106,7 +106,7 @@ const TagFilter = ({
         )}
 
         <div>
-          <p className="text-xs text-gray-600 font-medium mb-2">All Tags</p>
+          <p className="text-xs text-gray-600 font-medium mb-2">كل الوسوم</p>
           <div className="flex flex-wrap gap-2">
             {displayTags.map((tag) => (
               <TagButton
@@ -123,7 +123,7 @@ const TagFilter = ({
                 className="px-3 py-1 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full transition-colors flex items-center gap-1"
               >
                 <Plus className="w-3 h-3" />
-                Show {filteredTags.length - maxVisible} more
+                عرض {filteredTags.length - maxVisible} أخرى
               </button>
             )}
             {showAll && (
@@ -131,7 +131,7 @@ const TagFilter = ({
                 onClick={() => setShowAll(false)}
                 className="px-3 py-1 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-full transition-colors"
               >
-                Show less
+                عرض أقل
               </button>
             )}
           </div>
@@ -145,14 +145,14 @@ const TagFilter = ({
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-900 flex items-center gap-2">
           <Hash className="w-4 h-4" />
-          Tag Cloud
+          سحابة الوسوم
         </h3>
         {clearable && selectedTags.length > 0 && (
           <button
             onClick={handleClearAll}
             className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
-            Clear
+            مسح
           </button>
         )}
       </div>
@@ -196,7 +196,7 @@ const TagFilter = ({
             onClick={() => setShowAll(true)}
             className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
           >
-            +{filteredTags.length - maxVisible} more
+            +{filteredTags.length - maxVisible} أخرى
           </button>
         )}
       </div>
@@ -209,7 +209,7 @@ const TagFilter = ({
         options={tags}
         value={selectedTags}
         onChange={onChange}
-        placeholder="Select tags..."
+        placeholder="اختر الوسوم..."
         searchable={searchable}
         clearable={clearable}
         tagVariant="pill"
@@ -218,7 +218,7 @@ const TagFilter = ({
       
       {popularTags.length > 0 && (
         <div>
-          <p className="text-xs text-gray-600 font-medium mb-2">Quick select</p>
+          <p className="text-xs text-gray-600 font-medium mb-2">اختيار سريع</p>
           <div className="flex flex-wrap gap-2">
             {popularTags.map((tag) => (
               <TagButton

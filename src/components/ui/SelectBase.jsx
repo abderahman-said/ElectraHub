@@ -5,7 +5,7 @@ const SelectBase = ({
   options = [],
   value,
   onChange,
-  placeholder = 'Select an option',
+  placeholder = 'اختر خياراً',
   disabled = false,
   error = false,
   loading = false,
@@ -16,8 +16,8 @@ const SelectBase = ({
   optionClassName = '',
   dropdownClassName = '',
   maxHeight = 240,
-  emptyMessage = 'No options available',
-  noResultsMessage = 'No results found',
+  emptyMessage = 'لا توجد خيارات متاحة',
+  noResultsMessage = 'لم يتم العثور على نتائج',
   renderOption,
   renderValue,
   onSearch,
@@ -162,7 +162,7 @@ const SelectBase = ({
 
     if (multiSelect) {
       if (Array.isArray(value) && value.length > 0) {
-        return `${value.length} selected`;
+        return `${value.length} محدد`;
       }
       return placeholder;
     }
@@ -205,7 +205,7 @@ const SelectBase = ({
           {loading ? (
             <div className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-              <span className="text-gray-500">Loading...</span>
+              <span className="text-gray-500">جاري التحميل...</span>
             </div>
           ) : displayValue}
         </span>
@@ -244,7 +244,7 @@ const SelectBase = ({
                   type="text"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  placeholder="Search options..."
+                  placeholder="البحث في الخيارات..."
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
                 />
               </div>
@@ -281,7 +281,7 @@ const SelectBase = ({
                     }}
                     className="mt-2 text-sm text-blue-600 hover:text-blue-700 transition-colors"
                   >
-                    Clear search
+                    مسح البحث
                   </button>
                 )}
               </div>

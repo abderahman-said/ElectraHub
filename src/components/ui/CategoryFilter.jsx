@@ -40,14 +40,14 @@ const CategoryFilter = ({
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-900 flex items-center gap-2">
           <Filter className="w-4 h-4" />
-          Categories
+          الفئات
         </h3>
         {clearable && selectedCategories.length > 0 && (
           <button
             onClick={handleClearAll}
             className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
-            Clear all
+            مسح الكل
           </button>
         )}
       </div>
@@ -57,7 +57,7 @@ const CategoryFilter = ({
         value={selectedCategories}
         onChange={onChange}
         options={categories}
-        placeholder="Select categories"
+        placeholder="اختر الفئات"
         clearable={clearable}
         searchable={categories.length > 8}
       />
@@ -72,7 +72,7 @@ const CategoryFilter = ({
       >
         <span className="flex items-center gap-2">
           {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          Categories
+          الفئات
           {selectedCategories.length > 0 && (
             <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
               {selectedCategories.length}
@@ -118,7 +118,7 @@ const CategoryFilter = ({
 
   const InlineVariant = () => (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      <span className="text-sm font-medium text-gray-700">Categories:</span>
+      <span className="text-sm font-medium text-gray-700">الفئات:</span>
       {categories.map((category) => {
         const isSelected = selectedCategories.includes(category.value);
         return (
@@ -143,7 +143,7 @@ const CategoryFilter = ({
           onClick={handleClearAll}
           className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
-          Clear
+          مسح
         </button>
       )}
     </div>

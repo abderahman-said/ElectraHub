@@ -130,7 +130,7 @@ const CartDrawer = () => {
                             alt={item.name}
                             className="w-24 h-24 object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                         />
-                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg animate-pulse">
+                        <div className="absolute -top-2 -left-2 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg animate-pulse">
                             {item.quantity}
                         </div>
                         
@@ -189,10 +189,10 @@ const CartDrawer = () => {
                                 onClick={() => toggleItemExpansion(item.id)}
                                 className="flex items-center gap-2 text-sm text-primary hover:text-primary font-semibold transition-colors duration-200 group"
                             >
-                                <span>{isExpanded ? 'Hide' : 'Show'} Details</span>
+                                <span>{isExpanded ? 'إخفاء' : 'عرض'} التفاصيل</span>
                                 <ArrowRight 
                                     size={16} 
-                                    className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} group-hover:translate-x-1`}
+                                    className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} group-hover:-translate-x-1`}
                                 />
                             </button>
                         </div>
@@ -202,25 +202,25 @@ const CartDrawer = () => {
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="flex items-center gap-2 text-sm text-gray-700">
                                         <Sparkles className="w-4 h-4 text-primary" />
-                                        <span className="font-medium">Premium Quality</span>
+                                        <span className="font-medium">جودة مميزة</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-700">
                                         <Shield className="w-4 h-4 text-primary" />
-                                        <span className="font-medium">2-Year Warranty</span>
+                                        <span className="font-medium">ضمان سنتين</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-700">
                                         <Truck className="w-4 h-4 text-primary" />
-                                        <span className="font-medium">Free Shipping</span>
+                                        <span className="font-medium">شحن مجاني</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-700">
                                         <Package className="w-4 h-4 text-primary" />
-                                        <span className="font-medium">Eco-Friendly</span>
+                                        <span className="font-medium">صديق للبيئة</span>
                                     </div>
                                 </div>
                                 <div className="pt-3 border-t border-secondary">
                                     <div className="flex items-center gap-2 text-sm text-primary font-medium">
                                         <Zap className="w-4 h-4" />
-                                        In Stock - Ships Today
+                                        متوفر - يُشحن اليوم
                                     </div>
                                 </div>
                             </div>
@@ -228,9 +228,9 @@ const CartDrawer = () => {
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex flex-col items-end gap-3">
-                        <div className="flex flex-col items-end gap-2">
-                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</span>
+                    <div className="flex flex-col items-start gap-3">
+                        <div className="flex flex-col items-start gap-2">
+                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">الكمية</span>
                             <div className="flex items-center gap-2 bg-secondary rounded-xl p-1">
                                 <button
                                     onClick={(e) => handleQuantityChange(item.id, item.quantity - 1, e)}
@@ -253,16 +253,16 @@ const CartDrawer = () => {
                         </div>
 
                         {/* Price */}
-                        <div className="text-right">
+                        <div className="text-left">
                             <div className="text-2xl font-bold text-primary">
                                 {formatPrice(item.price * item.quantity)}
                             </div>
                             <div className="text-sm text-gray-500">
-                                {formatPrice(item.price)} each
+                                {formatPrice(item.price)} للوحدة
                             </div>
                             {item.quantity > 1 && (
                                 <div className="text-xs text-primary font-medium">
-                                    Save {formatPrice((item.price * item.quantity) * 0.1)}
+                                    وفر {formatPrice((item.price * item.quantity) * 0.1)}
                                 </div>
                             )}
                         </div>
@@ -288,9 +288,9 @@ const CartDrawer = () => {
             <div 
                 ref={drawerRef}
                 className={`
-                    fixed right-0 top-0 h-full w-full sm:w-96 md:w-[420px] lg:max-w-xl bg-white shadow-2xl z-50
+                    fixed left-0 top-0 h-full w-full sm:w-96 md:w-[420px] lg:max-w-xl bg-white shadow-2xl z-50
                     transform transition-all duration-500 ease-out
-                    ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}
+                    ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}
                     ${isAnimating ? 'scale-95' : 'scale-100'}
                 `}
             >
@@ -303,9 +303,9 @@ const CartDrawer = () => {
                                 <ShoppingBag className="w-6 h-6" />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold">Shopping Cart</h2>
+                                <h2 className="text-2xl font-bold">عربة التسوق</h2>
                                 <span className="text-sm opacity-90 flex items-center gap-2">
-                                    {cart.length} {cart.length === 1 ? 'item' : 'items'}
+                                    {cart.length} {cart.length === 1 ? 'منتج' : 'منتجات'}
                                     {cart.length > 0 && (
                                         <span className="bg-white/20 px-2 py-1 rounded-full text-xs">
                                             {formatPrice(cartTotal)}
@@ -332,9 +332,9 @@ const CartDrawer = () => {
                                 <div className="w-32 h-32 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6 animate-float">
                                     <ShoppingBag className="w-16 h-16 text-gray-400" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-primary mb-2">Your cart is empty</h3>
+                                <h3 className="text-2xl font-bold text-primary mb-2">عربة التسوق فارغة</h3>
                                 <p className="text-gray-600 mb-6 max-w-sm">
-                                    Looks like you haven't added anything to your cart yet. Start shopping to fill it up!
+                                    يبدو أنك لم تضف أي شيء لعربة التسوق بعد. ابدأ التسوق لملئها!
                                 </p>
                                 <div className="flex gap-3">
                                     <Link 
@@ -343,13 +343,13 @@ const CartDrawer = () => {
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-hover transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                                     >
                                         <ShoppingBag size={18} />
-                                        Start Shopping
+                                        ابدأ التسوق
                                     </Link>
                                     <button
                                         onClick={() => handleOpenChange(false)}
                                         className="px-6 py-3 border-2 border-secondary text-gray-700 rounded-xl hover:border-primary hover:bg-secondary transition-colors duration-200 font-semibold"
                                     >
-                                        Maybe Later
+                                        لاحقاً
                                     </button>
                                 </div>
                             </div>
@@ -368,7 +368,7 @@ const CartDrawer = () => {
                     <div className="space-y-4">
                         {/* Subtotal */}
                         <div className="flex items-center justify-between">
-                            <span className="text-gray-600 font-medium">Subtotal</span>
+                            <span className="text-gray-600 font-medium">المجموع الفرعي</span>
                             <span className="text-3xl font-bold text-primary">
                                 {formatPrice(cartTotal)}
                             </span>
@@ -378,14 +378,14 @@ const CartDrawer = () => {
                         {cartTotal > 100 && (
                             <div className="flex items-center gap-2 text-primary bg-secondary px-4 py-2 rounded-xl">
                                 <Truck className="w-5 h-5" />
-                                <span className="font-medium">You've qualified for free shipping!</span>
+                                <span className="font-medium">لقد تأهلت للشحن المجاني!</span>
                             </div>
                         )}
 
                         {/* Shipping Info */}
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <Truck className="w-4 h-4" />
-                            <span>{cartTotal >= 100 ? 'Free shipping applied' : `Add ${formatPrice(100 - cartTotal)} more for free shipping`}</span>
+                            <span>{cartTotal >= 100 ? 'تم تطبيق الشحن المجاني' : `أضف ${formatPrice(100 - cartTotal)} للشحن المجاني`}</span>
                         </div>
 
                         {/* Action Buttons */}
@@ -396,8 +396,8 @@ const CartDrawer = () => {
                                 className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white rounded-xl hover:bg-primary-hover transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 group"
                             >
                                 <CreditCard className="w-5 h-5 group-hover:animate-pulse" />
-                                Proceed to Checkout
-                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
+                                المتابعة للدفع
+                                <ArrowRight size={18} className="group-hover:-translate-x-1 transition-transform duration-200" />
                             </Link>
                             
                             <div className="flex gap-3">
@@ -405,7 +405,7 @@ const CartDrawer = () => {
                                     onClick={() => handleOpenChange(false)}
                                     className="flex-1 px-6 py-3 border-2 border-secondary text-gray-700 rounded-xl hover:border-primary hover:bg-secondary transition-all duration-200 font-medium"
                                 >
-                                    Continue Shopping
+                                    استمر في التسوق
                                 </button>
                                 <button
                                     className="px-6 py-3 border-2 border-secondary text-gray-600 rounded-xl hover:border-primary hover:bg-secondary transition-all duration-200 font-medium"
@@ -414,7 +414,7 @@ const CartDrawer = () => {
                                         cart.forEach(item => removeFromCart(item.id));
                                     }}
                                 >
-                                    Clear Cart
+                                    مسح العربة
                                 </button>
                             </div>
                         </div>

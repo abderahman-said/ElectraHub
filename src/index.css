@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* import font caior */
 @layer base {
   :root {
     --primary: 217 91% 60%;
@@ -29,6 +29,8 @@
 
   body {
     @apply font-sans text-slate-900 bg-white antialiased selection:bg-blue-100 selection:text-blue-900;
+    font-family: 'Tajawal', 'Cairo', 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
   }
 
   h1,
@@ -38,6 +40,8 @@
   h5,
   h6 {
     @apply font-heading font-extrabold text-blue-950 tracking-tight;
+    font-family: 'Tajawal', 'Cairo', 'Noto Sans Arabic', sans-serif;
+    direction: rtl;
   }
 }
 

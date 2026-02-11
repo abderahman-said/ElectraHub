@@ -24,19 +24,19 @@ const Hero = () => {
             <div className="inline-flex items-center gap-3 px-5 py-2.5 glass rounded-full shadow-premium border border-white/50">
               <div className="h-2 w-2 bg-blue-600 rounded-full animate-pulse" />
               <span className="text-xs font-bold text-blue-900 tracking-widest uppercase">
-                The Future of B2B Sourcing
+                الطلبات الشهرية
               </span>
             </div>
 
             {/* Headline */}
             <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-black text-blue-950 leading-[1] tracking-tighter">
-                Smart Sourcing <br />
-                <span className="text-gradient">Powering</span> Growth
+                التوريد الذكي <br />
+                <span className="text-gradient">تسريع النمو</span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-xl font-medium">
-                ElectraHub connects world-class appliance <span className="text-blue-700 font-bold underline decoration-yellow-400/50">importers</span> with qualified traders in a seamless, data-driven SaaS ecosystem.
+                يربط إلكتراهب بـ <span className="text-blue-700 font-bold underline decoration-yellow-400/50">موردي</span> مع تجار مؤهلين في نظام سحابي سلس مدفوع بالبيانات.
               </p>
             </div>
 
@@ -46,7 +46,7 @@ const Hero = () => {
                 to="/shop"
                 className="group relative inline-flex items-center justify-center px-10 py-5 bg-blue-700 text-white font-extrabold rounded-2xl overflow-hidden transition-all duration-500 hover:bg-blue-800 hover:shadow-2xl hover:-translate-y-1 w-full sm:w-auto text-lg shadow-xl shadow-blue-200"
               >
-                <span className="relative z-10">Start Sourcing Now</span>
+                <span className="relative z-10">ابدأ التوريد الآن</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Link>
 
@@ -54,7 +54,7 @@ const Hero = () => {
                 to="/register-importer"
                 className="group inline-flex items-center gap-4 text-blue-900 font-bold hover:text-blue-700 transition-all font-heading text-lg"
               >
-                <span>Become an Importer</span>
+                <span>كن مستورداً</span>
                 <div className="h-10 w-10 glass rounded-full flex items-center justify-center group-hover:translate-x-2 transition-transform shadow-premium">
                   <ArrowRight size={20} />
                 </div>
@@ -64,9 +64,9 @@ const Hero = () => {
             {/* Stats */}
             <div className="flex items-center gap-12 pt-8">
               {[
-                { val: '150+', label: 'Verified Importers' },
-                { val: '8.4k', label: 'Monthly Orders' },
-                { val: '99.9%', label: 'Order Accuracy' }
+                { val: '150+', label: 'مستوردون موثقون' },
+                { val: '8.4k', label: 'الطلبات الشهرية' },
+                { val: '99.9%', label: 'دقة الطلبات' }
               ].map((s, i) => (
                 <div key={i} className="space-y-1">
                   <div className="text-3xl font-black text-blue-950 font-heading tracking-tighter">{s.val}</div>
@@ -86,7 +86,7 @@ const Hero = () => {
                 <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl">
                   <img
                     src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=90"
-                    alt="Premium Home Appliances"
+                    alt="الأجهزة الذكية"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
 
@@ -97,7 +97,7 @@ const Hero = () => {
                         <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
                           <TrendingUp size={16} />
                         </div>
-                        <span className="text-sm font-black text-blue-950">Market Trends</span>
+                        <span className="text-sm font-black text-blue-950">النمو في الأجهزة الذكية</span>
                       </div>
                       <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">+14.5%</span>
                     </div>
@@ -105,7 +105,7 @@ const Hero = () => {
                       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full bg-blue-600 w-3/4 rounded-full" />
                       </div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase">Growth in Smart Appliances</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase">النمو في الأجهزة الذكية</p>
                     </div>
                   </div>
                 </div>
