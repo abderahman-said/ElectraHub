@@ -1,34 +1,43 @@
 import React, { useState } from 'react';
-import { ShoppingBag, ArrowRight, ShieldCheck, Zap, Globe, Heart, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ShoppingBag, ArrowLeft, ShieldCheck, Zap, Globe, Heart, Check, Lock } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ImporterRegister = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(2); // Start directly at step 2
     const [formData, setFormData] = useState({
         companyName: '',
         contactEmail: '',
         whatsapp: '',
+        password: '',
         category: 'AC',
         subscription: 'basic'
     });
+    const { register } = useAuth();
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     const categories = [
-        { id: 'AC', name: 'Air Conditioners' },
-        { id: 'FR', name: 'Refrigerators' },
-        { id: 'TV', name: 'Smart TVs' },
-        { id: 'WA', name: 'Washing Machines' },
-        { id: 'SA', name: 'Small Appliances' }
+        { id: 'AC', name: 'تكييفات' },
+        { id: 'FR', name: 'ثلاجات' },
+        { id: 'TV', name: 'شاشات سمارت' },
+        { id: 'WA', name: 'غسالات' },
+        { id: 'SA', name: 'أجهزة صغيرة' }
     ];
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle registration logic
-        console.log('Registering importer:', formData);
-        setStep(3); // Show success
+        setError('');
+        const result = register(formData);
+        if (result.success) {
+            setStep(3); // Show success
+        } else {
+            setError(result.message);
+        }
     };
 
     return (
-        <div className="min-h-screen bg-mesh flex items-center justify-center py-20 px-4">
+        <div className="min-h-screen bg-mesh flex items-center justify-center py-20 px-4" dir="rtl">
             <div className="max-w-xl w-full glass rounded-[3rem] shadow-premium border border-white/50 overflow-hidden relative group">
                 {/* Decorative Elements */}
                 <div className="absolute -top-24 -right-24 h-48 w-48 bg-blue-600/10 rounded-full blur-3xl" />
@@ -36,15 +45,14 @@ const ImporterRegister = () => {
 
                 <div className="p-10 sm:p-14 relative z-10">
                     <div className="text-center mb-12">
-                        <div className="mx-auto h-20 w-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2rem] flex items-center justify-center text-yellow-400 shadow-2xl shadow-blue-200 rotate-12 mb-8">
-                            <ShoppingBag size={40} />
-                        </div>
+                                                <img src="/logo.png" alt="" className='w-auto h-auto max-w-[180px] mx-auto' />
+
                         <h2 className="text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
-                            Elevate Your <br />
-                            <span className="text-gradient">Business</span>
+                            ارتقِ <br />
+                            <span className="text-gradient">بتجارتك</span>
                         </h2>
-                        <p className="text-slate-500 font-medium">
-                            Join ElectraHub's elite network of appliance importers.
+                        <p className="text-slate-500 font-medium font-arabic">
+                            انضم إلى شبكة ElectraHub لنخبة مستوردي الأجهزة الكهربائية.
                         </p>
                     </div>
 
@@ -85,33 +93,38 @@ const ImporterRegister = () => {
 
                     {step === 2 && (
                         <form className="space-y-8 animate-slideInUp" onSubmit={handleSubmit}>
+                            {error && (
+                                <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-center">
+                                    {error}
+                                </div>
+                            )}
                             <div className="space-y-6">
                                 <div className="group">
-                                    <label className="block text-[10px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">Company Entity Name</label>
+                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">اسم المنشأة / الشركة</label>
                                     <input
                                         type="text"
                                         required
-                                        className="w-full px-6 py-4 rounded-2xl glass border-slate-100 focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300"
-                                        placeholder="e.g. Al-Nour Global Electronics"
+                                        className="w-full px-6 py-4 rounded-2xl border   border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        placeholder="مثال: شركة النور للإلكترونيات"
                                         value={formData.companyName}
                                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                                     />
                                 </div>
                                 <div className="group">
-                                    <label className="block text-[10px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">Primary WhatsApp Contact</label>
+                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">رقم الواتساب للتواصل</label>
                                     <input
                                         type="tel"
                                         required
-                                        className="w-full px-6 py-4 rounded-2xl glass border-slate-100 focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300"
-                                        placeholder="+20 123 456 7890"
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        placeholder="01xxxxxxxxx"
                                         value={formData.whatsapp}
                                         onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                                     />
                                 </div>
                                 <div className="group relative">
-                                    <label className="block text-[10px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">Appliance Specialization</label>
+                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">التخصص الأساسي</label>
                                     <select
-                                        className="w-full px-6 py-4 rounded-2xl glass border-slate-100 focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 appearance-none cursor-pointer"
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 appearance-none cursor-pointer text-right"
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                     >
@@ -119,17 +132,39 @@ const ImporterRegister = () => {
                                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                                         ))}
                                     </select>
-                                    <div className="absolute right-6 top-[3.25rem] pointer-events-none text-blue-900">
+                                    <div className="absolute left-6 top-[3.25rem] pointer-events-none text-blue-900">
                                         <ChevronDown size={20} />
                                     </div>
+                                </div>
+                                <div className="group">
+                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">البريد الإلكتروني</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        placeholder="contact@company.com"
+                                        value={formData.contactEmail}
+                                        onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                                    />
+                                </div>
+                                <div className="group">
+                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">كلمة المرور</label>
+                                    <input
+                                        type="password"
+                                        required
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        placeholder="••••••••"
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    />
                                 </div>
                             </div>
                             <button
                                 type="submit"
                                 className="w-full flex justify-center py-5 px-4 bg-blue-700 text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-100 hover:bg-blue-800 hover:-translate-y-1 transition-all duration-500 active:scale-95 flex items-center gap-3 overflow-hidden group"
                             >
-                                <span>Submit for Verification</span>
-                                <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-500" />
+                                <span>إرسال طلب التحقق</span>
+                                <ArrowLeft size={20} className="group-hover:-translate-x-2 transition-transform duration-500" />
                             </button>
                         </form>
                     )}
@@ -140,16 +175,16 @@ const ImporterRegister = () => {
                                 <Check size={48} strokeWidth={3} />
                             </div>
                             <div className="space-y-4">
-                                <h3 className="text-3xl font-black text-blue-950 tracking-tighter">Application Secured!</h3>
+                                <h3 className="text-3xl font-black text-blue-950 tracking-tighter">تم استلام طلبك!</h3>
                                 <p className="text-slate-600 font-medium leading-relaxed">
-                                    Our audit team will review your credentials and contact you via <span className="text-blue-700 font-bold">WhatsApp</span> within 24 hours to finalize your access.
+                                    سيقوم فريقنا بمراجعة بياناتك والتواصل معك عبر <span className="text-blue-700 font-bold">الواتساب</span> خلال 24 ساعة لتفعيل حسابك.
                                 </p>
                             </div>
                             <Link
-                                to="/"
-                                className="inline-block w-full py-5 bg-blue-700 text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-100 hover:bg-blue-800 transition-all duration-500"
+                                to="/dashboard"
+                                className="inline-block w-full py-5 bg-blue-700 text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-800 transition-all shadow-lg shadow-blue-100"
                             >
-                                Back to Headquarters
+                                الذهاب للوحة التحكم
                             </Link>
                         </div>
                     )}

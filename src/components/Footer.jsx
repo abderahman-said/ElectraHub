@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
- 
+
 const Footer = () => {
     return (
         <footer className="bg-primary text-white py-12 sm:py-16 mt-auto">
@@ -14,7 +14,7 @@ const Footer = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 sm:mb-6">استكشف</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 sm:mb-6 text-white">استكشف</h4>
                         <ul className="space-y-3">
                             <li><Link to="/shop" className="text-xs sm:text-sm text-blue-100/60 hover:text-accent transition-colors">السوق</Link></li>
                             <li><Link to="/" className="text-xs sm:text-sm text-blue-100/60 hover:text-accent transition-colors">الفئات</Link></li>
@@ -24,7 +24,7 @@ const Footer = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 sm:mb-6">الدعم</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 sm:mb-6 text-white">الدعم</h4>
                         <ul className="space-y-3">
                             <li><a href="#faq" className="text-xs sm:text-sm text-gray-400 hover:text-accent transition-colors">الأسئلة الشائعة</a></li>
                             <li><a href="#shipping" className="text-xs sm:text-sm text-gray-400 hover:text-accent transition-colors">الشحن</a></li>
@@ -34,7 +34,7 @@ const Footer = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 sm:mb-6">الشركة</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-widest mb-4 sm:mb-6 text-white">الشركة</h4>
                         <ul className="space-y-3">
                             <li><a href="#about" className="text-xs sm:text-sm text-gray-400 hover:text-accent transition-colors">من نحن</a></li>
                             <li><a href="#sustainability" className="text-xs sm:text-sm text-gray-400 hover:text-accent transition-colors">الاستدامة</a></li>

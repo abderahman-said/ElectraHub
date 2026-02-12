@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, TrendingUp, Play, ArrowRight } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Play, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
@@ -23,14 +23,14 @@ const Hero = () => {
             {/* Badge */}
             <div className="inline-flex items-center gap-3 px-5 py-2.5 glass rounded-full shadow-premium border border-white/50">
               <div className="h-2 w-2 bg-blue-600 rounded-full animate-pulse" />
-              <span className="text-xs font-bold text-blue-900 tracking-widest uppercase">
+              <span className="text-sm font-bold text-blue-900 tracking-widest uppercase">
                 الطلبات الشهرية
               </span>
             </div>
 
             {/* Headline */}
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-black text-blue-950 leading-[1] tracking-tighter">
+              <h1 className="text-3xl pb-3 md:text-4xl lg:text-6xl xl:text-7xl font-black text-blue-950 leading-[1] tracking-tighter">
                 التوريد الذكي <br />
                 <span className="text-gradient">تسريع النمو</span>
               </h1>
@@ -51,12 +51,12 @@ const Hero = () => {
               </Link>
 
               <Link
-                to="/register-importer"
-                className="group inline-flex items-center gap-4 text-blue-900 font-bold hover:text-blue-700 transition-all font-heading text-lg"
+                to="/register"
+                className="group inline-flex items-center gap-4 text-blue-900 font-bold hover:text-blue-700 transition-all text-lg"
               >
                 <span>كن مستورداً</span>
                 <div className="h-10 w-10 glass rounded-full flex items-center justify-center group-hover:translate-x-2 transition-transform shadow-premium">
-                  <ArrowRight size={20} />
+                  <ArrowLeft size={20} />
                 </div>
               </Link>
             </div>
@@ -69,8 +69,8 @@ const Hero = () => {
                 { val: '99.9%', label: 'دقة الطلبات' }
               ].map((s, i) => (
                 <div key={i} className="space-y-1">
-                  <div className="text-3xl font-black text-blue-950 font-heading tracking-tighter">{s.val}</div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{s.label}</p>
+                  <div className="text-3xl font-black text-blue-950   tracking-tighter">{s.val}</div>
+                  <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -83,9 +83,9 @@ const Hero = () => {
               <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 to-yellow-400 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 animate-pulse" />
 
               <div className="relative glass p-4 rounded-[2.5rem] shadow-premium">
-                <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl">
+                <div className="relative aspect-[5/5] rounded-[2rem] overflow-hidden shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=90"
+                    src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1920&q=80"
                     alt="الأجهزة الذكية"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
@@ -99,13 +99,13 @@ const Hero = () => {
                         </div>
                         <span className="text-sm font-black text-blue-950">النمو في الأجهزة الذكية</span>
                       </div>
-                      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">+14.5%</span>
+                      <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">+14.5%</span>
                     </div>
                     <div className="space-y-2">
                       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full bg-blue-600 w-3/4 rounded-full" />
                       </div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase">النمو في الأجهزة الذكية</p>
+                      <p className="text-sm font-bold text-slate-500 uppercase">النمو في الأجهزة الذكية</p>
                     </div>
                   </div>
                 </div>

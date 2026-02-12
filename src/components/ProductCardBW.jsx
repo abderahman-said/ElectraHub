@@ -19,14 +19,14 @@ const ProductCardBW = ({ product, priority = false }) => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (addingToCart || inCart) return;
-    
+
     setAddingToCart(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     addToCart(product);
     setAddingToCart(false);
   };
@@ -35,7 +35,7 @@ const ProductCardBW = ({ product, priority = false }) => {
     e.preventDefault();
     e.stopPropagation();
     // Implement quick view modal
-    console.log('Quick view:', id);
+    // Quick view functionality - placeholder
   };
 
   const handleWishlist = (e) => {
@@ -61,7 +61,7 @@ const ProductCardBW = ({ product, priority = false }) => {
   };
 
   return (
-    <article 
+    <article
       className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -97,7 +97,7 @@ const ProductCardBW = ({ product, priority = false }) => {
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             <span className="
               bg-gray-900 
-              text-white text-[10px] font-bold uppercase tracking-wider 
+              text-white text-[16px] font-bold uppercase tracking-wider 
               px-3 py-1.5 rounded-lg shadow-lg
               transition-all duration-300
             ">
@@ -106,7 +106,7 @@ const ProductCardBW = ({ product, priority = false }) => {
             {discount > 0 && (
               <span className="
                 bg-gray-900 
-                text-white text-[10px] font-bold uppercase tracking-wider 
+                text-white text-[16px] font-bold uppercase tracking-wider 
                 px-3 py-1.5 rounded-lg shadow-lg
                 transition-all duration-300
               ">
@@ -116,7 +116,7 @@ const ProductCardBW = ({ product, priority = false }) => {
             {stock < 5 && stock > 0 && (
               <span className="
                 bg-gray-900 
-                text-white text-[10px] font-bold uppercase tracking-wider 
+                text-white text-[16px] font-bold uppercase tracking-wider 
                 px-3 py-1.5 rounded-lg shadow-lg
                 transition-all duration-300
               ">
@@ -151,8 +151,8 @@ const ProductCardBW = ({ product, priority = false }) => {
                 flex items-center justify-center 
                 hover:scale-125 transition-all duration-300
                 focus:outline-none focus:ring-2 focus:ring-gray-900
-                ${isWishlisted 
-                  ? 'text-gray-900 hover:bg-gray-100' 
+                ${isWishlisted
+                  ? 'text-gray-900 hover:bg-gray-100'
                   : 'text-gray-700 hover:bg-gray-900 hover:text-white'
                 }
               `}
@@ -160,8 +160,8 @@ const ProductCardBW = ({ product, priority = false }) => {
               aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
               aria-pressed={isWishlisted}
             >
-              <Heart 
-                size={16} 
+              <Heart
+                size={16}
                 fill={isWishlisted ? 'currentColor' : 'none'}
                 className={isWishlisted ? 'animate-pulse' : ''}
               />
@@ -197,13 +197,13 @@ const ProductCardBW = ({ product, priority = false }) => {
             </span>
             {rating && renderStars(rating)}
           </div>
-          
+
           {/* Product Name */}
           <h3 className="text-base lg:text-lg font-semibold text-gray-900 line-clamp-2 
                      group-hover:text-gray-900 transition-colors duration-300 leading-tight">
             {name}
           </h3>
-          
+
           {/* Price and Actions */}
           <div className="space-y-3">
             <div className="flex items-baseline gap-2">
@@ -243,10 +243,10 @@ const ProductCardBW = ({ product, priority = false }) => {
                 ${inCart
                   ? 'bg-gray-900 text-white hover:bg-gray-800'
                   : addingToCart
-                  ? 'bg-gray-900 text-white cursor-wait'
-                  : stock === 0
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gray-900 text-white hover:bg-gray-800'
+                    ? 'bg-gray-900 text-white cursor-wait'
+                    : stock === 0
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gray-900 text-white hover:bg-gray-800'
                 }
               `}
               title={inCart ? 'In Cart' : addingToCart ? 'Adding...' : stock === 0 ? 'Out of Stock' : 'Add to Cart'}
@@ -254,7 +254,7 @@ const ProductCardBW = ({ product, priority = false }) => {
             >
               {/* Button Ripple Effect */}
               <span className="absolute inset-0 bg-white opacity-0 transition-opacity duration-300"></span>
-              
+
               {inCart ? (
                 <>
                   <Check size={16} />

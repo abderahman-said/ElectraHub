@@ -1,98 +1,64 @@
+const suppliers = [
+    { id: '1', name: "النور للتوريدات", whatsapp: "+201012345678", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80" },
+    { id: '2', name: "شركة دلتا", whatsapp: "+201087654321", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80" },
+    { id: '4', name: "المتحدة للإلكترونيات", whatsapp: "+201011223344", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=100&q=80" },
+    { id: '5', name: "سويفت تريد", whatsapp: "+201055667788", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" },
+    { id: '6', name: "جلوبال باور", whatsapp: "+201099887766", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" }
+];
+
 export const SAMPLE_PRODUCTS = [
     {
         id: 1,
-        name: "Minimalist Linen Shirt",
-        price: 89,
-        category: "Menswear",
-        image: "https://images.unsplash.com/photo-1620012232964-7a7bde4c4ea5?auto=format&fit=crop&w=800&q=85",
-        description: "Crafted from 100% premium linen, this shirt offers breathability and effortless style for warm days."
+        name: "تكييف ذكي إنفرتر 2.25 حصان",
+        averagePrice: 1250,
+        category: "تكييف وتبريد",
+        image: "https://images.unsplash.com/photo-1590496794008-383c8070bb2b?auto=format&fit=crop&w=800&q=80",
+        description: "تكييف ذكي بتقنية الإنفرتر لتوفير الطاقة، يتميز بتبريد سريع وفلتر لتنقية الهواء.",
+        suppliers: suppliers
     },
     {
         id: 2,
-        name: "Silk Evening Dress",
-        price: 249,
-        category: "Womenswear",
-        image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=85",
-        description: "A stunning floor-length silk dress designed to make a statement at any formal event."
+        name: "ثلاجة بابين سعة 500 لتر",
+        averagePrice: 2100,
+        category: "ثلاجات",
+        image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80",
+        description: "ثلاجة حديثة بنظام نوفروست وتصميم انسيابي يناسب المطابخ العصرية.",
+        suppliers: suppliers
     },
     {
         id: 3,
-        name: "Classic Leather Boots",
-        price: 185,
-        category: "Accessories",
-        image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=800&q=85",
-        description: "Hand-stitched leather boots that combine durability with timeless design."
+        name: "شاشة OLED 65 بوصة 4K",
+        averagePrice: 3500,
+        category: "شاشات ذكية",
+        image: "https://images.unsplash.com/photo-1593784991095-a205029471b6?auto=format&fit=crop&w=800&q=80",
+        description: "تجربة مشاهدة سينمائية مع تقنية OLED وألوان نابضة بالحياة.",
+        suppliers: suppliers
     },
     {
         id: 4,
-        name: "Oversized Cashmere Sweater",
-        price: 120,
-        category: "Unisex",
-        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&q=85",
-        description: "Luxury meets comfort in this ultra-soft cashmere sweater featuring a modern oversized fit."
+        name: "غسالة أوتوماتيك 9 كيلو",
+        averagePrice: 850,
+        category: "غسالات",
+        image: "https://images.unsplash.com/photo-1582733775062-eb92170f5e13?auto=format&fit=crop&w=800&q=80",
+        description: "غسالة متطورة مع برامج غسيل متعددة ومحرك هادئ وموفر للكهرباء.",
+        suppliers: suppliers
     },
     {
         id: 5,
-        name: "Tailored Wool Trousers",
-        price: 145,
-        category: "Menswear",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=85",
-        description: "Sharp, tailored trousers made from fine wool, perfect for office or evening wear."
+        name: "لوح طاقة شمسية 450 واط",
+        averagePrice: 450,
+        category: "طاقة وكهرباء",
+        image: "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=800&q=80",
+        description: "ألواح شمسية عالية الكفاءة لتوليد الطاقة النظيفة للمنازل والمصانع.",
+        suppliers: suppliers
     },
     {
         id: 6,
-        name: "Structured Blazer",
-        price: 210,
-        category: "Womenswear",
-        image: "https://images.unsplash.com/photo-1583496266332-6e065d96d6b7?auto=format&fit=crop&w=800&q=85",
-        description: "A versatile, structured blazer that adds polish to any outfit, from jeans to dresses."
-    },
-    {
-        id: 7,
-        name: "Designer Sunglasses",
-        price: 95,
-        category: "Accessories",
-        image: "https://images.unsplash.com/photo-1473496169904-658ba7c44d8f?auto=format&fit=crop&w=800&q=85",
-        description: "Premium acetate sunglasses with UV protection and timeless aviator design."
-    },
-    {
-        id: 8,
-        name: "Merino Wool Cardigan",
-        price: 135,
-        category: "Womenswear",
-        image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=800&q=85",
-        description: "Soft merino wool cardigan perfect for layering in transitional seasons."
-    },
-    {
-        id: 9,
-        name: "Premium Leather Belt",
-        price: 75,
-        category: "Accessories",
-        image: "https://images.unsplash.com/photo-1544968253-7d60124676a4?auto=format&fit=crop&w=800&q=85",
-        description: "Genuine leather belt with polished buckle - a timeless accessory."
-    },
-    {
-        id: 10,
-        name: "Cotton Oxford Shirt",
-        price: 110,
-        category: "Menswear",
-        image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2f?auto=format&fit=crop&w=800&q=85",
-        description: "Classic Oxford shirt in premium cotton with button-down collar."
-    },
-    {
-        id: 11,
-        name: "Silk Scarf Collection",
-        price: 65,
-        category: "Accessories",
-        image: "https://images.unsplash.com/photo-1584816352556-3e6428a055b3?auto=format&fit=crop&w=800&q=85",
-        description: "Luxurious silk scarf featuring exclusive artistic patterns."
-    },
-    {
-        id: 12,
-        name: "Wool Blend Coat",
-        price: 295,
-        category: "Womenswear",
-        image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=800&q=85",
-        description: "Elegant wool blend coat with modern silhouette and classic tailoring."
+        name: "نظام كاميرات مراقبة متكامل",
+        averagePrice: 1200,
+        category: "سلامة وأمان",
+        image: "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80",
+        description: "نظام أمني ذكي مع رؤية ليلية وتنبيهات فورية على الهاتف.",
+        suppliers: suppliers
     }
 ];

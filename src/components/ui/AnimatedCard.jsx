@@ -39,17 +39,17 @@ const AnimatedCard = ({ product, index = 0 }) => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (addingToCart || inCart) return;
-    
+
     setAddingToCart(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     addToCart(product);
     setAddingToCart(false);
-    
+
     // Success animation
     const card = document.getElementById(`product-card-${id}`);
     if (card) {
@@ -62,14 +62,14 @@ const AnimatedCard = ({ product, index = 0 }) => {
     e.preventDefault();
     e.stopPropagation();
     // Implement quick view modal
-    console.log('Quick view:', id);
+    // Quick view functionality - placeholder
   };
 
   const handleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsWishlisted(!isWishlisted);
-    
+
     // Heart animation
     const heart = e.currentTarget.querySelector('svg');
     if (heart) {
@@ -87,8 +87,8 @@ const AnimatedCard = ({ product, index = 0 }) => {
             size={12}
             className={`
               transition-all duration-300
-              ${i < Math.floor(rating) 
-                ? "fill-yellow-400 text-yellow-400 scale-110" 
+              ${i < Math.floor(rating)
+                ? "fill-yellow-400 text-yellow-400 scale-110"
                 : "text-gray-300 scale-100"
               }
             `}
@@ -100,13 +100,13 @@ const AnimatedCard = ({ product, index = 0 }) => {
   };
 
   return (
-    <article 
+    <article
       id={`product-card-${id}`}
       className={`
         group relative bg-white rounded-2xl 
         transition-all duration-500 ease-out
-        ${isVisible 
-          ? 'opacity-100 translate-y-0 scale-100' 
+        ${isVisible
+          ? 'opacity-100 translate-y-0 scale-100'
           : 'opacity-0 translate-y-8 scale-95'
         }
         ${isHovered ? 'shadow-2xl ring-2 ring-blue-200 ring-offset-4' : 'shadow-lg'}
@@ -152,7 +152,7 @@ const AnimatedCard = ({ product, index = 0 }) => {
           <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
             <span className={`
               bg-gradient-to-r from-blue-600 to-indigo-600 
-              text-white text-[10px] font-bold uppercase tracking-wider 
+              text-white text-[16px] font-bold uppercase tracking-wider 
               px-3 py-1.5 rounded-lg shadow-lg
               transition-all duration-300
               ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}
@@ -162,7 +162,7 @@ const AnimatedCard = ({ product, index = 0 }) => {
             {discount > 0 && (
               <span className={`
                 bg-gradient-to-r from-red-600 to-pink-600 
-                text-white text-[10px] font-bold uppercase tracking-wider 
+                text-white text-[16px] font-bold uppercase tracking-wider 
                 px-3 py-1.5 rounded-lg shadow-lg
                 transition-all duration-300
                 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}
@@ -174,7 +174,7 @@ const AnimatedCard = ({ product, index = 0 }) => {
             {stock < 5 && stock > 0 && (
               <span className={`
                 bg-gradient-to-r from-orange-500 to-amber-500 
-                text-white text-[10px] font-bold uppercase tracking-wider 
+                text-white text-[16px] font-bold uppercase tracking-wider 
                 px-3 py-1.5 rounded-lg shadow-lg
                 transition-all duration-300
                 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}
@@ -211,8 +211,8 @@ const AnimatedCard = ({ product, index = 0 }) => {
                 flex items-center justify-center 
                 hover:scale-125 transition-all duration-300
                 focus:outline-none focus:ring-2 focus:ring-blue-500
-                ${isWishlisted 
-                  ? 'text-red-500 hover:bg-red-50' 
+                ${isWishlisted
+                  ? 'text-red-500 hover:bg-red-50'
                   : 'text-gray-700 hover:bg-red-50 hover:text-red-500'
                 }
               `}
@@ -220,8 +220,8 @@ const AnimatedCard = ({ product, index = 0 }) => {
               aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
               aria-pressed={isWishlisted}
             >
-              <Heart 
-                size={16} 
+              <Heart
+                size={16}
                 fill={isWishlisted ? 'currentColor' : 'none'}
                 className={isWishlisted ? 'animate-pulse' : ''}
               />
@@ -257,13 +257,13 @@ const AnimatedCard = ({ product, index = 0 }) => {
             </span>
             {rating && renderStars(rating)}
           </div>
-          
+
           {/* Product Name */}
           <h3 className="text-base lg:text-lg font-semibold text-gray-900 line-clamp-2 
                      group-hover:text-blue-600 transition-colors duration-300 leading-tight">
             {name}
           </h3>
-          
+
           {/* Price and Actions */}
           <div className="space-y-3">
             <div className="flex items-baseline gap-2">
@@ -303,10 +303,10 @@ const AnimatedCard = ({ product, index = 0 }) => {
                 ${inCart
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : addingToCart
-                  ? 'bg-blue-600 text-white cursor-wait'
-                  : stock === 0
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5'
+                    ? 'bg-blue-600 text-white cursor-wait'
+                    : stock === 0
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:-translate-y-0.5'
                 }
               `}
               title={inCart ? 'In Cart' : addingToCart ? 'Adding...' : stock === 0 ? 'Out of Stock' : 'Add to Cart'}
@@ -314,7 +314,7 @@ const AnimatedCard = ({ product, index = 0 }) => {
             >
               {/* Button Ripple Effect */}
               <span className="absolute inset-0 bg-white opacity-0 transition-opacity duration-300"></span>
-              
+
               {inCart ? (
                 <>
                   <Check size={16} />

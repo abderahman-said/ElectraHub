@@ -9,14 +9,14 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
     const [cart, setCart] = useState(() => {
         // Persist cart in local storage
-        const savedCart = localStorage.getItem('velvet_cart');
+        const savedCart = localStorage.getItem('eh_cart');
         return savedCart ? JSON.parse(savedCart) : [];
     });
 
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem('velvet_cart', JSON.stringify(cart));
+        localStorage.setItem('eh_cart', JSON.stringify(cart));
     }, [cart]);
 
     const addToCart = (product, quantity = 1) => {
@@ -51,7 +51,8 @@ export const CartProvider = ({ children }) => {
         setCart([]);
     };
 
-    const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
+    const cartTotal = cart.reduce((total, item) => total + (item.averagePrice || item.price || 0) * item.quantity, 0);
     const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
 
     const value = {

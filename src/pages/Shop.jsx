@@ -9,9 +9,9 @@ import SortSelect from '../components/ui/SortSelect';
 
 const CATEGORIES = ['الكل', 'رجالي', 'نسائي', 'إكسسوارات', 'مشترك'];
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'الأحدث' },
-  { value: 'price-low', label: 'السعر: من الأقل للأعلى' },
-  { value: 'price-high', label: 'السعر: من الأعلى للأقل' }
+    { value: 'newest', label: 'الأحدث' },
+    { value: 'price-low', label: 'السعر: من الأقل للأعلى' },
+    { value: 'price-high', label: 'السعر: من الأعلى للأقل' }
 ];
 
 const Shop = () => {
@@ -23,19 +23,19 @@ const Shop = () => {
     const [selectedTags, setSelectedTags] = useState([]);
 
     const categories = [
-      { value: 'electronics', label: 'إلكترونيات', count: 45 },
-      { value: 'clothing', label: 'ملابس', count: 32 },
-      { value: 'books', label: 'كتب', count: 28 },
-      { value: 'home', label: 'منزل وحديقة', count: 19 },
-      { value: 'sports', label: 'رياضة', count: 15 },
+        { value: 'electronics', label: 'إلكترونيات', count: 45 },
+        { value: 'clothing', label: 'ملابس', count: 32 },
+        { value: 'books', label: 'كتب', count: 28 },
+        { value: 'home', label: 'منزل وحديقة', count: 19 },
+        { value: 'sports', label: 'رياضة', count: 15 },
     ];
 
     const tags = [
-      { value: 'bestseller', label: 'الأكثر مبيعاً', count: 25 },
-      { value: 'new', label: 'وصل حديثاً', count: 18 },
-      { value: 'sale', label: 'خصم', count: 12 },
-      { value: 'premium', label: 'مميز', count: 8 },
-      { value: 'eco', label: 'صديق للبيئة', count: 6 },
+        { value: 'bestseller', label: 'الأكثر مبيعاً', count: 25 },
+        { value: 'new', label: 'وصل حديثاً', count: 18 },
+        { value: 'sale', label: 'خصم', count: 12 },
+        { value: 'premium', label: 'مميز', count: 8 },
+        { value: 'eco', label: 'صديق للبيئة', count: 6 },
     ];
 
     const filteredProducts = useMemo(() => {
@@ -43,7 +43,7 @@ const Shop = () => {
             const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
             const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max;
-            const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => 
+            const matchesTags = selectedTags.length === 0 || selectedTags.some(tag =>
                 product.tags && product.tags.includes(tag)
             );
             return matchesSearch && matchesCategory && matchesPrice && matchesTags;
@@ -80,7 +80,7 @@ const Shop = () => {
             <div className="bg-gray-900 text-white py-12 sm:py-16 mb-8 sm:mb-12">
                 <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
                     <div className="text-center max-w-4xl mx-auto">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">المجموعة</h1>
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-white">المجموعة</h1>
                         <p className="text-base sm:text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
                             قطع أساسية منتقاة للملابس الحديثة. قطع خالدة مصممة للرفاهية اليومية.
                         </p>
@@ -109,7 +109,7 @@ const Shop = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] gap-6 sm:gap-8">
-                    
+
                     {/* Sidebar Filters */}
                     <aside className="hidden lg:block space-y-4 sm:space-y-6">
                         {/* Filter Header */}
@@ -203,7 +203,7 @@ const Shop = () => {
                             </div>
 
                             {/* Mobile Filter Toggle */}
-                            <button 
+                            <button
                                 onClick={() => setShowFilters(!showFilters)}
                                 className="lg:hidden flex items-center gap-2 text-sm font-medium bg-white border border-gray-300 px-3 sm:px-4 py-2 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors shadow-sm touch-manipulation"
                             >
@@ -233,7 +233,7 @@ const Shop = () => {
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     {/* Mobile Categories */}
                                     <div>
                                         <h3 className="text-sm font-semibold text-gray-900 mb-2">الفئة</h3>
@@ -242,11 +242,10 @@ const Shop = () => {
                                                 <button
                                                     key={category}
                                                     onClick={() => setSelectedCategory(category)}
-                                                    className={`px-3 py-1.5 text-sm rounded-lg transition-colors touch-manipulation ${
-                                                        selectedCategory === category 
-                                                            ? 'bg-blue-600 text-white' 
+                                                    className={`px-3 py-1.5 text-sm rounded-lg transition-colors touch-manipulation ${selectedCategory === category
+                                                            ? 'bg-blue-600 text-white'
                                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {category}
                                                 </button>

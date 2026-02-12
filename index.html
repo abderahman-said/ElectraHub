@@ -1,16 +1,119 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;500;600;700;800;900&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <title>إلكترا هب</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>إلكترا هب - منصة B2B للأجهزة الكهربائية والإلكترونية</title>
+  <meta name="title" content="إلكترا هب - منصة B2B للأجهزة الكهربائية والإلكترونية" />
+  <meta name="description"
+    content="إلكترا هب هي منصة B2B رائدة تربط المستوردين والموردين للأجهزة الكهربائية والإلكترونية. اكتشف آلاف المنتجات من تكييف، ثلاجات، شاشات، وغسالات بأفضل الأسعار." />
+  <meta name="keywords"
+    content="أجهزة كهربائية، إلكترونيات، تكييف، ثلاجات، غسالات، شاشات، B2B، مستوردين، موردين، جملة" />
+  <meta name="author" content="ElectraHub" />
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="Arabic" />
+  <meta name="revisit-after" content="7 days" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://electrahub.com/" />
+  <meta property="og:title" content="إلكترا هب - منصة B2B للأجهزة الكهربائية والإلكترونية" />
+  <meta property="og:description"
+    content="منصة B2B رائدة تربط المستوردين والموردين للأجهزة الكهربائية. آلاف المنتجات بأفضل الأسعار." />
+  <meta property="og:image" content="https://electrahub.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="ar_AR" />
+  <meta property="og:site_name" content="ElectraHub" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://electrahub.com/" />
+  <meta property="twitter:title" content="إلكترا هب - منصة B2B للأجهزة الكهربائية" />
+  <meta property="twitter:description"
+    content="منصة B2B رائدة تربط المستوردين والموردين للأجهزة الكهربائية. آلاف المنتجات بأفضل الأسعار." />
+  <meta property="twitter:image" content="https://electrahub.com/og-image.png" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://electrahub.com/" />
+
+  <!-- Alternative languages (if applicable) -->
+  <link rel="alternate" hreflang="ar" href="https://electrahub.com/" />
+  <link rel="alternate" hreflang="en" href="https://electrahub.com/en/" />
+
+  <!-- Preconnect to external resources for faster DNS resolution -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Optimized Google Fonts: async loading with reduced variants -->
+  <!-- Reduced from 3 families (21+ files) to 2 families (8 files) for ~60% reduction -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap"
+      rel="stylesheet">
+  </noscript>
+
+  <!-- DNS Prefetch for external resources -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="/logo.png" as="image" type="image/png">
+
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#1e40af" />
+  <meta name="msapplication-TileColor" content="#1e40af" />
+
+  <!-- Structured Data / JSON-LD -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ElectraHub",
+      "alternateName": "إلكترا هب",
+      "url": "https://electrahub.com",
+      "description": "منصة B2B للأجهزة الكهربائية والإلكترونية",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://electrahub.com/shop?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ElectraHub",
+      "alternateName": "إلكترا هب",
+      "url": "https://electrahub.com",
+      "logo": "https://electrahub.com/logo.png",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Service",
+        "areaServed": "EG",
+        "availableLanguage": ["ar", "en"]
+      },
+      "sameAs": [
+        "https://facebook.com/electrahub",
+        "https://twitter.com/electrahub",
+        "https://instagram.com/electrahub"
+      ]
+    }
+    </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

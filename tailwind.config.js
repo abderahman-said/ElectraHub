@@ -13,9 +13,17 @@ export default {
       colors: {
         primary: {
           DEFAULT: '#0f172a',
-          light: '#1e293b',
+          hover: '#1e293b',
+          foreground: '#ffffff',
         },
-        secondary: '#ffffff',
+        secondary: {
+          DEFAULT: '#f8fafc',
+          foreground: '#0f172a',
+        },
+        success: {
+          DEFAULT: '#10b981',
+          foreground: '#ffffff',
+        },
         accent: {
           DEFAULT: '#c5a059',
           light: '#fdfaf3',

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+
+# Sitemap
+Sitemap: https://electrahub.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
