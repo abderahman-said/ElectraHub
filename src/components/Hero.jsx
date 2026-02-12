@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingBag, TrendingUp, Play, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import OptimizedImage from './OptimizedImage';
 
 const Hero = () => {
   const [loaded, setLoaded] = useState(false);
@@ -84,10 +85,12 @@ const Hero = () => {
 
               <div className="relative glass p-4 rounded-[2.5rem] shadow-premium">
                 <div className="relative aspect-[5/5] rounded-[2rem] overflow-hidden shadow-2xl">
-                  <img
+                  <OptimizedImage
                     src="/hero_premium.png"
                     alt="الأجهزة الذكية"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    priority={true}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
                   />
 
                   {/* Glass Card Overlay */}

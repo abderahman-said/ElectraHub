@@ -4,6 +4,7 @@ import { Search, User, Menu, X, ShoppingBag, ArrowLeft, LayoutDashboard, LogOut,
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { SAMPLE_PRODUCTS } from '../data/products';
+import OptimizedImage from './OptimizedImage';
 
 const Navbar = ({ cartCount = 0 }) => {
   const { setIsCartOpen } = useCart();
@@ -40,13 +41,13 @@ const Navbar = ({ cartCount = 0 }) => {
     <header className="sticky bg-white top-0 z-50 py-3 border-b border-white/20 transition-all duration-500">
       <div className="container mx-auto px-4 md:px-8 h-18 lg:h-22 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
-          <img
+          <OptimizedImage
             src="/logo.png"
             alt="ElectraHub Logo"
             width="150"
             height="150"
             className="h-auto w-auto max-w-[120px]"
-            loading="eager"
+            priority={true}
           />
         </Link>
 

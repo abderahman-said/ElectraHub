@@ -2,6 +2,7 @@ import { TrendingUp, Award, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
+import OptimizedImage from '../components/OptimizedImage';
 import { SAMPLE_PRODUCTS } from '../data/products';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -82,11 +83,12 @@ const Home = () => {
             >
               {categories.map((cat, i) => (
                 <SwiperSlide key={i} className='py-10'>
-                  <div className="glass  rounded-[20px] flex flex-col items-center text-center group hover:bg-white hover:scale-105 hover:shadow-2xl transition-all duration-500 border-blue-50/50 shadow-premium cursor-pointer h-full">
-                    <img
+                  <div className="glass  rounded-[20px] flex flex-col items-center text-center group hover:bg-white hover:scale-105 hover:shadow-2xl transition-all duration-500 border-blue-50/50 shadow-premium cursor-pointer h-full overflow-hidden">
+                    <OptimizedImage
                       src={cat.image}
                       alt={cat.name}
-                      className="relative w-full h-[150px] object-cover rounded-t-2xl  transition-all duration-500"
+                      className="relative w-full h-[150px] object-cover transition-all duration-500"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                     />
                     <div className=" p-4">
                       <h3 className="text-xl font-black text-blue-950 mb-2 uppercase tracking-tight group-hover:text-blue-700 transition-colors duration-300">{cat.name}</h3>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Star, Users, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import OptimizedImage from './OptimizedImage';
 
 const ProductCard = ({ product }) => {
   const { id, name, averagePrice, price, category, image, suppliers = [], rating = 4.8 } = product;
@@ -20,12 +21,11 @@ const ProductCard = ({ product }) => {
       >
         <div className="relative h-[250px] bg-slate-50 overflow-hidden">
           {/* Main Product Image */}
-          <img
+          <OptimizedImage
             src={image || "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"}
-            className={`w-full h-full object-cover transition-all duration-1000 ${isHovered ? 'scale-110 blur-[1px]' : 'scale-100'} ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            onLoad={() => setImageLoaded(true)}
+            className={`w-full h-full object-cover transition-all duration-1000 ${isHovered ? 'scale-110 blur-[1px]' : 'scale-100'}`}
             alt={`${name} - ${category}`}
-            loading="lazy"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
 
           {/* Hover Overlay Actions */}
