@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* import font caior */
+/* import font Cairo */
 @layer base {
   :root {
     --primary: 217 91% 60%;

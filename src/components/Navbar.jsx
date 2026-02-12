@@ -46,7 +46,7 @@ const Navbar = ({ cartCount = 0 }) => {
             alt="ElectraHub Logo"
             width="150"
             height="150"
-            className="h-auto w-auto max-w-[120px]"
+            className="h-auto w-auto max-w-[100px]"
             priority={true}
           />
         </Link>
