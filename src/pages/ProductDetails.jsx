@@ -119,11 +119,10 @@ const ProductDetails = () => {
                                 <div
                                     key={index}
                                     onClick={() => setSelectedImageIndex(index)}
-                                    className={`aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
-                                        selectedImageIndex === index 
-                                            ? 'ring-2 ring-blue-500 ring-offset-2' 
+                                    className={`aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${selectedImageIndex === index
+                                            ? 'ring-2 ring-blue-500 ring-offset-2'
                                             : 'hover:ring-2 hover:ring-blue-500'
-                                    }`}
+                                        }`}
                                 >
                                     <img
                                         src={image}
@@ -302,22 +301,16 @@ const ProductDetails = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     {product.suppliers?.map((supplier, i) => (
-                                        <div key={i} className="bg-white/60 backdrop-blur border border-white/60 p-6 rounded-2xl hover:bg-white/80 transition-all duration-500 hover:shadow-xl hover:shadow-blue-900/5 group/card transform hover:-translate-y-1">
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                                                <div className="flex items-center gap-5">
+                                        <div key={i} className="bg-white/60 backdrop-blur border border-white/60 p-3 rounded-2xl hover:bg-white/80 transition-all duration-500 hover:shadow-xl hover:shadow-blue-900/5 group/card transform hover:-translate-y-1">
+                                            <div className="flex flex-col  sm:items-center justify-between gap-6">
+                                                <div className="flex items-center flex-col gap-5">
                                                     <div className="relative">
-                                                        <img src={supplier.image} alt={supplier.name} className="w-16 h-16 rounded-2xl object-cover shadow-md group-hover/card:scale-105 transition-transform duration-500" />
+                                                        <img src={supplier.image} alt={supplier.name} className="w-[100px] h-[100px] rounded-2xl object-cover shadow-md group-hover/card:scale-105 transition-transform duration-500" />
                                                         <div className="absolute -bottom-2 -left-2 bg-blue-600 text-white p-1 rounded-lg shadow-lg">
                                                             <ShieldCheck size={14} />
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <div className="font-extrabold text-blue-950 text-xl mb-1">{supplier.name}</div>
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                                            <span className="text-sm font-black text-emerald-600 uppercase tracking-[0.2em]">Platinum Partner A+</span>
-                                                        </div>
-                                                    </div>
+                                                    <div className="font-extrabold text-blue-950 text-xl mb-1">{supplier.name}</div>
                                                 </div>
 
                                                 <a
@@ -345,9 +338,9 @@ const ProductDetails = () => {
                             <div className="flex border-b border-gray-200">
                                 {[
                                     { id: 'description', label: 'الوصف', icon: FileText },
-                                    { id: 'specs',       label: 'المواصفات', icon: ClipboardList },
-                                    { id: 'shipping',    label: 'الشحن', icon: Truck },
-                                    { id: 'reviews',     label: 'التقييمات', icon: Star },
+                                    { id: 'specs', label: 'المواصفات', icon: ClipboardList },
+                                    { id: 'shipping', label: 'الشحن', icon: Truck },
+                                    { id: 'reviews', label: 'التقييمات', icon: Star },
                                 ].map((tab) => (
                                     <button
                                         key={tab.id}
