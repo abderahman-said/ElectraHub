@@ -27,8 +27,8 @@ const ProductDetails = () => {
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">المنتج غير موجود</h2>
                     <p className="text-gray-600 mb-6">المنتج الذي تبحث عنه غير موجود.</p>
-                    <Link 
-                        to="/shop" 
+                    <Link
+                        to="/shop"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
                     >
                         <ArrowLeft size={20} className="rotate-180" />
@@ -76,8 +76,8 @@ const ProductDetails = () => {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white" dir="rtl">
             {/* Breadcrumb Navigation */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <Link 
-                    to="/shop" 
+                <Link
+                    to="/shop"
                     className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 font-medium"
                 >
                     <ArrowLeft size={18} className="rotate-180" />
@@ -87,18 +87,18 @@ const ProductDetails = () => {
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    
+
                     {/* Gallery Section - Left Side */}
                     <div className="space-y-4">
                         <div className="relative group">
                             <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden shadow-lg">
-                                <img 
-                                    src={product.image} 
-                                    alt={product.name} 
+                                <img
+                                    src={product.image}
+                                    alt={product.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
-                            
+
                             {/* Action buttons overlay */}
                             <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <button className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200">
@@ -109,13 +109,13 @@ const ProductDetails = () => {
                                 </button>
                             </div>
                         </div>
-                        
+
                         {/* Thumbnail gallery */}
                         <div className="grid grid-cols-4 gap-2">
                             {[1, 2, 3, 4].map((i) => (
                                 <div key={i} className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all duration-200">
-                                    <img 
-                                        src={product.image} 
+                                    <img
+                                        src={product.image}
                                         alt={`${product.name} view ${i}`}
                                         className="w-full h-full object-cover"
                                     />
@@ -134,23 +134,23 @@ const ProductDetails = () => {
                                 </span>
                                 <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
-                                        <Star 
-                                            key={i} 
-                                            size={16} 
-                                            className={i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
+                                        <Star
+                                            key={i}
+                                            size={16}
+                                            className={i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
                                         />
                                     ))}
                                     <span className="text-sm text-gray-600 mr-2">4.9 (128 تقييم)</span>
                                 </div>
                             </div>
-                            
+
                             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                                 {product.name}
                             </h1>
-                            
+
                             <div className="flex items-baseline gap-3">
-                                <span className="text-3xl font-bold text-gray-900">${product.price}</span>
-                                <span className="text-lg text-gray-500 line-through">${(product.price * 1.5).toFixed(2)}</span>
+                                <span className="text-3xl font-bold text-gray-900">${product.averagePrice}</span>
+                                <span className="text-lg text-gray-500 line-through">${(product.averagePrice * 1.5).toFixed(2)}</span>
                                 <span className="px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded">وفر 33%</span>
                             </div>
                         </div>
@@ -170,14 +170,14 @@ const ProductDetails = () => {
 
                         {/* Add to Cart Section */}
                         <div className="space-y-4">
-                            <button 
+                            <button
                                 onClick={handleAddToCart}
                                 className="w-full bg-[#0f172a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3"
                             >
                                 <ShoppingBag size={24} />
-                                أضف للسلة — ${(product.price * quantity).toFixed(2)}
+                                أضف للسلة — ${(product.averagePrice * quantity).toFixed(2)}
                             </button>
-                            
+
                             <div className="grid grid-cols-2 gap-3">
                                 <button className="py-3 px-4 border-2 border-gray-300 rounded-xl font-medium hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2">
                                     <Heart size={18} />
@@ -204,8 +204,8 @@ const ProductDetails = () => {
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`
                                             flex-1 py-4 px-6 text-sm font-medium transition-all duration-200
-                                            ${activeTab === tab.id 
-                                                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
+                                            ${activeTab === tab.id
+                                                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
                                                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                             }
                                         `}
@@ -241,7 +241,7 @@ const ProductDetails = () => {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {activeTab === 'details' && (
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-gray-900 mb-3">تفاصيل المنتج</h3>
@@ -277,7 +277,7 @@ const ProductDetails = () => {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {activeTab === 'shipping' && (
                                     <div className="space-y-4">
                                         <h3 className="font-semibold text-gray-900 mb-3">الشحن والإرجاع</h3>
@@ -315,10 +315,10 @@ const ProductDetails = () => {
                                                 <div className="text-4xl font-bold text-gray-900">4.9</div>
                                                 <div className="flex gap-1 mt-1">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <Star 
-                                                            key={i} 
-                                                            size={16} 
-                                                            className={i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
+                                                        <Star
+                                                            key={i}
+                                                            size={16}
+                                                            className={i < 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
                                                         />
                                                     ))}
                                                 </div>
@@ -330,8 +330,8 @@ const ProductDetails = () => {
                                                             <span className="text-sm text-gray-600 w-3">{rating}</span>
                                                             <Star size={12} className="fill-yellow-400 text-yellow-400" />
                                                             <div className="flex-1 bg-gray-200 rounded-full h-2">
-                                                                <div 
-                                                                    className="bg-yellow-400 h-2 rounded-full" 
+                                                                <div
+                                                                    className="bg-yellow-400 h-2 rounded-full"
                                                                     style={{ width: rating === 5 ? '70%' : rating === 4 ? '20%' : '5%' }}
                                                                 ></div>
                                                             </div>

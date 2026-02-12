@@ -2,15 +2,50 @@ import { TrendingUp, Award, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
+import { SAMPLE_PRODUCTS } from '../data/products';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const Home = () => {
   const categories = [
-    { name: 'تكييف وتبريد', image: 'https://images.unsplash.com/photo-1585338927620-f134b2da3f31?auto=format&fit=crop&w=200&q=75', count: '1.2k منتج', importers: '45 بائع' },
-    { name: 'ثلاجات', image: 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=200&q=75', count: '850 منتج', importers: '32 بائع' },
-    { name: 'شاشات ذكية', image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=200&q=75', count: '2.4k منتج', importers: '68 بائع' },
-    { name: 'غسالات', image: 'https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=200&q=75', count: '640 منتج', importers: '24 بائع' },
-    { name: 'طاقة وكهرباء', image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=200&q=75', count: '1.1k منتج', importers: '38 بائع' },
-    { name: 'سلامة وأمان', image: 'https://images.unsplash.com/photo-1560419015-7c427e8ae5ba?auto=format&fit=crop&w=200&q=75', count: '420 منتج', importers: '15 بائع' },
+    {
+      name: 'تكييف وتبريد',
+      image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=400&q=80',
+      count: '1.2k منتج',
+      importers: '45 بائع'
+    },
+    {
+      name: 'ثلاجات',
+      image: 'https://png.pngtree.com/png-vector/20250416/ourmid/pngtree-innovative-home-appliances-png-image_15987797.png',
+      count: '850 منتج',
+      importers: '32 بائع'
+    },
+    {
+      name: 'شاشات ذكية',
+      image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=400&q=80',
+      count: '2.4k منتج',
+      importers: '68 بائع'
+    },
+    {
+      name: 'غسالات',
+      image: 'https://png.pngtree.com/png-clipart/20230120/ourmid/pngtree-electric-clothes-washing-machine-png-image_6568230.png',
+      count: '640 منتج',
+      importers: '24 بائع'
+    },
+
+    {
+      name: 'طاقة وكهرباء',
+      image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=400&q=80',
+      count: '1.1k منتج',
+      importers: '38 بائع'
+    },
+    { name: 'سلامة وأمان', image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=400&q=80', count: '420 منتج', importers: '15 بائع' },
+
   ];
 
   return (
@@ -31,26 +66,38 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-            {categories.map((cat, i) => (
-              <div key={i} className="glass p-6 rounded-[2.5rem] flex flex-col items-center text-center group hover:bg-white hover:-translate-y-3 transition-all duration-500 border-blue-50/50 shadow-premium cursor-pointer">
-                <div className="relative h-24 w-24 mb-6 group-hover:scale-110 transition-all duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl group-hover:from-blue-600 group-hover:to-blue-700 transition-all duration-500"></div>
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="relative w-full h-full object-cover rounded-2xl shadow-lg group-hover:shadow-2xl transition-all duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                <h3 className="text-sm font-black text-blue-950 mb-2 uppercase tracking-tight group-hover:text-blue-700 transition-colors duration-300">{cat.name}</h3>
-                <div className="space-y-1">
-                  <p className="text-[16px] font-bold text-slate-400 uppercase tracking-widest">{cat.count}</p>
-                  <p className="text-[16px] font-black text-blue-600 uppercase tracking-widest">{cat.importers}</p>
-                </div>
-              </div>
-            ))}
+          <div className="categories-slider">
+            <Swiper
+              modules={[Autoplay, Pagination]}
+              spaceBetween={24}
+              slidesPerView={2}
+              pagination={{ clickable: true }}
+              autoplay={{ delay: 3000, disableOnInteraction: false }}
+              breakpoints={{
+                640: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+                1280: { slidesPerView: 6 },
+              }}
+              className="pb-16"
+            >
+              {categories.map((cat, i) => (
+                <SwiperSlide key={i} className='py-10'>
+                  <div className="glass  rounded-[20px] flex flex-col items-center text-center group hover:bg-white hover:scale-105 hover:shadow-2xl transition-all duration-500 border-blue-50/50 shadow-premium cursor-pointer h-full">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="relative w-full h-[150px] object-cover rounded-t-2xl  transition-all duration-500"
+                    />
+                    <div className=" p-4">
+                      <h3 className="text-xl font-black text-blue-950 mb-2 uppercase tracking-tight group-hover:text-blue-700 transition-colors duration-300">{cat.name}</h3>
+                      <p className="text-[18px] font-bold text-slate-400 uppercase tracking-widest">{cat.count}</p>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
+
         </div>
       </section>
 
@@ -77,10 +124,9 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <ProductCard product={{ id: 1, name: "تكييف ذكي احترافي XL", price: 1200, category: "ثلاجات", image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=75" }} />
-            <ProductCard product={{ id: 2, name: "تهوية صناعية 5K", price: 850, category: "تكييف", image: "https://images.unsplash.com/photo-1591189863430-ab87e120f312?auto=format&fit=crop&w=600&q=75" }} />
-            <ProductCard product={{ id: 3, name: "شاشة OLED 8K", price: 2100, category: "إلكترونيات", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=600&q=75" }} />
-            <ProductCard product={{ id: 4, name: "غسالة توربو سريعة", price: 450, category: "غسالات", image: "https://images.unsplash.com/photo-1626806819282-2c1dc01a5e0c?auto=format&fit=crop&w=600&q=75" }} />
+            {SAMPLE_PRODUCTS.slice(0, 4).map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </section>
@@ -89,10 +135,10 @@ const Home = () => {
       <section id="importers" className="py-32 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-mesh opacity-10" />
         <div className="container mx-auto px-4 md:px-8 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20  ">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20 ">
             <div className="max-w-xl space-y-4">
               <span className="text-[16px] font-black text-yellow-400 uppercase tracking-[0.4em]">الشركاء النخبة</span>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.9] text-white">
+              <h2 className="text-4xl md:text-6xl text-white font-black tracking-tighter leading-[0.9]">
                 مركز <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-600">المستوردين المعتمدين</span>
               </h2>
@@ -138,7 +184,7 @@ const Home = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <h3 className="text-2xl font-black tracking-tight text-white">{partner.name}</h3>
+                    <h3 className="text-2xl font-black  text-white tracking-tight">{partner.name}</h3>
                     <p className="text-sm font-medium text-slate-400">{partner.cat}</p>
                   </div>
 

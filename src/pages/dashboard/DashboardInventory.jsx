@@ -70,7 +70,7 @@ const DashboardInventory = () => {
                                     <td className="px-8 py-6 text-center">
                                         <div className="flex flex-col items-center">
                                             <span className="font-black text-blue-700 text-xl tracking-tighter">${product.price}</span>
-                                            <span className="text-[16px] font-black text-slate-300 uppercase tracking-widest">السعر المقترح</span>
+                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">السعر المقترح</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">

@@ -85,7 +85,7 @@ const Hero = () => {
               <div className="relative glass p-4 rounded-[2.5rem] shadow-premium">
                 <div className="relative aspect-[5/5] rounded-[2rem] overflow-hidden shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1920&q=80"
+                    src="/hero_premium.png"
                     alt="الأجهزة الذكية"
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />

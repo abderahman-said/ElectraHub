@@ -3,7 +3,8 @@ import { ShoppingBag, Star, Users, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
-  const { id, name, averagePrice, category, image, suppliers = [], rating = 4.8 } = product;
+  const { id, name, averagePrice, price, category, image, suppliers = [], rating = 4.8 } = product;
+  const displayPrice = averagePrice || price;
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -56,7 +57,7 @@ const ProductCard = ({ product }) => {
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">متوسط السعر</span>
-              <span className="text-3xl font-black text-blue-700 tracking-tighter">${averagePrice}</span>
+              <span className="text-3xl font-black text-blue-700 tracking-tighter">${displayPrice}</span>
             </div>
             <div className="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
               <span className="text-sm font-black text-yellow-700">{rating}</span>
