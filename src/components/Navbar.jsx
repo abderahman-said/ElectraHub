@@ -46,7 +46,7 @@ const Navbar = ({ cartCount = 0 }) => {
             alt="Bel-Gomla Logo"
             width="150"
             height="150"
-            className="h-auto w-auto max-w-[100px]"
+            className="h-auto w-auto max-w-[100px]  rounded-xl"
             priority={true}
           />
         </Link>

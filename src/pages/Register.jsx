@@ -45,7 +45,7 @@ const ImporterRegister = () => {
 
                 <div className="p-10 sm:p-14 relative z-10">
                     <div className="text-center mb-12">
-                        <img src="/logo.png" alt="" className='w-auto h-auto max-w-[180px] mx-auto' />
+                        <img src="/logo.png" alt="" className=' rounded-xl w-auto h-auto max-w-[180px] mx-auto' />
 
                         <h2 className="text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
                             ارتقِ <br />

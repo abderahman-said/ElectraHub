@@ -45,7 +45,7 @@ const ImporterDashboard = () => {
             {/* Sidebar */}
             <aside className="w-72 bg-white/80 backdrop-blur-2xl border-l border-blue-100/50 hidden md:flex flex-col sticky top-0 h-screen">
                 <div className="p-8">
-                    <img src="/logo.png" alt="" className="w-24 h-24" />
+                    <img src="/logo.png" alt="" className="w-24 h-24  rounded-xl" />
                     <p className="text-[16px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 text-right">لوحة تحكم المستورد</p>
                 </div>
 

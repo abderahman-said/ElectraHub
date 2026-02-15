@@ -7,8 +7,8 @@ const Footer = () => {
             <div className="container mx-auto px-4 sm:px-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-8 sm:mb-12">
                     <div>
-                        <img src="/logo.png" alt="Bel-Gomla Logo" className="h-10 sm:h-12 w-auto object-contain brightness-200" />
-                        <p className="text-blue-100/70 text-sm sm:text-base leading-relaxed max-w-sm">
+                        <img src="/logo.png" alt="Bel-Gomla Logo" className="h-16 sm:h-20 w-auto object-contain  rounded-xl" />
+                        <p className="text-blue-100/70 text-sm sm:text-base mt-4 leading-relaxed max-w-sm">
                             السوق الرائد للأدوات المنزلية B2B. نربط المستوردين بالتجار عالمياً.
                         </p>
                     </div>
