@@ -57,10 +57,10 @@ const Navbar = ({ cartCount = 0 }) => {
             <Link
               key={item.name}
               to={item.href}
-              className="text-xl font-black uppercase tracking-widest text-blue-950 hover:text-blue-600 transition-colors relative group py-2"
+              className="text-xl font-black uppercase tracking-widest text-slate-900 hover:text-[#2650fc] transition-colors relative group py-2"
             >
               {item.name}
-              <span className="absolute right-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute right-0 -bottom-1 w-0 h-0.5 bg-[#2650fc] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </nav>
@@ -69,14 +69,14 @@ const Navbar = ({ cartCount = 0 }) => {
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="h-11 w-11 glass rounded-xl flex items-center justify-center text-blue-950 hover:bg-white transition-all"
+              className="h-11 w-11 glass rounded-xl flex items-center justify-center text-slate-900 hover:bg-white transition-all"
               aria-label="فتح البحث"
             >
               <Search size={18} />
             </button>
             {user ? (
               <div className="flex items-center gap-2">
-                <Link to="/dashboard" className="h-11 px-6 bg-blue-50 rounded-xl flex items-center justify-center text-xs font-black uppercase tracking-widest text-blue-700 hover:bg-white transition-all gap-2">
+                <Link to="/dashboard" className="h-11 px-6 bg-[#2650fc]/10 rounded-xl flex items-center justify-center text-xs font-black uppercase tracking-widest text-[#2650fc] hover:bg-white transition-all gap-2">
                   <LayoutDashboard size={16} />
                   لوحة التحكم
                 </Link>
@@ -97,13 +97,13 @@ const Navbar = ({ cartCount = 0 }) => {
           </div>
 
           <button
-            className="h-11 w-11 bg-blue-700 text-white rounded-xl flex items-center justify-center relative hover:bg-blue-800 transition-all shadow-lg shadow-blue-100"
+            className="h-11 w-11 bg-[#2650fc] text-white rounded-xl flex items-center justify-center relative hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
             onClick={() => setIsCartOpen(true)}
             aria-label={`عربة التسوق${cartCount > 0 ? ` - ${cartCount} منتج` : ''}`}
           >
             <ShoppingBag size={20} />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-yellow-400 text-blue-950 text-[16px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white" aria-hidden="true">
+              <span className="absolute -top-1 -right-1 bg-yellow-400 text-slate-900 text-[16px] font-black h-5 w-5 flex items-center justify-center rounded-full border-2 border-white" aria-hidden="true">
                 {cartCount}
               </span>
             )}
@@ -130,11 +130,11 @@ const Navbar = ({ cartCount = 0 }) => {
                   autoFocus
                   type="text"
                   placeholder="ابحث عن أدوات منزلية، مستوردين..."
-                  className="w-full bg-white/90 backdrop-blur-xl border border-white/20 px-8 py-6 rounded-[2rem] text-xl font-bold text-blue-950 outline-none focus:ring-4 focus:ring-blue-100/50 shadow-2xl transition-all"
+                  className="w-full bg-white/90 backdrop-blur-xl border border-white/20 px-8 py-6 rounded-[2rem] text-xl font-bold text-slate-900 outline-none focus:ring-4 focus:ring-brand/20 shadow-2xl transition-all"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button type="submit" className="absolute left-6 top-1/2 -translate-y-1/2 text-blue-600 hover:scale-110 transition-transform" aria-label="بحث">
+                <button type="submit" className="absolute left-6 top-1/2 -translate-y-1/2 text-[#2650fc] hover:scale-110 transition-transform" aria-label="بحث">
                   <Search size={28} />
                 </button>
               </form>
@@ -167,11 +167,11 @@ const Navbar = ({ cartCount = 0 }) => {
                         )}
                       </div>
                       <div className="flex-grow flex flex-col gap-1">
-                        <span className="font-black text-blue-950 text-lg group-hover:text-blue-700 transition-colors uppercase tracking-tight">{product.name}</span>
+                        <span className="font-black text-slate-900 text-lg group-hover:text-[#2650fc] transition-colors uppercase tracking-tight">{product.name}</span>
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{product.category}</span>
                       </div>
                       <div className="text-left">
-                        <span className="font-black text-blue-700 text-xl tracking-tighter">${product.averagePrice}</span>
+                        <span className="font-black text-[#2650fc] text-xl tracking-tighter">${product.averagePrice}</span>
                       </div>
                       <div className="h-11 w-11 glass rounded-xl flex items-center justify-center text-blue-950 group-hover:bg-white transition-all">
                         <ChevronRight size={18} />
@@ -182,7 +182,7 @@ const Navbar = ({ cartCount = 0 }) => {
                 <div className="p-4 border-t border-blue-50/50">
                   <button
                     onClick={handleSearchSubmit}
-                    className="w-full py-5 bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-800 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-3"
+                    className="w-full py-5 bg-[#2650fc] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand/20 flex items-center justify-center gap-3"
                   >
                     عرض جميع النتائج
                     <ArrowLeft size={16} />
@@ -238,7 +238,7 @@ const Navbar = ({ cartCount = 0 }) => {
             ) : (
               <Link
                 to="/register"
-                className="w-full py-5 bg-blue-700 text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
+                className="w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 أصبح مستورداً

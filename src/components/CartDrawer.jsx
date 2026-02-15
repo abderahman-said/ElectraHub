@@ -194,23 +194,23 @@ const CartDrawer = () => {
                 `}
             >
                 {/* Enhanced Header */}
-                <div className="bg-[#0f172a] text-white px-6 py-8 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent"></div>
+                <div className="bg-[#2650fc] text-white px-6 py-8 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#2650fc]/10 to-transparent"></div>
                     <div className="relative flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10">
-                                <ShoppingBag className="w-6 h-6 text-blue-400" />
+                            <div className="w-12 h-12 bg-[#2650fc]/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10">
+                                <ShoppingBag className="w-6 h-6 text-[#fff]" />
                             </div>
                             <div>
                                 <h2 className="text-xl text-white font-bold tracking-tight">عربة التسوق</h2>
-                                <p className="text-xs text-slate-400 font-medium mt-0.5">
+                                <p className="pt-2 text-xs text-slate-400 font-medium mt-0.5">
                                     لديك <span className="text-white">{cart.length}</span> {cart.length === 1 ? 'منتج' : 'منتجات'} حالياً
                                 </p>
                             </div>
                         </div>
                         <button
                             onClick={() => handleOpenChange(false)}
-                            className="w-10 h-10 bg-slate-800 text-slate-400 rounded-xl flex items-center justify-center hover:text-white hover:bg-slate-700 transition-all active:scale-95"
+                            className="w-10 h-10 bg-[#031a79] text-slate-400 rounded-xl flex items-center justify-center hover:text-white hover:bg-slate-700 transition-all active:scale-95"
                         >
                             <X size={20} />
                         </button>
@@ -232,7 +232,7 @@ const CartDrawer = () => {
                                 <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                     <ShoppingBag className="w-16 h-16 text-gray-300" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-primary mb-2">عربة التسوق فارغة</h3>
+                                <h3 className="text-2xl font-bold text-[#2650fc] mb-2">عربة التسوق فارغة</h3>
                                 <p className="text-gray-600 mb-6 max-w-sm">
                                     يبدو أنك لم تضف أي شيء لعربة التسوق بعد. ابدأ التسوق لملئها!
                                 </p>
@@ -240,14 +240,14 @@ const CartDrawer = () => {
                                     <Link
                                         to="/shop"
                                         onClick={() => handleOpenChange(false)}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-hover transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#2650fc] text-white rounded-xl hover:bg-primary-hover transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                                     >
                                         <ShoppingBag size={18} />
                                         ابدأ التسوق
                                     </Link>
                                     <button
                                         onClick={() => handleOpenChange(false)}
-                                        className="px-6 py-3 border-2 border-[#17255421] text-gray-700 rounded-xl hover:border-primary hover:bg-slate-50 transition-colors duration-200 font-semibold"
+                                        className="px-6 py-3 border-2 border-[#17255421] text-gray-700 rounded-xl hover:border-[#2650fc] hover:bg-slate-50 transition-colors duration-200 font-semibold"
                                     >
                                         لاحقاً
                                     </button>
@@ -289,7 +289,7 @@ const CartDrawer = () => {
                             <Link
                                 to="/checkout"
                                 onClick={() => handleOpenChange(false)}
-                                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 group"
+                                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#2650fc] text-white rounded-xl hover:bg-[#031a79] transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 group"
                             >
                                 <CreditCard className="w-5 h-5" />
                                 المتابعة للدفع
@@ -299,7 +299,7 @@ const CartDrawer = () => {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => handleOpenChange(false)}
-                                    className="flex-1 px-6 py-3 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-primary hover:bg-white transition-all duration-200 font-medium text-sm"
+                                    className="flex-1 px-6 py-3 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-[#2650fc] hover:bg-white transition-all duration-200 font-medium text-sm"
                                 >
                                     استمر في التسوق
                                 </button>

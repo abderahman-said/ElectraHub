@@ -40,4 +40,4 @@ The platform aims to provide a seamless and transparent shopping experience, all
 
 ## rebranding note
 
-Formerly known as ElectraHub and HomyHub, the platform has expanded its scope from electrical appliances to all household goods under the new brand **Bel-Gomla (بالجملة)**.
+Formerly known as ElectraHub and HomyHub, the platform has expanded its scope from electrical appliances to all household goods under the new [#2650fc] **Bel-Gomla (بالجملة)**.

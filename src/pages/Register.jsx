@@ -61,7 +61,7 @@ const ImporterRegister = () => {
                             <div className="grid grid-cols-1 gap-6">
                                 <div className="p-6 glass border-blue-50/50 rounded-2xl hover:border-blue-700/30 transition-all duration-500 cursor-pointer group shadow-premium">
                                     <div className="flex items-center gap-5">
-                                        <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:bg-blue-700 group-hover:text-white transition-all duration-500 shadow-inner">
+                                        <div className="h-14 w-14 bg-[#2650fc]/10 rounded-2xl flex items-center justify-center text-[#2650fc] group-hover:bg-[#2650fc] group-hover:text-white transition-all duration-500 shadow-inner">
                                             <ShieldCheck size={28} />
                                         </div>
                                         <div>
@@ -84,7 +84,7 @@ const ImporterRegister = () => {
                             </div>
                             <button
                                 onClick={() => setStep(2)}
-                                className="w-full flex justify-center py-5 px-4 bg-blue-700 text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-100 hover:bg-blue-800 hover:-translate-y-1 transition-all duration-500 active:scale-95"
+                                className="w-full flex justify-center py-5 px-4 bg-[#2650fc] text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-brand/20 hover:bg-brand-dark hover:-translate-y-1 transition-all duration-500 active:scale-95"
                             >
                                 Begin Application
                             </button>
@@ -104,7 +104,7 @@ const ImporterRegister = () => {
                                     <input
                                         type="text"
                                         required
-                                        className="w-full px-6 py-4 rounded-2xl border   border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        className="w-full px-6 py-4 rounded-2xl border   border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
                                         placeholder="مثال: شركة النور للإلكترونيات"
                                         value={formData.companyName}
                                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
@@ -115,7 +115,7 @@ const ImporterRegister = () => {
                                     <input
                                         type="tel"
                                         required
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
                                         placeholder="01xxxxxxxxx"
                                         value={formData.whatsapp}
                                         onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
@@ -124,7 +124,7 @@ const ImporterRegister = () => {
                                 <div className="group relative">
                                     <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">التخصص الأساسي</label>
                                     <select
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 appearance-none cursor-pointer text-right"
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 appearance-none cursor-pointer text-right"
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                     >
@@ -141,7 +141,7 @@ const ImporterRegister = () => {
                                     <input
                                         type="email"
                                         required
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
                                         placeholder="contact@company.com"
                                         value={formData.contactEmail}
                                         onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
@@ -152,7 +152,7 @@ const ImporterRegister = () => {
                                     <input
                                         type="password"
                                         required
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
                                         placeholder="••••••••"
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -161,7 +161,7 @@ const ImporterRegister = () => {
                             </div>
                             <button
                                 type="submit"
-                                className="w-full flex justify-center py-5 px-4 bg-blue-700 text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-100 hover:bg-blue-800 hover:-translate-y-1 transition-all duration-500 active:scale-95 flex items-center gap-3 overflow-hidden group"
+                                className="w-full flex justify-center py-5 px-4 bg-[#2650fc] text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-brand/20 hover:bg-brand-dark hover:-translate-y-1 transition-all duration-500 active:scale-95 flex items-center gap-3 overflow-hidden group"
                             >
                                 <span>إرسال طلب التحقق</span>
                                 <ArrowLeft size={20} className="group-hover:-translate-x-2 transition-transform duration-500" />
@@ -171,7 +171,7 @@ const ImporterRegister = () => {
 
                     {step === 3 && (
                         <div className="text-center space-y-10 animate-slideInUp">
-                            <div className="mx-auto h-24 w-24 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center text-emerald-600 shadow-inner">
+                            <div className="mx-auto h-24 w-24 bg-[#2650fc]/10 rounded-[2.5rem] flex items-center justify-center text-[#2650fc] shadow-inner">
                                 <Check size={48} strokeWidth={3} />
                             </div>
                             <div className="space-y-4">
@@ -182,7 +182,7 @@ const ImporterRegister = () => {
                             </div>
                             <Link
                                 to="/dashboard"
-                                className="inline-block w-full py-5 bg-blue-700 text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-800 transition-all shadow-lg shadow-blue-100"
+                                className="inline-block w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
                             >
                                 الذهاب للوحة التحكم
                             </Link>

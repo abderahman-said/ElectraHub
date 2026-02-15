@@ -120,8 +120,8 @@ const ProductDetails = () => {
                                     key={index}
                                     onClick={() => setSelectedImageIndex(index)}
                                     className={`aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${selectedImageIndex === index
-                                            ? 'ring-2 ring-blue-500 ring-offset-2'
-                                            : 'hover:ring-2 hover:ring-blue-500'
+                                        ? 'ring-2 ring-blue-500 ring-offset-2'
+                                        : 'hover:ring-2 hover:ring-blue-500'
                                         }`}
                                 >
                                     <img
@@ -265,7 +265,7 @@ const ProductDetails = () => {
                         <div className="space-y-3">
                             <button
                                 onClick={handleAddToCart}
-                                className="w-full bg-[#0f172a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:bg-slate-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3"
+                                className="w-full bg-[#0f172a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:bg-[#031a79] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3"
                             >
                                 <ShoppingBag size={24} />
                                 أضف للسلة — ${(product.averagePrice * quantity).toFixed(2)}

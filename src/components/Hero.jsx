@@ -31,13 +31,13 @@ const Hero = () => {
 
             {/* Headline */}
             <div className="space-y-6">
-              <h1 className="text-3xl pb-3 md:text-4xl lg:text-6xl xl:text-7xl font-black text-blue-950 leading-[1] tracking-tighter">
-                التوريد الذكي <br />
-                <span className="text-gradient">تسريع النمو</span>
+              <h1 className="text-3xl pb-3 md:text-4xl lg:text-6xl xl:text-7xl font-black text-slate-900 leading-[1] tracking-tighter">
+                منصة <span className="text-brand">بالجملة</span> <br />
+                للأدوات المنزلية
               </h1>
 
               <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-xl font-medium">
-                يربط إلكتراهب بـ <span className="text-blue-700 font-bold underline decoration-yellow-400/50">موردي</span> مع تجار مؤهلين في نظام سحابي سلس مدفوع بالبيانات.
+                اربط تجارتك مباشرة مع كبار المستوردين والمصنعين. احصل على أفضل أسعار الجملة في السوق المصري والعربي من خلال منصة رقمية موحدة.
               </p>
             </div>
 
@@ -45,17 +45,17 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <Link
                 to="/shop"
-                className="group relative inline-flex items-center justify-center px-10 py-5 bg-blue-700 text-white font-extrabold rounded-2xl overflow-hidden transition-all duration-500 hover:bg-blue-800 hover:shadow-2xl hover:-translate-y-1 w-full sm:w-auto text-lg shadow-xl shadow-blue-200"
+                className="group relative inline-flex items-center justify-center px-10 py-5 bg-[#2650fc] text-white font-extrabold rounded-2xl overflow-hidden transition-all duration-500 hover:bg-brand-dark hover:shadow-2xl hover:-translate-y-1 w-full sm:w-auto text-lg shadow-xl shadow-brand/20"
               >
                 <span className="relative z-10">ابدأ التوريد الآن</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#2650fc] to-[#031a79] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Link>
 
               <Link
                 to="/register"
-                className="group inline-flex items-center gap-4 text-blue-900 font-bold hover:text-blue-700 transition-all text-lg"
+                className="group inline-flex items-center gap-4 text-[#2650fc] font-bold hover:text-brand-dark transition-all text-lg"
               >
-                <span>كن مستورداً</span>
+                <span>سجّل كتاجر الآن</span>
                 <div className="h-10 w-10 glass rounded-full flex items-center justify-center group-hover:translate-x-2 transition-transform shadow-premium">
                   <ArrowLeft size={20} />
                 </div>
@@ -70,7 +70,7 @@ const Hero = () => {
                 { val: '99.9%', label: 'دقة الطلبات' }
               ].map((s, i) => (
                 <div key={i} className="space-y-1">
-                  <div className="text-3xl font-black text-blue-950   tracking-tighter">{s.val}</div>
+                  <div className="text-3xl font-black text-[#2650fc] tracking-tighter">{s.val}</div>
                   <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">{s.label}</p>
                 </div>
               ))}
@@ -102,7 +102,7 @@ const Hero = () => {
                         </div>
                         <span className="text-sm font-black text-blue-950">النمو في الأجهزة الذكية</span>
                       </div>
-                      <span className="text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">+14.5%</span>
+                      <span className="text-sm font-bold text-[#2650fc] bg-[#2650fc]/10 px-2 py-1 rounded-md">+14.5%</span>
                     </div>
                     <div className="space-y-2">
                       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">

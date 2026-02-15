@@ -29,6 +29,9 @@ export default {
           light: '#fdfaf3',
           dark: '#b08d45',
         },
+        brand: '#2650fc',
+        'brand-light': '#4f72ff',
+        'brand-dark': '#1a3ecb',
         muted: '#64748b',
         border: '#e2e8f0',
       }

@@ -30,7 +30,7 @@ const SEO = ({
             element.setAttribute('content', content);
         };
 
-        // Primary Meta Tags
+        // [#2650fc] Meta Tags
         updateMetaTag('description', description);
         updateMetaTag('keywords', keywords);
 

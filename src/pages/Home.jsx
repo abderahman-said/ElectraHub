@@ -16,36 +16,41 @@ const Home = () => {
   const categories = [
     {
       name: 'أدوات المطبخ',
-      image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80',
       count: '1.2k منتج',
-      importers: '45 بائع'
+      importers: '45 مورد'
     },
     {
       name: 'ثلاجات',
-      image: 'https://png.pngtree.com/png-vector/20250416/ourmid/pngtree-innovative-home-appliances-png-image_15987797.png',
+      image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80',
       count: '850 منتج',
-      importers: '32 بائع'
+      importers: '32 مورد'
     },
     {
       name: 'شاشات ذكية',
-      image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=80',
       count: '2.4k منتج',
-      importers: '68 بائع'
+      importers: '68 مورد'
     },
     {
       name: 'غسالات',
-      image: 'https://png.pngtree.com/png-clipart/20230120/ourmid/pngtree-electric-clothes-washing-machine-png-image_6568230.png',
+      image: 'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=800&q=80',
       count: '640 منتج',
-      importers: '24 بائع'
+      importers: '24 مورد'
     },
 
     {
       name: 'طاقة وكهرباء',
-      image: 'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80',
       count: '1.1k منتج',
-      importers: '38 بائع'
+      importers: '38 مورد'
     },
-    { name: 'سلامة وأمان', image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=400&q=80', count: '420 منتج', importers: '15 بائع' },
+    {
+      name: 'سلامة وأمان',
+      image: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=800&q=80',
+      count: '420 منتج',
+      importers: '15 مورد'
+    },
 
   ];
 
@@ -58,9 +63,9 @@ const Home = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-blue-50/20 -z-10" />
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-            <span className="text-[16px] font-black text-blue-600 uppercase tracking-[0.3em]">نظام السوق</span>
-            <h2 className="text-4xl md:text-5xl font-black text-blue-950 tracking-tighter leading-tight">
-              فئات <span className="text-gradient">المنزل</span> المتخصصة
+            <span className="text-[16px] font-black text-[#2650fc] uppercase tracking-[0.3em]">نظام السوق</span>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight">
+              فئات <span className="text-brand">المنزل</span> المتخصصة
             </h2>
             <p className="text-slate-500 font-medium">
               مورّد من مستوردين عالميين معتمدين متخصصين في الأدوات والأجهزة المنزلية.
@@ -82,17 +87,20 @@ const Home = () => {
               className="pb-16"
             >
               {categories.map((cat, i) => (
-                <SwiperSlide key={i} className='py-10'>
-                  <div className="glass  rounded-[20px] flex flex-col items-center text-center group hover:bg-white hover:scale-105 hover:shadow-2xl transition-all duration-500 border-blue-50/50 shadow-premium cursor-pointer h-full overflow-hidden">
+                <SwiperSlide key={i} className='py-5'>
+                  <div className="group relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5] cursor-pointer">
                     <OptimizedImage
                       src={cat.image}
                       alt={cat.name}
-                      className="relative w-full h-[150px] object-cover transition-all duration-500"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                     />
-                    <div className=" p-4">
-                      <h3 className="text-xl font-black text-blue-950 mb-2 uppercase tracking-tight group-hover:text-blue-700 transition-colors duration-300">{cat.name}</h3>
-                      <p className="text-[18px] font-bold text-slate-400 uppercase tracking-widest">{cat.count}</p>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent p-4 flex flex-col justify-end text-right">
+                      <h3 className="text-xl font-bold text-white mb-1">{cat.name}</h3>
+                      <p className="text-sm text-white/80 font-medium">{cat.count} • {cat.importers}</p>
+                      <button className="mt-4 w-full rounded-xl bg-[#2650fc] py-2.5 text-sm font-bold text-white hover:bg-brand-dark transition-colors">
+                        عرض المنتجات
+                      </button>
                     </div>
                   </div>
                 </SwiperSlide>
@@ -108,16 +116,16 @@ const Home = () => {
         <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-50/30 -z-10 blur-3xl opacity-50" />
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20">
-            <div className="max-w-2xl space-y-4">
-              <span className="text-[16px] font-black text-blue-600 uppercase tracking-[0.3em]">مخزون B2B</span>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-blue-950 tracking-tighter leading-tight">
-                سوق <span className="text-gradient">الجملة</span>
+            <div className="max-w-2xl space-y-4 text-right">
+              <span className="text-[16px] font-black text-[#2650fc] uppercase tracking-[0.3em]">مخزون B2B</span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter leading-tight">
+                سوق <span className="text-brand">الجملة</span>
               </h2>
               <p className="text-lg text-slate-500 font-medium max-w-xl">
                 مخزون فوري من المستوردين المعتمدين. احمِ عملك بالترخيص المباشر وشفافية الأدوات والمنتجات المنزلية.
               </p>
             </div>
-            <Link to="/shop" className="group flex items-center gap-3 text-blue-900 font-black uppercase tracking-widest text-xs hover:text-blue-700 transition-all">
+            <Link to="/shop" className="group flex items-center gap-3 text-[#2650fc] font-black uppercase tracking-widest text-xs hover:text-brand-dark transition-all">
               بحث متقدم في القوائم
               <div className="h-10 w-10 glass rounded-full flex items-center justify-center group-hover:-translate-x-2 transition-transform shadow-premium">
                 <ArrowRight size={18} className="rotate-180" />
@@ -220,26 +228,26 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
               {
-                title: 'أسعار الجملة',
-                desc: 'أسعار المصنع المباشرة من المستوردين المرخصين بدون هوامش ربح للوسطاء.',
-                icon: <TrendingUp className="text-blue-700" size={32} />
+                title: 'أسعار الجملة المباشرة',
+                desc: 'وفر تكاليف الوسطاء واحصل على أفضل أسعار المصنع والمستوردين مباشرة لحساب مؤسستك.',
+                icon: <TrendingUp className="text-brand" size={32} />
               },
               {
-                title: 'توريد معتمد',
-                desc: 'كل مستورد في بالجملة يخضع لفحص تحقق صارم من 24 نقطة.',
+                title: 'موردون موثقون',
+                desc: 'نحن نضمن جودة الموردين من خلال فحص دقيق للتراخيص والسجلات التجارية والقدرة الإنتاجية.',
                 icon: <Award className="text-yellow-600" size={32} />
               },
               {
-                title: 'خدمات B2B',
-                desc: 'تتبع الخدمات اللوجستية المتكاملة وإدارة الشحن على مستوى الحاويات.',
-                icon: <ShoppingBag className="text-blue-700" size={32} />
+                title: 'دعم لوجستي متكامل',
+                desc: 'نظام متقدم لتتبع الشحنات وإدارة الطلبات الكبيرة لضمان وصول بضاعتك في الموعد المحدد.',
+                icon: <ShoppingBag className="text-brand" size={32} />
               }
             ].map((badge, i) => (
-              <div key={i} className="glass p-10 rounded-[2.5rem] shadow-premium hover:-translate-y-2 transition-all duration-500 group border-white/50">
-                <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-inner group-hover:scale-110 transition-transform duration-500">
+              <div key={i} className="bg-white p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 group border border-slate-100">
+                <div className="h-16 w-16 bg-brand/5 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
                   {badge.icon}
                 </div>
-                <h3 className="text-xl font-black text-blue-950 mb-4 tracking-tight uppercase">{badge.title}</h3>
+                <h3 className="text-xl font-black text-slate-900 mb-4 tracking-tight uppercase">{badge.title}</h3>
                 <p className="text-slate-500 font-medium leading-relaxed">
                   {badge.desc}
                 </p>

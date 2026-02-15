@@ -56,8 +56,8 @@ const ProductCard = ({ product }) => {
         <div className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">متوسط السعر</span>
-              <span className="text-3xl font-black text-blue-700 tracking-tighter">${displayPrice}</span>
+              <span className="text-sm font-bold text-slate-400 uppercase tracking-widest text-right">سعر الجملة</span>
+              <span className="text-3xl font-black text-[#2650fc] tracking-tighter">{(displayPrice * 50).toLocaleString()} ج.م</span>
             </div>
             <div className="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
               <span className="text-sm font-black text-yellow-700">{rating}</span>
@@ -71,14 +71,15 @@ const ProductCard = ({ product }) => {
 
           <div className="pt-4 border-t border-slate-50">
             <div className="flex items-center gap-2 mb-4">
-              <Users size={16} className="text-blue-600" />
-              <span className="text-sm font-black text-blue-900">متوفر من {suppliers.length} موردين</span>
+              <span className="bg-[#2650fc]/10 text-[#2650fc] text-xs font-black px-2.5 py-1 rounded-lg border border-brand/20">الحد الأدنى: 5 قطع</span>
+              <span className="text-sm font-black text-slate-400">|</span>
+              <span className="text-sm font-black text-slate-600">متوفر من {suppliers.length} موردين</span>
             </div>
 
             <div className="grid grid-cols-5 gap-2">
               {suppliers.map((supplier, idx) => (
                 <div key={idx} className="group/supplier relative">
-                  <div className="h-10 w-10 rounded-xl overflow-hidden border-2 border-white shadow-sm group-hover/supplier:border-blue-500 transition-all duration-300">
+                  <div className="h-10 w-10 rounded-xl overflow-hidden border-2 border-white shadow-sm group-hover/supplier:border-brand/40 transition-all duration-300">
                     <img
                       src={supplier.image}
                       alt={`مورد: ${supplier.name}`}
@@ -87,12 +88,16 @@ const ProductCard = ({ product }) => {
                     />
                   </div>
                   {/* Tooltip on hover */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-blue-950 text-white text-sm rounded opacity-0 group-hover/supplier:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-20">
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover/supplier:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-20">
                     {supplier.name}
                   </div>
                 </div>
               ))}
             </div>
+
+            <button className="mt-6 w-full py-4 bg-[#2650fc] text-white font-black rounded-2xl hover:bg-brand-dark transition-all uppercase text-sm tracking-widest shadow-lg shadow-brand/20">
+              أضف للطلب
+            </button>
           </div>
         </div>
       </Link>

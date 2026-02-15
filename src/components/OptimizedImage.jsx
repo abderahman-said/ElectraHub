@@ -61,6 +61,10 @@ const OptimizedImage = ({
                 decoding={priority ? 'sync' : 'async'}
                 className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'} ${className}`}
                 onLoad={() => setIsLoaded(true)}
+                onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80'; // Fallback to a nice abstract B2B placeholder
+                }}
             />
         </picture>
     );
