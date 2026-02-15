@@ -2,14 +2,15 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const SEO = ({
-    title = 'إلكترا هب - منصة B2B للأجهزة الكهربائية',
-    description = 'منصة B2B رائدة تربط المستوردين والموردين للأجهزة الكهربائية والإلكترونية.',
-    keywords = 'أجهزة كهربائية، إلكترونيات، تكييف، ثلاجات، غسالات، شاشات، B2B',
-    image = 'https://electrahub.com/og-image.png',
+    title = 'بالجملة - منصة B2B للأجهزة والأدوات المنزلية',
+    description = 'منصة B2B رائدة تربط المستوردين والموردين للأجهزة والأدوات المنزلية والأثاث.',
+    keywords = 'بالجملة، أدوات منزلية، أجهزة منزلية، مطبخ، أثاث، B2B، جملة',
+    image = 'https://bel-gomla.com/og-image.jpg',
+    url = 'https://bel-gomla.com',
     type = 'website'
 }) => {
     const location = useLocation();
-    const currentUrl = `https://electrahub.com${location.pathname}`;
+    const currentUrl = `https://bel-gomla.com${location.pathname}`;
 
     useEffect(() => {
         // Update document title

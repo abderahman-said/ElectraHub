@@ -20,14 +20,14 @@ const Importers = () => {
                     <div className="inline-flex items-center gap-2 px-5 py-2 glass rounded-full shadow-premium border border-white/50 mb-8">
                         <ShieldCheck size={16} className="text-blue-600" />
                         <span className="text-sm font-bold text-blue-900 tracking-widest uppercase">
-                            شركاء ElectraHub المعتمدون
+                            شركاء بالجملة المعتمدون
                         </span>
                     </div>
                     <h1 className="text-5xl md:text-7xl font-black text-blue-950 tracking-tighter mb-6">
                         شبكة <span className="text-gradient">المستوردين</span> النخبة
                     </h1>
                     <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
-                        تواصل مباشرة مع أكبر الموردين الموثقين في قطاع الأجهزة الكهربائية. شفافية كاملة في الأسعار والحد الأدنى للطلب.
+                        تواصل مباشرة مع أكبر الموردين الموثقين في قطاع الأدوات والأجهزة المنزلية. شفافية كاملة في الأسعار والحد الأدنى للطلب.
                     </p>
                 </div>
             </section>
@@ -39,7 +39,7 @@ const Importers = () => {
                         <Search className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <input
                             type="text"
-                            placeholder="ابحث عن مستورد أو تخصص (مثلاً: تكييف، إلكترونيات)..."
+                            placeholder="ابحث عن مستورد أو تخصص (مثلاً: مطبخ، أثاث، إلكترونيات)..."
                             className="w-full py-5 pr-14 pl-6 bg-slate-50 border border-slate-200 rounded-[20px] text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all shadow-inner"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}

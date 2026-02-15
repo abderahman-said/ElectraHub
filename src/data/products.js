@@ -9,9 +9,9 @@ const suppliers = [
 export const SAMPLE_PRODUCTS = [
     {
         id: 1,
-        name: "تكييف ذكي إنفرتر 2.25 حصان",
-        averagePrice: 1250,
-        category: "تكييف وتبريد",
+        name: "طقم أواني طهي جرانيت 10 قطع",
+        averagePrice: 450,
+        category: "أدوات المطبخ",
         image: "https://images.unsplash.com/photo-1590496794008-383c8070bb2b?auto=format&fit=crop&w=600&q=75",
         description: "تكييف ذكي بتقنية الإنفرتر لتوفير الطاقة، يتميز بتبريد سريع وفلتر لتنقية الهواء.",
         suppliers: suppliers,
@@ -31,9 +31,9 @@ export const SAMPLE_PRODUCTS = [
     },
     {
         id: 3,
-        name: "شاشة OLED 65 بوصة 4K",
-        averagePrice: 3500,
-        category: "شاشات ذكية",
+        name: "طقم ركنة مودرن 5 مقاعد",
+        averagePrice: 1500,
+        category: "أثاث منزلي",
         image: "https://images.unsplash.com/photo-1593784991095-a205029471b6?auto=format&fit=crop&w=600&q=75",
         description: "تجربة مشاهدة سينمائية مع تقنية OLED وألوان نابضة بالحياة.",
         suppliers: suppliers,

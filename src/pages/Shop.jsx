@@ -103,18 +103,18 @@ const Shop = () => {
     return (
         <>
             <SEO
-                title="متجر الأجهزة الكهربائية - إلكترا هب"
-                description="تسوق أفضل الأجهزة الكهربائية والإلكترونية من تكييفات، ثلاجات، شاشات، غسالات وأنظمة الطاقة من موردين معتمدين بأسعار تنافسية."
-                keywords="شراء أجهزة كهربائية، تكييف، ثلاجات، شاشات ذكية، غسالات، طاقة شمسية، كاميرات مراقبة، B2B، جملة"
+                title="متجر الأدوات المنزلية - بالجملة"
+                description="تسوق أفضل الأدوات والأجهزة المنزلية والأثاث من موردين معتمدين بأسعار تنافسية."
+                keywords="شراء أدوات منزلية، أثاث، مطبخ، تكييف، ثلاجات، غسالات، B2B، جملة"
             />
             <div className="min-h-screen bg-white" dir="rtl">
                 {/* Header Banner */}
                 <div className="bg-gray-900 text-white py-12 sm:py-16 mb-8 sm:mb-12">
                     <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
                         <div className="text-center max-w-4xl mx-auto">
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-6 text-white">متجر الأجهزة الكهربائية</h1>
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-6 text-white">متجر الأدوات المنزلية</h1>
                             <p className="text-base sm:text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
-                                اكتشف أفضل الأجهزة الكهربائية والإلكترونية من موردين معتمدين بأسعار تنافسية.
+                                اكتشف أفضل الأدوات والأجهزة المنزلية والأثاث من موردين معتمدين بأسعار تنافسية.
                             </p>
                         </div>
                     </div>

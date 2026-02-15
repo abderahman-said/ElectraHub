@@ -43,7 +43,7 @@ const Navbar = ({ cartCount = 0 }) => {
         <Link to="/" className="flex items-center gap-3 group">
           <OptimizedImage
             src="/logo.png"
-            alt="ElectraHub Logo"
+            alt="Bel-Gomla Logo"
             width="150"
             height="150"
             className="h-auto w-auto max-w-[100px]"
@@ -129,7 +129,7 @@ const Navbar = ({ cartCount = 0 }) => {
                 <input
                   autoFocus
                   type="text"
-                  placeholder="ابحث عن أجهزة كهربائية، مستوردين..."
+                  placeholder="ابحث عن أدوات منزلية، مستوردين..."
                   className="w-full bg-white/90 backdrop-blur-xl border border-white/20 px-8 py-6 rounded-[2rem] text-xl font-bold text-blue-950 outline-none focus:ring-4 focus:ring-blue-100/50 shadow-2xl transition-all"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

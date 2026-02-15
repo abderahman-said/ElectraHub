@@ -15,8 +15,8 @@ import 'swiper/css/pagination';
 const Home = () => {
   const categories = [
     {
-      name: 'تكييف وتبريد',
-      image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=400&q=80',
+      name: 'أدوات المطبخ',
+      image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=400&q=80',
       count: '1.2k منتج',
       importers: '45 بائع'
     },
@@ -60,10 +60,10 @@ const Home = () => {
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
             <span className="text-[16px] font-black text-blue-600 uppercase tracking-[0.3em]">نظام السوق</span>
             <h2 className="text-4xl md:text-5xl font-black text-blue-950 tracking-tighter leading-tight">
-              فئات <span className="text-gradient">الأجهزة</span> المتخصصة
+              فئات <span className="text-gradient">المنزل</span> المتخصصة
             </h2>
             <p className="text-slate-500 font-medium">
-              مورّد من مستوردين عالميين معتمدين متخصصين في الأنظمة الكهربائية للمؤسسات.
+              مورّد من مستوردين عالميين معتمدين متخصصين في الأدوات والأجهزة المنزلية.
             </p>
           </div>
 
@@ -114,7 +114,7 @@ const Home = () => {
                 سوق <span className="text-gradient">الجملة</span>
               </h2>
               <p className="text-lg text-slate-500 font-medium max-w-xl">
-                مخزون فوري من المستوردين المعتمدين. احمِ عملك بالترخيص المباشر وشفافية الحد الأدنى للطلب.
+                مخزون فوري من المستوردين المعتمدين. احمِ عملك بالترخيص المباشر وشفافية الأدوات والمنتجات المنزلية.
               </p>
             </div>
             <Link to="/shop" className="group flex items-center gap-3 text-blue-900 font-black uppercase tracking-widest text-xs hover:text-blue-700 transition-all">
@@ -226,7 +226,7 @@ const Home = () => {
               },
               {
                 title: 'توريد معتمد',
-                desc: 'كل مستورد في إلكترا هب يخضع لفحص تحقق صارم من 24 نقطة.',
+                desc: 'كل مستورد في بالجملة يخضع لفحص تحقق صارم من 24 نقطة.',
                 icon: <Award className="text-yellow-600" size={32} />
               },
               {

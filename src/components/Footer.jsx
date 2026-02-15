@@ -7,9 +7,9 @@ const Footer = () => {
             <div className="container mx-auto px-4 sm:px-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-8 sm:mb-12">
                     <div>
-                        <img src={"/logo.png"} alt="ElectraHub Logo" className="h-auto max-w-[150px] w-auto" />
-                        <p className="text-xs sm:text-sm text-blue-100 leading-relaxed opacity-80">
-                            السوق الرائد للأجهزة الكهربائية B2B. نربط المستوردين بالتجار عالمياً.
+                        <img src="/logo.png" alt="Bel-Gomla Logo" className="h-10 sm:h-12 w-auto object-contain brightness-200" />
+                        <p className="text-blue-100/70 text-sm sm:text-base leading-relaxed max-w-sm">
+                            السوق الرائد للأدوات المنزلية B2B. نربط المستوردين بالتجار عالمياً.
                         </p>
                     </div>
 
@@ -45,7 +45,7 @@ const Footer = () => {
                 </div>
 
                 <div className="pt-6 sm:pt-8 border-t border-blue-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs sm:text-sm text-blue-100/60">&copy; 2026 منصة إلكترا هب B2B. جميع الحقوق محفوظة.</p>
+                    <p className="text-xs sm:text-sm text-blue-100/60">&copy; 2026 منصة بالجملة B2B. جميع الحقوق محفوظة.</p>
                     <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm">
                         <a href="#privacy" className="text-gray-400 hover:text-accent transition-colors">سياسة الخصوصية</a>
                         <span className="text-gray-700">|</span>

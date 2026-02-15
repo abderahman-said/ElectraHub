@@ -45,14 +45,14 @@ const ImporterRegister = () => {
 
                 <div className="p-10 sm:p-14 relative z-10">
                     <div className="text-center mb-12">
-                                                <img src="/logo.png" alt="" className='w-auto h-auto max-w-[180px] mx-auto' />
+                        <img src="/logo.png" alt="" className='w-auto h-auto max-w-[180px] mx-auto' />
 
                         <h2 className="text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
                             ارتقِ <br />
                             <span className="text-gradient">بتجارتك</span>
                         </h2>
                         <p className="text-slate-500 font-medium font-arabic">
-                            انضم إلى شبكة ElectraHub لنخبة مستوردي الأجهزة الكهربائية.
+                            انضم إلى شبكة بالجملة لنخبة مستوردي الأدوات المنزلية.
                         </p>
                     </div>
 
