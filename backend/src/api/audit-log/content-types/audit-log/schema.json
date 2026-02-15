@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "audit_logs",
+  "info": {
+    "singularName": "audit-log",
+    "pluralName": "audit-logs",
+    "displayName": "Audit Log",
+    "description": "System Activity Audit Log"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "action": {
+      "type": "string",
+      "required": true
+    },
+    "resource": {
+      "type": "string"
+    },
+    "resourceId": {
+      "type": "string"
+    },
+    "details": {
+      "type": "json"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "text"
+    },
+    "timestamp": {
+      "type": "datetime",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["success", "failure", "warning"],
+      "default": "success"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::pam-user.pam-user",
+      "inversedBy": "auditLogs"
+    }
+  }
+}

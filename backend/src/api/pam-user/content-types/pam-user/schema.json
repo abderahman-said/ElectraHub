@@ -1,0 +1,86 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pam_users",
+  "info": {
+    "singularName": "pam-user",
+    "pluralName": "pam-users",
+    "displayName": "PAM User",
+    "description": "Privileged Access Management User"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "username": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "email": {
+      "type": "email",
+      "required": true,
+      "unique": true
+    },
+    "fullName": {
+      "type": "string",
+      "required": true
+    },
+    "employeeId": {
+      "type": "string",
+      "unique": true
+    },
+    "department": {
+      "type": "string"
+    },
+    "position": {
+      "type": "string"
+    },
+    "accessLevel": {
+      "type": "enumeration",
+      "enum": ["basic", "intermediate", "advanced", "admin", "super_admin"],
+      "default": "basic"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["active", "inactive", "suspended", "pending"],
+      "default": "pending"
+    },
+    "lastLogin": {
+      "type": "datetime"
+    },
+    "loginAttempts": {
+      "type": "integer",
+      "default": 0
+    },
+    "password": {
+      "type": "string",
+      "required": true,
+      "private": true
+    },
+    "permissions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::permission.permission",
+      "inversedBy": "users"
+    },
+    "roles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::role.role",
+      "inversedBy": "users"
+    },
+    "sessions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::session.session",
+      "mappedBy": "user"
+    },
+    "auditLogs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::audit-log.audit-log",
+      "mappedBy": "user"
+    }
+  }
+}

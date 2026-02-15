@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "roles",
+  "info": {
+    "singularName": "role",
+    "pluralName": "roles",
+    "displayName": "Role",
+    "description": "PAM System Role"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "level": {
+      "type": "enumeration",
+      "enum": ["basic", "intermediate", "advanced", "admin", "super_admin"],
+      "required": true
+    },
+    "isSystem": {
+      "type": "boolean",
+      "default": false
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::pam-user.pam-user",
+      "inversedBy": "roles"
+    },
+    "permissions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::permission.permission",
+      "inversedBy": "roles"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "permissions",
+  "info": {
+    "singularName": "permission",
+    "pluralName": "permissions",
+    "displayName": "Permission",
+    "description": "PAM System Permission"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "resource": {
+      "type": "string",
+      "required": true
+    },
+    "action": {
+      "type": "enumeration",
+      "enum": ["create", "read", "update", "delete", "admin"],
+      "required": true
+    },
+    "conditions": {
+      "type": "json"
+    },
+    "isSystem": {
+      "type": "boolean",
+      "default": false
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::pam-user.pam-user",
+      "inversedBy": "permissions"
+    },
+    "roles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::role.role",
+      "inversedBy": "permissions"
+    }
+  }
+}

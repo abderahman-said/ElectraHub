@@ -1,0 +1,32 @@
+{
+  "name": "bel-gomla-pam",
+  "private": true,
+  "version": "0.1.0",
+  "description": "PAM system for Bel-Gomla B2B platform",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/strapi": "4.25.0",
+    "@strapi/plugin-users-permissions": "4.25.0",
+    "@strapi/plugin-i18n": "4.25.0",
+    "@strapi/plugin-cloud": "4.25.0",
+    "better-sqlite3": "8.7.0",
+    "pg": "8.8.0",
+    "mysql": "2.18.1"
+  },
+  "author": {
+    "name": "Bel-Gomla Team"
+  },
+  "strapi": {
+    "uuid": "bel-gomla-pam"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=20.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
