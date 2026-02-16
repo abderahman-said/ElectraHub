@@ -1,25 +1,42 @@
 import React, { useState } from 'react';
-import { ShoppingBag, ArrowLeft, Mail, Lock, Check } from 'lucide-react';
+import {   ArrowLeft, Mail, Lock,   } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 
 const Login = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
-    const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setError('');
-        const result = login(formData.email, formData.password);
-        if (result.success) {
-            navigate('/dashboard');
-        } else {
-            setError(result.message);
+    const onSubmit = async (data) => {
+        setIsLoading(true);
+        try {
+            console.log('Login form data:', data);
+            const result = await login(data);
+            console.log('Login result:', result);
+            
+            if (result.success) {
+                toast.success('Login successful!');
+                console.log('Navigating to dashboard...');
+                localStorage.setItem('pam_token', result.token);
+                navigate('/dashboard');
+            } else {
+                console.error('Login failed:', result.error);
+                toast.error(result.error);
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            toast.error('Login failed. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -41,48 +58,46 @@ const Login = () => {
                         </p>
                     </div>
 
-                    <form className="space-y-8 animate-slideInUp" onSubmit={handleSubmit}>
-                        {error && (
-                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-center">
-                                {error}
-                            </div>
-                        )}
+                    <form className="space-y-8 animate-slideInUp" onSubmit={handleSubmit(onSubmit)}>
                         <div className="space-y-6">
                             <div className="group">
-                                <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">البريد الإلكتروني</label>
+                                <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">اسم المستخدم أو البريد الإلكتروني</label>
                                 <div className="relative">
                                     <input
-                                        type="email"
-                                        required
+                                        {...register('username', { required: 'Username is required' })}
+                                        type="text"
                                         className="w-full px-6 py-4 pr-14 rounded-2xl  border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
-                                        placeholder="البريد@الموقع.com"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        placeholder="اسم المستخدم أو البريد الإلكتروني"
                                     />
                                     <Mail className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-700 transition-colors" size={20} />
                                 </div>
+                                {errors.username && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
+                                )}
                             </div>
                             <div className="group">
                                 <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">كلمة المرور</label>
                                 <div className="relative">
                                     <input
+                                        {...register('password', { required: 'Password is required' })}
                                         type="password"
-                                        required
                                         className="w-full px-6 py-4 pr-14 rounded-2xl border   border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
                                         placeholder="••••••••"
-                                        value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     />
                                     <Lock className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-700 transition-colors" size={20} />
                                 </div>
+                                {errors.password && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                                )}
                             </div>
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-5 px-4 bg-blue-700 text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-100 hover:bg-blue-800 hover:-translate-y-1 transition-all duration-500 active:scale-95 flex items-center gap-3 overflow-hidden group"
+                            disabled={isLoading}
+                            className="w-full flex justify-center py-5 px-4 bg-blue-700 text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-100 hover:bg-blue-800 hover:-translate-y-1 transition-all duration-500 active:scale-95 flex items-center gap-3 overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <span>تسجيل الدخول</span>
+                            <span>{isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}</span>
                             <ArrowLeft size={20} className="group-hover:-translate-x-2 transition-transform duration-500" />
                         </button>
 
@@ -92,6 +107,9 @@ const Login = () => {
                                 <Link to="/register" className="text-blue-700 hover:text-blue-800 transition-colors">
                                     سجل كمستورد الآن
                                 </Link>
+                            </p>
+                            <p className="text-xs text-gray-500 mt-2">
+                                بيانات الافتراضية: <span className="font-mono bg-gray-100 px-2 py-1 rounded">admin / admin123</span>
                             </p>
                         </div>
                     </form>

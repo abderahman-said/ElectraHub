@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, User, Menu, X, ShoppingBag, ArrowLeft, LayoutDashboard, LogOut, Package, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { SAMPLE_PRODUCTS } from '../data/products';
+import { productsAPI } from '../services/api';
 import OptimizedImage from './OptimizedImage';
 
 const Navbar = ({ cartCount = 0 }) => {
@@ -13,6 +13,7 @@ const Navbar = ({ cartCount = 0 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const navLinks = [
     { name: 'السوق', href: '/shop' },
@@ -20,13 +21,20 @@ const Navbar = ({ cartCount = 0 }) => {
     { name: 'الأسعار', href: '/pricing' }
   ];
 
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return [];
-    return SAMPLE_PRODUCTS.filter(p =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase())
-    ).slice(0, 5);
-  }, [searchQuery]);
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      try {
+        const response = await productsAPI.getProducts({ search: query, limit: 5 });
+        setSearchResults(response.data || []);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -34,6 +42,7 @@ const Navbar = ({ cartCount = 0 }) => {
       navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
       setIsSearchOpen(false);
       setSearchQuery('');
+      setSearchResults([]);
     }
   };
 

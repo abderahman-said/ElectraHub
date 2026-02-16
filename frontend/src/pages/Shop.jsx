@@ -1,14 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ProductCard from '../components/ProductCard';
 import { Search, SlidersHorizontal, ChevronDown, Filter, X } from 'lucide-react';
-import { SAMPLE_PRODUCTS } from '../data/products';
+import { productsAPI, categoriesAPI } from '../services/api';
 import CategoryFilter from '../components/ui/CategoryFilter';
 import PriceRangeFilter from '../components/ui/PriceRangeFilter';
 import TagFilter from '../components/ui/TagFilter';
 import SortSelect from '../components/ui/SortSelect';
 import SEO from '../components/SEO';
 
-const CATEGORIES = ['All', 'تكييف وتبريد', 'ثلاجات', 'شاشات ذكية', 'غسالات', 'طاقة وكهرباء', 'سلامة وأمان'];
 const SORT_OPTIONS = [
     { value: 'newest', label: 'الأحدث' },
     { value: 'price-low', label: 'السعر: من الأقل للأعلى' },
@@ -16,6 +15,9 @@ const SORT_OPTIONS = [
 ];
 
 const Shop = () => {
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [sortBy, setSortBy] = useState('newest');
@@ -23,25 +25,47 @@ const Shop = () => {
     const [priceRange, setPriceRange] = useState({ min: 0, max: 4000 });
     const [selectedTags, setSelectedTags] = useState([]);
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [productsRes, categoriesRes] = await Promise.all([
+                productsAPI.getProducts(),
+                categoriesAPI.getCategories()
+            ]);
+            
+            setProducts(productsRes.data || []);
+            setCategories(categoriesRes.data || []);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const categoriesWithCounts = useMemo(() => {
-        const counts = SAMPLE_PRODUCTS.reduce((acc, product) => {
-            acc[product.category] = (acc[product.category] || 0) + 1;
+        const counts = products.reduce((acc, product) => {
+            const categoryName = product.category_name || product.category || 'غير مصنف';
+            acc[categoryName] = (acc[categoryName] || 0) + 1;
             return acc;
         }, {});
 
         return [
-            { value: 'All', label: 'الكل', count: SAMPLE_PRODUCTS.length },
-            ...CATEGORIES.filter(c => c !== 'All').map(cat => ({
-                value: cat,
-                label: cat,
-                count: counts[cat] || 0
+            { value: 'All', label: 'الكل', count: products.length },
+            ...categories.map(cat => ({
+                value: cat.id.toString(),
+                label: cat.name_ar || cat.name,
+                count: counts[cat.name_ar || cat.name] || 0
             }))
         ];
-    }, []);
+    }, [products, categories]);
 
     const tagsWithCounts = useMemo(() => {
         const counts = {};
-        SAMPLE_PRODUCTS.forEach(product => {
+        products.forEach(product => {
             if (product.tags) {
                 product.tags.forEach(tag => {
                     counts[tag] = (counts[tag] || 0) + 1;
@@ -62,28 +86,33 @@ const Shop = () => {
             label,
             count: counts[value] || 0
         }));
-    }, []);
+    }, [products]);
 
     const filteredProducts = useMemo(() => {
-        let result = SAMPLE_PRODUCTS.filter(product => {
-            const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-            const matchesPrice = product.averagePrice >= priceRange.min && product.averagePrice <= priceRange.max;
-            const matchesTags = selectedTags.length === 0 || selectedTags.some(tag =>
-                product.tags && product.tags.includes(tag)
-            );
+        let result = products.filter(product => {
+            const matchesSearch = !searchQuery || 
+                (product.name && product.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                (product.name_ar && product.name_ar.includes(searchQuery));
+            
+            const matchesCategory = selectedCategory === 'All' || 
+                product.category_id?.toString() === selectedCategory ||
+                product.category_name === selectedCategory;
+            
+            const matchesPrice = true; // TODO: implement price filtering when price data is available
+            const matchesTags = selectedTags.length === 0 || 
+                (product.tags && selectedTags.some(tag => product.tags.includes(tag)));
+            
             return matchesSearch && matchesCategory && matchesPrice && matchesTags;
         });
 
         if (sortBy === 'price-low') {
-            result.sort((a, b) => a.averagePrice - b.averagePrice);
+            result.sort((a, b) => (a.price || 0) - (b.price || 0));
         } else if (sortBy === 'price-high') {
-            result.sort((a, b) => b.averagePrice - a.averagePrice);
+            result.sort((a, b) => (b.price || 0) - (a.price || 0));
         }
-        // 'newest' assumes default order for now
 
         return result;
-    }, [searchQuery, selectedCategory, sortBy, priceRange, selectedTags]);
+    }, [products, searchQuery, selectedCategory, sortBy, selectedTags]);
 
     const clearAllFilters = () => {
         setSearchQuery('');
@@ -99,6 +128,17 @@ const Shop = () => {
         priceRange.min > 0 || priceRange.max < 4000,
         selectedTags.length > 0
     ].filter(Boolean).length;
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">جاري تحميل المنتجات...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -270,16 +310,16 @@ const Shop = () => {
                                         <div>
                                             <h3 className="text-sm font-semibold text-gray-900 mb-2">الفئة</h3>
                                             <div className="flex flex-wrap gap-2">
-                                                {CATEGORIES.map(category => (
+                                                {categoriesWithCounts.map(category => (
                                                     <button
-                                                        key={category}
-                                                        onClick={() => setSelectedCategory(category)}
-                                                        className={`px-3 py-1.5 text-sm rounded-lg transition-colors touch-manipulation ${selectedCategory === category
+                                                        key={category.value}
+                                                        onClick={() => setSelectedCategory(category.value)}
+                                                        className={`px-3 py-1.5 text-sm rounded-lg transition-colors touch-manipulation ${selectedCategory === category.value
                                                             ? 'bg-blue-600 text-white'
                                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                                             }`}
                                                     >
-                                                        {category === 'All' ? 'الكل' : category}
+                                                        {category.label} ({category.count})
                                                     </button>
                                                 ))}
                                             </div>

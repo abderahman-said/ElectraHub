@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { SAMPLE_PRODUCTS } from '../data/products';
+import { productsAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import {
     ArrowLeft, ShoppingBag, Truck, ShieldCheck, Star,
@@ -11,11 +11,38 @@ import {
 const ProductDetails = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('description');
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-    const product = SAMPLE_PRODUCTS.find(p => p.id === parseInt(id));
+    useEffect(() => {
+        fetchProduct();
+    }, [id]);
+
+    const fetchProduct = async () => {
+        try {
+            setLoading(true);
+            const response = await productsAPI.getProduct(id);
+            setProduct(response.data);
+        } catch (error) {
+            console.error('Failed to fetch product:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">جاري تحميل المنتج...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!product) {
         return (
