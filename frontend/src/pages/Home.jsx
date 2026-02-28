@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
 import OptimizedImage from '../components/OptimizedImage';
-import { productsAPI, categoriesAPI, suppliersAPI } from '../services/api';
+import { productsAPI, categoriesAPI, suppliersAPI, trustBadgesAPI } from '../services/api';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -17,6 +17,7 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [trustBadges, setTrustBadges] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,15 +26,17 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, productsRes, suppliersRes] = await Promise.all([
+      const [categoriesRes, productsRes, suppliersRes, badgesRes] = await Promise.all([
         categoriesAPI.getCategories(),
         productsAPI.getProducts({ limit: 8 }),
-        suppliersAPI.getPublicSuppliers()
+        suppliersAPI.getPublicSuppliers(),
+        trustBadgesAPI.getBadges()
       ]);
 
       setCategories(categoriesRes.data || []);
       setProducts(productsRes.data || []);
       setSuppliers(suppliersRes.data || []);
+      setTrustBadges(badgesRes.data || []);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -200,33 +203,28 @@ const Home = () => {
           <section className="py-24 bg-mesh border-y border-blue-50">
             <div className="container mx-auto px-4 md:px-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                {[
-                  {
-                    title: 'أسعار الجملة المباشرة',
-                    desc: 'وفر تكاليف الوسطاء واحصل على أفضل أسعار المصنع والمستوردين مباشرة لحساب مؤسستك.',
-                    icon: <TrendingUp className="text-brand" size={32} />
-                  },
-                  {
-                    title: 'موردون موثقون',
-                    desc: 'نحن نضمن جودة الموردين من خلال فحص دقيق للتراخيص والسجلات التجارية والقدرة الإنتاجية.',
-                    icon: <Award className="text-yellow-600" size={32} />
-                  },
-                  {
-                    title: 'دعم لوجستي متكامل',
-                    desc: 'نظام متقدم لتتبع الشحنات وإدارة الطلبات الكبيرة لضمان وصول بضاعتك في الموعد المحدد.',
-                    icon: <ShoppingBag className="text-brand" size={32} />
-                  }
-                ].map((badge, i) => (
-                  <div key={i} className="bg-white p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 group border border-slate-100">
-                    <div className="h-16 w-16 bg-brand/5 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-                      {badge.icon}
+                {trustBadges.map((badge, i) => {
+                  const getIcon = (iconName) => {
+                    switch (iconName) {
+                      case 'trending-up': return <TrendingUp className="text-brand" size={32} />;
+                      case 'award': return <Award className="text-yellow-600" size={32} />;
+                      case 'shopping-bag': return <ShoppingBag className="text-brand" size={32} />;
+                      default: return <TrendingUp className="text-brand" size={32} />;
+                    }
+                  };
+
+                  return (
+                    <div key={badge.id} className="bg-white p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 group border border-slate-100">
+                      <div className="h-16 w-16 bg-brand/5 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+                        {getIcon(badge.icon)}
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 mb-4 tracking-tight uppercase">{badge.title}</h3>
+                      <p className="text-slate-500 font-medium leading-relaxed">
+                        {badge.description}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-black text-slate-900 mb-4 tracking-tight uppercase">{badge.title}</h3>
-                    <p className="text-slate-500 font-medium leading-relaxed">
-                      {badge.desc}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>

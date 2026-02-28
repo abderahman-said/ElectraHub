@@ -1,38 +1,51 @@
 import React, { useState } from 'react';
 import { ShoppingBag, ArrowLeft, ShieldCheck, Zap, Globe, Heart, Check, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 
-const ImporterRegister = () => {
-    const [step, setStep] = useState(2); // Start directly at step 2
-    const [formData, setFormData] = useState({
-        companyName: '',
-        contactEmail: '',
-        whatsapp: '',
-        password: '',
-        category: 'AC',
-        subscription: 'basic'
-    });
-    const { register } = useAuth();
+const Register = () => {
+    const { register: registerUser } = useAuth();
     const navigate = useNavigate();
-    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
 
-    const categories = [
-        { id: 'AC', name: 'تكييفات' },
-        { id: 'FR', name: 'ثلاجات' },
-        { id: 'TV', name: 'شاشات سمارت' },
-        { id: 'WA', name: 'غسالات' },
-        { id: 'SA', name: 'أجهزة صغيرة' }
-    ];
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setError('');
-        const result = register(formData);
-        if (result.success) {
-            setStep(3); // Show success
-        } else {
-            setError(result.message);
+    const onSubmit = async (data) => {
+        setIsLoading(true);
+        try {
+            console.log('Register form data:', data);
+            const result = await registerUser(data);
+            console.log('Register result:', result);
+            
+            if (result.success) {
+                toast.success(result.message || 'Registration successful!');
+                
+                if (result.autoLogin) {
+                    // Auto-login successful, go to dashboard
+                    setTimeout(() => {
+                        navigate('/dashboard');
+                    }, 1500);
+                } else {
+                    // Registration successful but login failed, go to login page
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 2000);
+                }
+            } else {
+                console.error('Register failed:', result.error);
+                toast.error(result.error);
+            }
+        } catch (error) {
+            console.error('Register error:', error);
+            toast.error('Registration failed');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -48,146 +61,108 @@ const ImporterRegister = () => {
                         <img src="/logo.png" alt="" className=' rounded-xl w-auto h-auto max-w-[180px] mx-auto' />
 
                         <h2 className="text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
-                            ارتقِ <br />
-                            <span className="text-gradient">بتجارتك</span>
+                            إنشاء حساب جديد
                         </h2>
-                        <p className="text-slate-500 font-medium font-arabic">
-                            انضم إلى شبكة بالجملة لنخبة مستوردي الأدوات المنزلية.
+                        <p className="text-slate-500 font-medium">
+                            انضم إلى منصة بالجملة للتجار
                         </p>
                     </div>
 
-                    {step === 1 && (
-                        <div className="space-y-8 animate-slideInUp">
-                            <div className="grid grid-cols-1 gap-6">
-                                <div className="p-6 glass border-blue-50/50 rounded-2xl hover:border-blue-700/30 transition-all duration-500 cursor-pointer group shadow-premium">
-                                    <div className="flex items-center gap-5">
-                                        <div className="h-14 w-14 bg-[#2650fc]/10 rounded-2xl flex items-center justify-center text-[#2650fc] group-hover:bg-[#2650fc] group-hover:text-white transition-all duration-500 shadow-inner">
-                                            <ShieldCheck size={28} />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-black text-blue-900 leading-tight">Verified Importer Status</h3>
-                                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">Access to 5000+ traders</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="p-6 glass border-yellow-50/50 rounded-2xl hover:border-yellow-400/30 transition-all duration-500 cursor-pointer group shadow-premium">
-                                    <div className="flex items-center gap-5">
-                                        <div className="h-14 w-14 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600 group-hover:bg-yellow-400 group-hover:text-white transition-all duration-500 shadow-inner">
-                                            <Zap size={28} />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-black text-blue-900 leading-tight">Advanced SaaS Tools</h3>
-                                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">Real-time stock & order tracking</p>
-                                        </div>
-                                    </div>
-                                </div>
+                    <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+                        {errors.username && (
+                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-right">
+                                {errors.username.message}
                             </div>
-                            <button
-                                onClick={() => setStep(2)}
-                                className="w-full flex justify-center py-5 px-4 bg-[#2650fc] text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-brand/20 hover:bg-brand-dark hover:-translate-y-1 transition-all duration-500 active:scale-95"
-                            >
-                                Begin Application
-                            </button>
-                        </div>
-                    )}
+                        )}
+                        {errors.email && (
+                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-right">
+                                {errors.email.message}
+                            </div>
+                        )}
+                        {errors.password && (
+                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-right">
+                                {errors.password.message}
+                            </div>
+                        )}
+                        {errors.full_name && (
+                            <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-right">
+                                {errors.full_name.message}
+                            </div>
+                        )}
 
-                    {step === 2 && (
-                        <form className="space-y-8 animate-slideInUp" onSubmit={handleSubmit}>
-                            {error && (
-                                <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold text-center">
-                                    {error}
-                                </div>
-                            )}
-                            <div className="space-y-6">
-                                <div className="group">
-                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">اسم المنشأة / الشركة</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full px-6 py-4 rounded-2xl border   border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
-                                        placeholder="مثال: شركة النور للإلكترونيات"
-                                        value={formData.companyName}
-                                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                                    />
-                                </div>
-                                <div className="group">
-                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">رقم الواتساب للتواصل</label>
-                                    <input
-                                        type="tel"
-                                        required
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
-                                        placeholder="01xxxxxxxxx"
-                                        value={formData.whatsapp}
-                                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-                                    />
-                                </div>
-                                <div className="group relative">
-                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">التخصص الأساسي</label>
-                                    <select
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 appearance-none cursor-pointer text-right"
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    >
-                                        {categories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute left-6 top-[3.25rem] pointer-events-none text-blue-900">
-                                        <ChevronDown size={20} />
-                                    </div>
-                                </div>
-                                <div className="group">
-                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">البريد الإلكتروني</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
-                                        placeholder="contact@company.com"
-                                        value={formData.contactEmail}
-                                        onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
-                                    />
-                                </div>
-                                <div className="group">
-                                    <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">كلمة المرور</label>
-                                    <input
-                                        type="password"
-                                        required
-                                        className="w-full px-6 py-4 rounded-2xl border  border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
-                                        placeholder="••••••••"
-                                        value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    />
-                                </div>
+                        <div className="space-y-6">
+                            <div className="group">
+                                <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">اسم المستخدم</label>
+                                <input
+                                    type="text"
+                                    {...register('username', { required: 'Username is required' })}
+                                    className="w-full px-6 py-4 rounded-2xl border border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                    placeholder="أدخل اسم المستخدم"
+                                />
                             </div>
+
+                            <div className="group">
+                                <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">الاسم الكامل</label>
+                                <input
+                                    type="text"
+                                    {...register('full_name', { required: 'Full name is required' })}
+                                    className="w-full px-6 py-4 rounded-2xl border border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                    placeholder="أدخل اسمك الكامل"
+                                />
+                            </div>
+
+                            <div className="group">
+                                <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">البريد الإلكتروني</label>
+                                <input
+                                    type="email"
+                                    {...register('email', { required: 'Valid email is required' })}
+                                    className="w-full px-6 py-4 rounded-2xl border border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                    placeholder="example@email.com"
+                                />
+                            </div>
+
+                            <div className="group">
+                                <label className="block text-xs font-black text-blue-950 uppercase tracking-wider mb-3 mr-2 text-right">كلمة المرور</label>
+                                <input
+                                    type="password"
+                                    {...register('password', { 
+                                        required: 'Password is required',
+                                        minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                                    })}
+                                    className="w-full px-6 py-4 rounded-2xl border border-[#17255421] focus:ring-4 focus:ring-[#2650fc]/10 focus:border-brand/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
+                                    placeholder="•••••••••"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
                             <button
                                 type="submit"
-                                className="w-full flex justify-center py-5 px-4 bg-[#2650fc] text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-brand/20 hover:bg-brand-dark hover:-translate-y-1 transition-all duration-500 active:scale-95 flex items-center gap-3 overflow-hidden group"
+                                disabled={isLoading}
+                                className="flex-1 flex justify-center py-5 px-4 bg-[#2650fc] text-white text-base font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-brand/20 hover:bg-brand-dark hover:-translate-y-1 transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed items-center gap-3"
                             >
-                                <span>إرسال طلب التحقق</span>
-                                <ArrowLeft size={20} className="group-hover:-translate-x-2 transition-transform duration-500" />
+                                {isLoading ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        <span>جاري التسجيل...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>إنشاء حساب</span>
+                                        <ArrowLeft size={20} className="-translate-x-2" />
+                                    </>
+                                )}
                             </button>
-                        </form>
-                    )}
 
-                    {step === 3 && (
-                        <div className="text-center space-y-10 animate-slideInUp">
-                            <div className="mx-auto h-24 w-24 bg-[#2650fc]/10 rounded-[2.5rem] flex items-center justify-center text-[#2650fc] shadow-inner">
-                                <Check size={48} strokeWidth={3} />
-                            </div>
-                            <div className="space-y-4">
-                                <h3 className="text-3xl font-black text-blue-950 tracking-tighter">تم استلام طلبك!</h3>
-                                <p className="text-slate-600 font-medium leading-relaxed">
-                                    سيقوم فريقنا بمراجعة بياناتك والتواصل معك عبر <span className="text-blue-700 font-bold">الواتساب</span> خلال 24 ساعة لتفعيل حسابك.
-                                </p>
-                            </div>
                             <Link
-                                to="/dashboard"
-                                className="inline-block w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
+                                to="/login"
+                                className="flex justify-center py-5 px-4 border border-[#17255421] text-blue-950 text-base font-black uppercase tracking-widest rounded-2xl hover:bg-gray-50 transition-all duration-500 items-center gap-3"
                             >
-                                الذهاب للوحة التحكم
+                                <span>تسجيل الدخول</span>
+                                <ArrowLeft size={20} className="-translate-x-2" />
                             </Link>
                         </div>
-                    )}
+                    </form>
                 </div>
             </div>
         </div>
@@ -201,4 +176,4 @@ const ChevronDown = ({ size = 20 }) => (
     </svg>
 );
 
-export default ImporterRegister;
+export default Register;

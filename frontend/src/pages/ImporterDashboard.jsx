@@ -6,14 +6,14 @@ import {
     Plus,
     LogOut
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate, NavLink, Outlet } from 'react-router-dom';
 
 const ImporterDashboard = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
-    if (!user) {
+    if (!isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-mesh" dir="rtl">
                 <div className="glass p-10 rounded-[2rem] text-center space-y-6">

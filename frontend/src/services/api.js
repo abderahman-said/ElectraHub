@@ -44,6 +44,7 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   logout: () => api.post('/auth/logout'),
   getCurrentUser: () => api.get('/auth/me'),
+  register: (userData) => api.post('/auth/register', userData),
 };
 
 // Users API
@@ -91,6 +92,15 @@ export const productsAPI = {
   deleteProduct: (id) => api.delete(`/products/${id}`),
 };
 
+// Dashboard Products API
+export const dashboardProductsAPI = {
+  getProducts: (params = {}) => api.get('/dashboard/products', { params }),
+  getProduct: (id) => api.get(`/dashboard/products/${id}`),
+  createProduct: (productData) => api.post('/dashboard/products', productData),
+  updateProduct: (id, productData) => api.put(`/dashboard/products/${id}`, productData),
+  deleteProduct: (id) => api.delete(`/dashboard/products/${id}`),
+};
+
 // Categories API
 export const categoriesAPI = {
   getCategories: () => api.get('/categories'),
@@ -126,6 +136,25 @@ export const customersAPI = {
   createCustomer: (customerData) => api.post('/customers', customerData),
   updateCustomer: (id, customerData) => api.put(`/customers/${id}`, customerData),
   deleteCustomer: (id) => api.delete(`/customers/${id}`),
+};
+
+// Trust Badges API
+export const trustBadgesAPI = {
+  getBadges: () => api.get('/trust-badges'),
+};
+
+// Cycle/Carousel API
+export const cycleAPI = {
+  getFeaturedProducts: () => api.get('/cycle/featured-products'),
+  getPromotions: () => api.get('/cycle/promotions'),
+  getCategories: () => api.get('/cycle/categories'),
+  getBanners: () => api.get('/cycle/banners'),
+};
+
+// Importers/Suppliers API
+export const importersAPI = {
+  getImporters: () => api.get('/public/suppliers'),
+  getImporter: (id) => api.get(`/public/suppliers/${id}`),
 };
 
 // Health check

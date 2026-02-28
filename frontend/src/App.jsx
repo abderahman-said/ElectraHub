@@ -10,8 +10,7 @@ import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import NotFound from './pages/NotFound';
 import { useCart } from './context/CartContext';
-import { AuthProvider } from './context/AuthContext';
-import { AuthProvider as PamAuthProvider } from './hooks/useAuth';
+import { AuthProvider } from './hooks/useAuth';
 import './App.css';
 
 import Login from './pages/Login';
@@ -35,43 +34,41 @@ function App() {
   const { cartCount } = useCart();
 
   return (
-    <PamAuthProvider>
-      <AuthProvider>
-        <ErrorBoundary>
-          <div className="flex flex-col min-h-screen bg-white text-gray-900" dir="rtl">
-            <Navbar cartCount={cartCount} />
-            <CartDrawer />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/pam-dashboard" element={<PamDashboard />} />
-                <Route path="/product-management" element={<ProductManagement />} />
-                <Route path="/category-management" element={<CategoryManagement />} />
-                <Route path="/supplier-management" element={<SupplierManagement />} />
-                <Route path="/order-management" element={<OrderManagement />} />
-                <Route path="/dashboard" element={<PrivateRoute><ImporterDashboard /></PrivateRoute>}>
-                  <Route index element={<DashboardOverview />} />
-                  <Route path="inventory" element={<DashboardInventory />} />
-                  <Route path="profile" element={<DashboardProfile />} />
-                </Route>
-                <Route path="/dashboard/add-product" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
-                <Route path="/dashboard/edit-product/:id" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
-                <Route path="/importers" element={<Importers />} />
-                <Route path="/importer/:id" element={<ImporterProfile />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </ErrorBoundary>
-      </AuthProvider>
-    </PamAuthProvider>
+    <AuthProvider>
+      <ErrorBoundary>
+        <div className="flex flex-col min-h-screen bg-white text-gray-900" dir="rtl">
+          <Navbar cartCount={cartCount} />
+          <CartDrawer />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/pam-dashboard" element={<PamDashboard />} />
+              <Route path="/product-management" element={<ProductManagement />} />
+              <Route path="/category-management" element={<CategoryManagement />} />
+              <Route path="/supplier-management" element={<SupplierManagement />} />
+              <Route path="/order-management" element={<OrderManagement />} />
+              <Route path="/dashboard" element={<PrivateRoute><ImporterDashboard /></PrivateRoute>}>
+                <Route index element={<DashboardOverview />} />
+                <Route path="inventory" element={<DashboardInventory />} />
+                <Route path="profile" element={<DashboardProfile />} />
+              </Route>
+              <Route path="/dashboard/add-product" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
+              <Route path="/dashboard/edit-product/:id" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
+              <Route path="/importers" element={<Importers />} />
+              <Route path="/importer/:id" element={<ImporterProfile />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </ErrorBoundary>
+    </AuthProvider>
   );
 }
 

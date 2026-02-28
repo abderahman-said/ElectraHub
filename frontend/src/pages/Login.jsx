@@ -26,7 +26,7 @@ const Login = () => {
             if (result.success) {
                 toast.success('Login successful!');
                 console.log('Navigating to dashboard...');
-                localStorage.setItem('pam_token', result.token);
+                // Token is already stored in useAuth hook, no need to set manually
                 navigate('/dashboard');
             } else {
                 console.error('Login failed:', result.error);

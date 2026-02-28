@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Save, ChevronDown } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const DashboardProfile = () => {
-    const { user, updateProfile } = useAuth();
+    const { user, updateProfile, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     const [profileData, setProfileData] = useState({
         companyName: user?.companyName || '',
@@ -12,6 +14,22 @@ const DashboardProfile = () => {
         category: user?.category || 'AC',
         password: user?.password || ''
     });
+
+    if (!isAuthenticated) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-mesh" dir="rtl">
+                <div className="glass p-10 rounded-[2rem] text-center space-y-6">
+                    <h2 className="text-2xl font-black text-blue-950 uppercase tracking-tighter">يرجى تسجيل الدخول أولاً</h2>
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="px-8 py-4 bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200"
+                    >
+                        الذهاب لصفحة الدخول
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const categories = [
         { id: 'AC', name: 'تكييفات' },

@@ -2,13 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, User, Menu, X, ShoppingBag, ArrowLeft, LayoutDashboard, LogOut, Package, ChevronRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { productsAPI } from '../services/api';
 import OptimizedImage from './OptimizedImage';
 
 const Navbar = ({ cartCount = 0 }) => {
   const { setIsCartOpen } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -83,7 +83,7 @@ const Navbar = ({ cartCount = 0 }) => {
             >
               <Search size={18} />
             </button>
-            {user ? (
+            {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <Link to="/dashboard" className="h-11 px-6 bg-[#2650fc]/10 rounded-xl flex items-center justify-center text-xs font-black uppercase tracking-widest text-[#2650fc] hover:bg-white transition-all gap-2">
                   <LayoutDashboard size={16} />
@@ -228,7 +228,7 @@ const Navbar = ({ cartCount = 0 }) => {
             </Link>
           ))}
           <div className="pt-4 border-t border-blue-50 flex flex-col gap-3">
-            {user ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/dashboard"
@@ -245,13 +245,22 @@ const Navbar = ({ cartCount = 0 }) => {
                 </button>
               </>
             ) : (
-              <Link
-                to="/register"
-                className="w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                أصبح مستورداً
-              </Link>
+              <>
+                <Link
+                  to="/login"
+                  className="w-full py-5 bg-blue-50 text-blue-700 text-center rounded-2xl font-black text-xs uppercase tracking-widest"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  تسجيل الدخول
+                </Link>
+                <Link
+                  to="/register"
+                  className="w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  أصبح مستورداً
+                </Link>
+              </>
             )}
           </div>
         </div>

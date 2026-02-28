@@ -1,12 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, Building2, ArrowLeft, ShieldCheck, Zap } from 'lucide-react';
-import { IMPORTERS } from '../data/importers';
+import { importersAPI } from '../services/api';
 
 const Importers = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [importers, setImporters] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const filteredImporters = IMPORTERS.filter(imp =>
+    useEffect(() => {
+        fetchImporters();
+    }, []);
+
+    const fetchImporters = async () => {
+        try {
+            setLoading(true);
+            const response = await importersAPI.getImporters();
+            
+            // Transform supplier data to match the expected format
+            const transformedImporters = response.data.map(supplier => ({
+                id: supplier.id.toString(),
+                name: supplier.name_ar || supplier.name,
+                cat: supplier.city_ar || supplier.city,
+                stock: `${Math.floor(Math.random() * 3000) + 500} عنصر`, // Mock stock count
+                active: `${Math.floor(Math.random() * 20) + 5} سنوات`, // Mock years active
+                desc: `مورد معتمد في ${supplier.city_ar} متخصص في توريد السلع عالية الجودة.`,
+                img: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}?auto=format&fit=crop&w=800&q=80`,
+                rating: supplier.rating || 4.5,
+                reviews: Math.floor(Math.random() * 200) + 50,
+                verified: supplier.is_verified
+            }));
+            
+            setImporters(transformedImporters);
+        } catch (error) {
+            console.error('Failed to fetch importers:', error);
+            // Fallback to empty array or show error
+            setImporters([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredImporters = importers.filter(imp =>
         imp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         imp.cat.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -51,7 +86,15 @@ const Importers = () => {
             {/* Importers Grid */}
             <section className="py-20">
                 <div className="container mx-auto px-4 md:px-8">
-                    {filteredImporters.length > 0 ? (
+                    {loading ? (
+                        <div className="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
+                            <div className="h-20 w-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                            </div>
+                            <h3 className="text-2xl font-black text-blue-950 mb-2">جاري تحميل الموردين...</h3>
+                            <p className="text-slate-500 font-bold">يرجى الانتظار لحظة</p>
+                        </div>
+                    ) : filteredImporters.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredImporters.map((imp) => (
                                 <div key={imp.id} className="group glass p-8 rounded-[2.5rem] border-[#17255421]/50 hover:bg-white hover:scale-[1.02] hover:shadow-premium transition-all duration-500 flex flex-col h-full relative overflow-hidden">
@@ -66,6 +109,12 @@ const Importers = () => {
                                                 <Star size={14} className="text-yellow-500 fill-yellow-500" />
                                                 <span className="text-sm font-bold text-blue-950">{imp.rating}</span>
                                             </div>
+                                            {imp.verified && (
+                                                <div className="absolute top-4 right-4 bg-green-500/90 backdrop-blur px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm">
+                                                    <ShieldCheck size={14} className="text-white" />
+                                                    <span className="text-sm font-bold text-white">معتمد</span>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="flex-grow space-y-4">

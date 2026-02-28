@@ -1,26 +1,90 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Edit, Trash2 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { dashboardProductsAPI } from '../../services/api';
+import { toast } from 'react-hot-toast';
 
 const DashboardInventory = () => {
-    const { user, deleteProduct } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchProducts();
+        }
+    }, [isAuthenticated]);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await dashboardProductsAPI.getProducts();
+            setProducts(response.data || []);
+        } catch (error) {
+            console.error('Failed to fetch products:', error);
+            toast.error('فشل في جلب المنتجات');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteProduct = async (productId) => {
+        try {
+            await dashboardProductsAPI.deleteProduct(productId);
+            toast.success('تم حذف المنتج بنجاح');
+            fetchProducts(); // Refresh the list
+        } catch (error) {
+            console.error('Failed to delete product:', error);
+            toast.error('فشل في حذف المنتج');
+        }
+    };
+
+    if (!isAuthenticated) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-mesh" dir="rtl">
+                <div className="glass p-10 rounded-[2rem] text-center space-y-6">
+                    <h2 className="text-2xl font-black text-blue-950 uppercase tracking-tighter">يرجى تسجيل الدخول أولاً</h2>
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="px-8 py-4 bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200"
+                    >
+                        الذهاب لصفحة الدخول
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     const categoryMap = {
-        'AC': { name: 'تكييفات', color: 'bg-blue-50 text-blue-600 border-blue-100' },
-        'FR': { name: 'ثلاجات', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-        'WA': { name: 'غسالات', color: 'bg-purple-50 text-purple-600 border-purple-100' },
-        'TV': { name: 'شاشات', color: 'bg-amber-50 text-amber-600 border-amber-100' },
-        'SA': { name: 'أجهزة صغيرة', color: 'bg-rose-50 text-rose-600 border-rose-100' }
+        'HOME': { name: 'أدوات منزلية', color: 'bg-blue-50 text-blue-600 border-blue-100' },
+        'KITCHEN': { name: 'مطبخ', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+        'CLEANING': { name: 'تنظيف', color: 'bg-purple-50 text-purple-600 border-purple-100' },
+        'GARDEN': { name: 'حديقة', color: 'bg-green-50 text-green-600 border-green-100' },
+        'DECOR': { name: 'ديكور', color: 'bg-amber-50 text-amber-600 border-amber-100' },
+        'STORAGE': { name: 'تخزين', color: 'bg-rose-50 text-rose-600 border-rose-100' },
+        'LIGHTING': { name: 'إضاءة', color: 'bg-yellow-50 text-yellow-600 border-yellow-100' },
+        'ELECTRONICS': { name: 'إلكترونيات', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-mesh" dir="rtl">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">جاري تحميل المنتجات...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-2xl font-black text-blue-950 tracking-tight">إدارة المنتجات</h3>
-                    <p className="text-slate-500 font-medium">لديك إجمالي <span className="text-blue-700 font-bold">{user.products?.length || 0}</span> منتج معروض حالياً</p>
+                    <p className="text-slate-500 font-medium">لديك إجمالي <span className="text-blue-700 font-bold">{products.length || 0}</span> منتج معروض حالياً</p>
                 </div>
             </div>
 
@@ -36,13 +100,13 @@ const DashboardInventory = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-blue-50/20">
-                            {user.products?.map((product) => (
+                            {products.map((product) => (
                                 <tr key={product.id} className="hover:bg-blue-50/30 transition-all duration-300 group">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-5">
                                             <div className="h-16 w-16 bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-100 flex-shrink-0 relative group-hover:scale-105 transition-transform duration-500 flex items-center justify-center p-1">
-                                                {product.image ? (
-                                                    <img src={product.image} alt={product.name} className="h-full w-full object-contain" />
+                                                {product.images && product.images[0] ? (
+                                                    <img src={product.images[0]} alt={product.name} className="h-full w-full object-contain" />
                                                 ) : (
                                                     <Package className="text-slate-300" size={28} />
                                                 )}
@@ -85,7 +149,7 @@ const DashboardInventory = () => {
                                             <button
                                                 onClick={() => {
                                                     if (window.confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                                                        deleteProduct(product.id);
+                                                        handleDeleteProduct(product.id);
                                                     }
                                                 }}
                                                 className="h-11 w-11 bg-white border border-red-50 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-600 hover:text-white hover:shadow-lg hover:shadow-red-200 transition-all duration-300 active:scale-90 shadow-sm"
@@ -97,7 +161,7 @@ const DashboardInventory = () => {
                                     </td>
                                 </tr>
                             ))}
-                            {(!user.products || user.products.length === 0) && (
+                            {(!products || products.length === 0) && (
                                 <tr>
                                     <td colSpan="4" className="px-8 py-20 text-center">
                                         <div className="flex flex-col items-center gap-4">

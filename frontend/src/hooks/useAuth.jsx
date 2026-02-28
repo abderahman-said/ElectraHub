@@ -88,6 +88,31 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (userData) => {
+    try {
+      console.log('Attempting registration with:', userData);
+      const response = await authAPI.register(userData);
+      console.log('Register response:', response.data);
+      
+      // Auto-login after registration for pending users
+      // For pending users, they can login but might have limited access
+      const loginResult = await login({
+        username: userData.username,
+        password: userData.password
+      });
+      
+      return { 
+        success: true, 
+        message: response.data.message || 'Registration successful! Please wait for account activation.',
+        autoLogin: loginResult.success
+      };
+    } catch (error) {
+      console.error('Registration error:', error);
+      const message = error.response?.data?.error || 'Registration failed';
+      return { success: false, error: message };
+    }
+  };
+
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -129,6 +154,7 @@ export const AuthProvider = ({ children }) => {
     token,
     loading,
     login,
+    register,
     logout,
     hasPermission,
     hasAccessLevel,
