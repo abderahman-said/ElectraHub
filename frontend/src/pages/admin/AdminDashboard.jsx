@@ -1,21 +1,19 @@
 import React from 'react';
 import {
     LayoutDashboard,
-    Box,
-    Settings,
-    Plus,
-    LogOut,
-    ShieldAlert,
     Users,
-    Tags
+    Tags,
+    LogOut,
+    ShieldAlert
 } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, NavLink, Outlet } from 'react-router-dom';
 
-const ImporterDashboard = () => {
+const AdminDashboard = () => {
     const { user, logout, isAuthenticated, hasAccessLevel } = useAuth();
     const navigate = useNavigate();
 
+    // Ideally, check for admin access level here.
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-mesh" dir="rtl">
@@ -32,32 +30,34 @@ const ImporterDashboard = () => {
         );
     }
 
+    // uncomment this and remove the visual component when ready:
+    // if (!hasAccessLevel('admin') && !hasAccessLevel('super_admin')) {
+    //  return <div>غير مصرح</div>;
+    // }
+
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
     const menuItems = [
-        { path: '/dashboard', label: 'نظرة عامة', icon: LayoutDashboard, end: true },
-        { path: '/dashboard/inventory', label: 'إدارة المنتجات', icon: Box },
-        { path: '/dashboard/profile', label: 'تعديل البروفايل', icon: Settings },
+        { path: '/admin/merchants', label: 'جميع التجار', icon: Users },
+        { path: '/admin/categories', label: 'جميع التصنيفات', icon: Tags },
     ];
-
-    if (hasAccessLevel && (hasAccessLevel('admin') || hasAccessLevel('super_admin'))) {
-        menuItems.push({ path: '/dashboard/admin/merchants', label: 'إدارة التجار', icon: Users, end: false });
-        menuItems.push({ path: '/dashboard/admin/categories', label: 'إدارة التصنيفات', icon: Tags, end: false });
-    }
 
     return (
         <div className="min-h-screen bg-mesh flex" dir="rtl">
             {/* Sidebar */}
             <aside className="w-72 bg-white/80 backdrop-blur-2xl border-l border-blue-100/50 hidden md:flex flex-col sticky top-0 h-screen">
                 <div className="p-8">
-                    <img src="/logo.png" alt="" className="w-24 h-24  rounded-xl" />
-                    <p className="text-[16px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 text-right">لوحة تحكم المستورد</p>
+                    <div className="flex items-center gap-3">
+                        <ShieldAlert className="text-blue-700 w-10 h-10" />
+                        <h2 className="text-2xl font-black text-blue-950 tracking-tighter">الإدارة</h2>
+                    </div>
+                    <p className="text-[14px] font-black text-slate-400 uppercase tracking-[0.1em] mt-2 text-right">لوحة تحكم المشرف</p>
                 </div>
 
-                <nav className="flex-grow px-4 pb-8 space-y-2">
+                <nav className="flex-grow px-4 pb-8 space-y-2 mt-4">
                     {menuItems.map((item) => (
                         <NavLink
                             key={item.path}
@@ -77,7 +77,7 @@ const ImporterDashboard = () => {
                     ))}
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-black text-red-500 hover:bg-red-50 transition-all duration-300"
+                        className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-black text-red-500 hover:bg-red-50 transition-all duration-300 mt-auto"
                     >
                         <LogOut size={20} />
                         تسجيل الخروج
@@ -86,26 +86,16 @@ const ImporterDashboard = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-grow p-8 lg:p-12 space-y-10">
+            <main className="flex-grow p-8 lg:p-12 space-y-10 w-full overflow-hidden">
                 {/* Header */}
                 <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                        <h1 className="text-4xl font-black text-blue-950 tracking-tighter">لوحة التحكم</h1>
-                        <p className="text-slate-500 font-medium mt-1">مرحباً بك مجدداً، <span className="text-blue-700 font-bold">{user.companyName}</span> 👋</p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => navigate('/dashboard/add-product')}
-                            className="bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-3 hover:bg-blue-800 transition-all shadow-2xl shadow-blue-200 active:scale-95"
-                        >
-                            <Plus size={20} />
-                            إضافة منتج جديد
-                        </button>
+                        <h1 className="text-4xl font-black text-blue-950 tracking-tighter">لوحة تحكم الإدارة</h1>
+                        <p className="text-slate-500 font-medium mt-1">مرحباً بك مجدداً، <span className="text-blue-700 font-bold">{user?.full_name || 'Admin'}</span> 👋</p>
                     </div>
                 </header>
 
-                <div className="animate-fadeIn">
+                <div className="animate-fadeIn w-full">
                     <Outlet />
                 </div>
             </main>
@@ -113,4 +103,4 @@ const ImporterDashboard = () => {
     );
 };
 
-export default ImporterDashboard;
+export default AdminDashboard;

@@ -29,6 +29,8 @@ import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import OrderManagement from './pages/OrderManagement';
+import AdminMerchants from './pages/admin/AdminMerchants';
+import AdminCategories from './pages/admin/AdminCategories';
 
 function App() {
   const { cartCount } = useCart();
@@ -56,12 +58,15 @@ function App() {
                 <Route index element={<DashboardOverview />} />
                 <Route path="inventory" element={<DashboardInventory />} />
                 <Route path="profile" element={<DashboardProfile />} />
+                <Route path="admin/merchants" element={<AdminMerchants />} />
+                <Route path="admin/categories" element={<AdminCategories />} />
               </Route>
               <Route path="/dashboard/add-product" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
               <Route path="/dashboard/edit-product/:id" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
               <Route path="/importers" element={<Importers />} />
               <Route path="/importer/:id" element={<ImporterProfile />} />
               <Route path="/pricing" element={<Pricing />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

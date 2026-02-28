@@ -94,6 +94,7 @@ export const productsAPI = {
 
 // Dashboard Products API
 export const dashboardProductsAPI = {
+  getOverview: (params = {}) => api.get('/dashboard/overview', { params }),
   getProducts: (params = {}) => api.get('/dashboard/products', { params }),
   getProduct: (id) => api.get(`/dashboard/products/${id}`),
   createProduct: (productData) => api.post('/dashboard/products', productData),

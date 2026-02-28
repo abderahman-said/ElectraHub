@@ -57,15 +57,16 @@ const DashboardInventory = () => {
         );
     }
 
-    const categoryMap = {
-        'HOME': { name: 'أدوات منزلية', color: 'bg-blue-50 text-blue-600 border-blue-100' },
-        'KITCHEN': { name: 'مطبخ', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-        'CLEANING': { name: 'تنظيف', color: 'bg-purple-50 text-purple-600 border-purple-100' },
-        'GARDEN': { name: 'حديقة', color: 'bg-green-50 text-green-600 border-green-100' },
-        'DECOR': { name: 'ديكور', color: 'bg-amber-50 text-amber-600 border-amber-100' },
-        'STORAGE': { name: 'تخزين', color: 'bg-rose-50 text-rose-600 border-rose-100' },
-        'LIGHTING': { name: 'إضاءة', color: 'bg-yellow-50 text-yellow-600 border-yellow-100' },
-        'ELECTRONICS': { name: 'إلكترونيات', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' }
+    const categoryColorMap = {
+        'أدوات منزلية': 'bg-blue-50 text-blue-600 border-blue-100',
+        'مطبخ': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+        'تنظيف': 'bg-purple-50 text-purple-600 border-purple-100',
+        'حديقة': 'bg-green-50 text-green-600 border-green-100',
+        'ديكور': 'bg-amber-50 text-amber-600 border-amber-100',
+        'تخزين': 'bg-rose-50 text-rose-600 border-rose-100',
+        'إضاءة': 'bg-yellow-50 text-yellow-600 border-yellow-100',
+        'إلكترونيات': 'bg-indigo-50 text-indigo-600 border-indigo-100',
+        'أجهزة منزلية': 'bg-orange-50 text-orange-600 border-orange-100'
     };
 
     if (loading) {
@@ -115,7 +116,10 @@ const DashboardInventory = () => {
                                                 <span className="font-black text-blue-950 text-lg group-hover:text-blue-700 transition-colors uppercase tracking-tight">{product.name}</span>
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
-                                                        📦 MOQ: {product.moq || 1} قطعة
+                                                        📦 المخزون: {product.stock_quantity || 0}
+                                                    </span>
+                                                    <span className="text-xs font-bold text-slate-400 flex items-center gap-1">
+                                                        🛍️ أقل كمية: {product.moq || 1}
                                                     </span>
                                                     {product.warranty && (
                                                         <span className="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-md">
@@ -127,14 +131,18 @@ const DashboardInventory = () => {
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-center">
-                                        <span className={`px-4 py-1.5 rounded-xl text-xs font-black border tracking-widest uppercase ${categoryMap[product.category]?.color || 'bg-slate-50 text-slate-600 border-slate-100'}`}>
-                                            {categoryMap[product.category]?.name || product.category}
+                                        <span className={`px-4 py-1.5 rounded-xl text-xs font-black border tracking-widest uppercase ${categoryColorMap[product.category_name_ar] || 'bg-slate-50 text-slate-600 border-slate-100'}`}>
+                                            {product.category_name_ar || product.category_name || 'غير محدد'}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-center">
                                         <div className="flex flex-col items-center">
                                             <span className="font-black text-blue-700 text-xl tracking-tighter">${product.price}</span>
-                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">السعر المقترح</span>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest relative -top-1">السعر للمستهلك</span>
+                                            <div className="mt-1 flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-xs font-bold">
+                                                <span>الجملة:</span>
+                                                <span>${product.wholesale_price}</span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">

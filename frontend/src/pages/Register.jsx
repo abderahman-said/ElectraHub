@@ -60,7 +60,7 @@ const Register = () => {
                     <div className="text-center mb-12">
                         <img src="/logo.png" alt="" className=' rounded-xl w-auto h-auto max-w-[180px] mx-auto' />
 
-                        <h2 className="text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
+                        <h2 className="pt-2 text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
                             إنشاء حساب جديد
                         </h2>
                         <p className="text-slate-500 font-medium">

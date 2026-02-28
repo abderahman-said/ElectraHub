@@ -19,7 +19,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan('combined'));
 
 // Rate limiting
@@ -120,7 +121,7 @@ db.serialize(() => {
   // Add additional columns for home appliances
   const additionalColumns = [
     'brand TEXT',
-    'model TEXT', 
+    'model TEXT',
     'color TEXT',
     'size TEXT',
     'weight_unit TEXT',
@@ -350,7 +351,7 @@ function insertDefaultData() {
 
   // Create default admin user
   const adminPassword = bcrypt.hashSync('admin123', 10);
-  db.run('INSERT OR IGNORE INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+  db.run('INSERT OR IGNORE INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     ['admin', 'admin@belgomla.com', 'System Administrator', 'ADMIN001', 'IT', 'System Administrator', 'super_admin', 'active', adminPassword]);
 
   // Insert sample categories
@@ -414,7 +415,7 @@ const checkPermission = (resource, action) => {
   return async (req, res, next) => {
     try {
       const userId = req.user.id;
-      
+
       // Super admin has access to everything
       const user = await new Promise((resolve, reject) => {
         db.get('SELECT access_level FROM users WHERE id = ?', [userId], (err, row) => {
@@ -473,7 +474,7 @@ app.post('/api/auth/login', [
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res) => {
   console.log('Login request received:', req.body);
-  
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log('Validation errors:', errors.array());
@@ -483,7 +484,7 @@ app.post('/api/auth/login', [
   const { username, password } = req.body;
   const ipAddress = req.ip;
   const userAgent = req.get('User-Agent');
-  
+
   console.log('Attempting login for:', username);
 
   try {
@@ -543,10 +544,10 @@ app.post('/api/auth/login', [
 
 app.post('/api/auth/logout', authenticateToken, (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
-  
+
   db.run('UPDATE sessions SET is_active = 0 WHERE token = ?', [token]);
   logAudit('LOGOUT', 'auth', req.user.id, {}, req.ip, req.get('User-Agent'), req.user.id);
-  
+
   res.json({ message: 'Logged out successfully' });
 });
 
@@ -579,7 +580,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
           else resolve(row.count);
         });
       });
-      
+
       user.products_count = productsCount;
     }
 
@@ -621,17 +622,17 @@ app.post('/api/users', authenticateToken, checkPermission('users', 'create'), [
 
   try {
     const hashedPassword = bcrypt.hashSync(password, 10);
-    
+
     const result = await new Promise((resolve, reject) => {
       db.run('INSERT INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [username, email, full_name, employee_id, department, position, access_level || 'basic', status || 'pending', hashedPassword], function(err) {
+        [username, email, full_name, employee_id, department, position, access_level || 'basic', status || 'pending', hashedPassword], function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID });
         });
     });
 
     logAudit('CREATE_USER', 'users', result.id.toString(), { username, email, full_name }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.status(201).json({ message: 'User created successfully', userId: result.id });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -639,6 +640,55 @@ app.post('/api/users', authenticateToken, checkPermission('users', 'create'), [
     } else {
       res.status(500).json({ error: 'Failed to create user' });
     }
+  }
+});
+
+app.delete('/api/users/:id', authenticateToken, checkPermission('users', 'delete'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if user exists
+    const existingUser = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if user is trying to delete themselves
+    if (existingUser.id === req.user.id) {
+      return res.status(400).json({ error: 'You cannot delete your own account' });
+    }
+
+    // Check if user has related products
+    const hasProducts = await new Promise((resolve, reject) => {
+      db.get('SELECT COUNT(*) as count FROM products WHERE user_id = ?', [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row.count > 0);
+      });
+    });
+
+    if (hasProducts) {
+      return res.status(400).json({ error: 'لا يمكن حذف التاجر لأنه يمتلك منتجات بالموقع' });
+    }
+
+    await new Promise((resolve, reject) => {
+      db.run('DELETE FROM users WHERE id = ?', [id], function (err) {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    logAudit('DELETE_USER', 'users', id, { username: existingUser.username, email: existingUser.email }, req.ip, req.get('User-Agent'), req.user.id);
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Failed to delete user:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 });
 
@@ -722,7 +772,7 @@ app.get('/api/sessions', authenticateToken, checkPermission('sessions', 'read'),
 app.get('/api/products', async (req, res) => {
   try {
     const { category, featured, search, min_price, max_price, page = 1, limit = 20 } = req.query;
-    
+
     let query = `
       SELECT p.*, c.name as category_name, c.name_ar as category_name_ar, s.name as supplier_name
       FROM products p
@@ -730,45 +780,45 @@ app.get('/api/products', async (req, res) => {
       LEFT JOIN suppliers s ON p.supplier_id = s.id
       WHERE p.is_active = 1
     `;
-    
+
     const params = [];
-    
+
     if (category) {
       query += ' AND p.category_id = ?';
       params.push(category);
     }
-    
+
     if (featured === 'true') {
       query += ' AND p.is_featured = 1';
     }
-    
+
     if (search) {
       query += ' AND (p.name LIKE ? OR p.name_ar LIKE ? OR p.description LIKE ? OR p.description_ar LIKE ?)';
       const searchTerm = `%${search}%`;
       params.push(searchTerm, searchTerm, searchTerm, searchTerm);
     }
-    
+
     if (min_price) {
       query += ' AND p.wholesale_price >= ?';
       params.push(min_price);
     }
-    
+
     if (max_price) {
       query += ' AND p.wholesale_price <= ?';
       params.push(max_price);
     }
-    
+
     query += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?';
     const offset = (parseInt(page) - 1) * parseInt(limit);
     params.push(parseInt(limit), offset);
-    
+
     const products = await new Promise((resolve, reject) => {
       db.all(query, params, (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
     });
-    
+
     // Parse JSON fields
     const formattedProducts = products.map(product => ({
       ...product,
@@ -776,7 +826,7 @@ app.get('/api/products', async (req, res) => {
       specifications: product.specifications ? JSON.parse(product.specifications) : {},
       tags: product.tags ? JSON.parse(product.tags) : []
     }));
-    
+
     res.json(formattedProducts);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch products' });
@@ -786,7 +836,7 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const product = await new Promise((resolve, reject) => {
       db.get(`
         SELECT p.*, c.name as category_name, c.name_ar as category_name_ar, s.name as supplier_name
@@ -799,11 +849,11 @@ app.get('/api/products/:id', async (req, res) => {
         else resolve(row);
       });
     });
-    
+
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    
+
     // Parse JSON fields
     const formattedProduct = {
       ...product,
@@ -811,7 +861,7 @@ app.get('/api/products/:id', async (req, res) => {
       specifications: product.specifications ? JSON.parse(product.specifications) : {},
       tags: product.tags ? JSON.parse(product.tags) : []
     };
-    
+
     res.json(formattedProduct);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product' });
@@ -852,14 +902,14 @@ app.post('/api/products', authenticateToken, checkPermission('products', 'create
         max_order_quantity, stock_quantity, unit, weight, dimensions,
         JSON.stringify(images || []), JSON.stringify(specifications || {}),
         JSON.stringify(tags || []), category_id, supplier_id
-      ], function(err) {
+      ], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
 
     logAudit('CREATE_PRODUCT', 'products', result.id.toString(), { name, sku }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.status(201).json({ message: 'Product created successfully', productId: result.id });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -938,7 +988,7 @@ app.put('/api/products/:id', authenticateToken, checkPermission('products', 'upd
         return;
       }
 
-      db.run(`UPDATE products SET ${updates.join(', ')} WHERE id = ?`, values, function(err) {
+      db.run(`UPDATE products SET ${updates.join(', ')} WHERE id = ?`, values, function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -949,7 +999,7 @@ app.put('/api/products/:id', authenticateToken, checkPermission('products', 'upd
     }
 
     logAudit('UPDATE_PRODUCT', 'products', id, { name, sku }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Product updated successfully' });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -977,7 +1027,7 @@ app.delete('/api/products/:id', authenticateToken, checkPermission('products', '
     }
 
     const result = await new Promise((resolve, reject) => {
-      db.run('DELETE FROM products WHERE id = ?', [id], function(err) {
+      db.run('DELETE FROM products WHERE id = ?', [id], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -988,7 +1038,7 @@ app.delete('/api/products/:id', authenticateToken, checkPermission('products', '
     }
 
     logAudit('DELETE_PRODUCT', 'products', id, { name: existingProduct.name, sku: existingProduct.sku }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete product' });
@@ -1020,18 +1070,18 @@ app.get('/api/categories', async (req, res) => {
 app.get('/api/categories/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const category = await new Promise((resolve, reject) => {
       db.get('SELECT * FROM categories WHERE id = ? AND is_active = 1', [id], (err, row) => {
         if (err) reject(err);
         else resolve(row);
       });
     });
-    
+
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
-    
+
     res.json(category);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch category' });
@@ -1054,14 +1104,14 @@ app.post('/api/categories', authenticateToken, checkPermission('categories', 'cr
       db.run(`
         INSERT INTO categories (name, name_ar, description, description_ar, image_url, parent_id, sort_order)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, [name, name_ar, description, description_ar, image_url, parent_id, sort_order || 0], function(err) {
+      `, [name, name_ar, description, description_ar, image_url, parent_id, sort_order || 0], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
 
     logAudit('CREATE_CATEGORY', 'categories', result.id.toString(), { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.status(201).json({ message: 'Category created successfully', categoryId: result.id });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create category' });
@@ -1114,7 +1164,7 @@ app.put('/api/categories/:id', authenticateToken, checkPermission('categories', 
         return;
       }
 
-      db.run(`UPDATE categories SET ${updates.join(', ')} WHERE id = ?`, values, function(err) {
+      db.run(`UPDATE categories SET ${updates.join(', ')} WHERE id = ?`, values, function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1125,7 +1175,7 @@ app.put('/api/categories/:id', authenticateToken, checkPermission('categories', 
     }
 
     logAudit('UPDATE_CATEGORY', 'categories', id, { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Category updated successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update category' });
@@ -1161,7 +1211,7 @@ app.delete('/api/categories/:id', authenticateToken, checkPermission('categories
     }
 
     const result = await new Promise((resolve, reject) => {
-      db.run('DELETE FROM categories WHERE id = ?', [id], function(err) {
+      db.run('DELETE FROM categories WHERE id = ?', [id], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1172,7 +1222,7 @@ app.delete('/api/categories/:id', authenticateToken, checkPermission('categories
     }
 
     logAudit('DELETE_CATEGORY', 'categories', id, { name: existingCategory.name, name_ar: existingCategory.name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete category' });
@@ -1250,14 +1300,14 @@ app.post('/api/suppliers', authenticateToken, checkPermission('suppliers', 'crea
         name, name_ar, email, phone, address, address_ar,
         city, city_ar, country, country_ar, tax_id,
         commercial_register, rating || 0, is_verified || 0
-      ], function(err) {
+      ], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
 
     logAudit('CREATE_SUPPLIER', 'suppliers', result.id.toString(), { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.status(201).json({ message: 'Supplier created successfully', supplierId: result.id });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -1271,7 +1321,7 @@ app.post('/api/suppliers', authenticateToken, checkPermission('suppliers', 'crea
 app.get('/api/suppliers/:id', authenticateToken, checkPermission('suppliers', 'read'), async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const supplier = await new Promise((resolve, reject) => {
       db.get(`
         SELECT s.*, 
@@ -1283,11 +1333,11 @@ app.get('/api/suppliers/:id', authenticateToken, checkPermission('suppliers', 'r
         else resolve(row);
       });
     });
-    
+
     if (!supplier) {
       return res.status(404).json({ error: 'Supplier not found' });
     }
-    
+
     res.json(supplier);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch supplier' });
@@ -1352,7 +1402,7 @@ app.put('/api/suppliers/:id', authenticateToken, checkPermission('suppliers', 'u
         return;
       }
 
-      db.run(`UPDATE suppliers SET ${updates.join(', ')} WHERE id = ?`, values, function(err) {
+      db.run(`UPDATE suppliers SET ${updates.join(', ')} WHERE id = ?`, values, function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1363,7 +1413,7 @@ app.put('/api/suppliers/:id', authenticateToken, checkPermission('suppliers', 'u
     }
 
     logAudit('UPDATE_SUPPLIER', 'suppliers', id, { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Supplier updated successfully' });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -1403,7 +1453,7 @@ app.delete('/api/suppliers/:id', authenticateToken, checkPermission('suppliers',
     }
 
     const result = await new Promise((resolve, reject) => {
-      db.run('DELETE FROM suppliers WHERE id = ?', [id], function(err) {
+      db.run('DELETE FROM suppliers WHERE id = ?', [id], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1414,7 +1464,7 @@ app.delete('/api/suppliers/:id', authenticateToken, checkPermission('suppliers',
     }
 
     logAudit('DELETE_SUPPLIER', 'suppliers', id, { name: existingSupplier.name, name_ar: existingSupplier.name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Supplier deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete supplier' });
@@ -1425,7 +1475,7 @@ app.delete('/api/suppliers/:id', authenticateToken, checkPermission('suppliers',
 app.get('/api/orders', authenticateToken, checkPermission('orders', 'read'), async (req, res) => {
   try {
     const { status, customer_id, page = 1, limit = 20 } = req.query;
-    
+
     let query = `
       SELECT o.*, c.name as customer_name, u.username as created_by_username
       FROM orders o
@@ -1433,30 +1483,30 @@ app.get('/api/orders', authenticateToken, checkPermission('orders', 'read'), asy
       LEFT JOIN users u ON o.created_by = u.id
       WHERE 1=1
     `;
-    
+
     const params = [];
-    
+
     if (status) {
       query += ' AND o.status = ?';
       params.push(status);
     }
-    
+
     if (customer_id) {
       query += ' AND o.customer_id = ?';
       params.push(customer_id);
     }
-    
+
     query += ' ORDER BY o.created_at DESC LIMIT ? OFFSET ?';
     const offset = (parseInt(page) - 1) * parseInt(limit);
     params.push(parseInt(limit), offset);
-    
+
     const orders = await new Promise((resolve, reject) => {
       db.all(query, params, (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
     });
-    
+
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch orders' });
@@ -1476,10 +1526,10 @@ app.post('/api/orders', authenticateToken, checkPermission('orders', 'create'), 
 
   try {
     const { customer_id, items, notes, shipping_address, billing_address, payment_method } = req.body;
-    
+
     // Generate order number
     const order_number = 'ORD' + Date.now();
-    
+
     // Calculate total amount
     let total_amount = 0;
     for (const item of items) {
@@ -1489,14 +1539,14 @@ app.post('/api/orders', authenticateToken, checkPermission('orders', 'create'), 
           else resolve(row);
         });
       });
-      
+
       if (!product) {
         return res.status(400).json({ error: `Product with ID ${item.product_id} not found` });
       }
-      
+
       total_amount += product.wholesale_price * item.quantity;
     }
-    
+
     // Create order
     const orderResult = await new Promise((resolve, reject) => {
       db.run(`
@@ -1504,12 +1554,12 @@ app.post('/api/orders', authenticateToken, checkPermission('orders', 'create'), 
           order_number, customer_id, total_amount, notes, 
           shipping_address, billing_address, payment_method, created_by
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `, [order_number, customer_id, total_amount, notes, shipping_address, billing_address, payment_method, req.user.id], function(err) {
+      `, [order_number, customer_id, total_amount, notes, shipping_address, billing_address, payment_method, req.user.id], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
-    
+
     // Create order items
     for (const item of items) {
       const product = await new Promise((resolve, reject) => {
@@ -1518,23 +1568,23 @@ app.post('/api/orders', authenticateToken, checkPermission('orders', 'create'), 
           else resolve(row);
         });
       });
-      
+
       const unit_price = product.wholesale_price;
       const total_price = unit_price * item.quantity;
-      
+
       await new Promise((resolve, reject) => {
         db.run(`
           INSERT INTO order_items (order_id, product_id, quantity, unit_price, total_price)
           VALUES (?, ?, ?, ?, ?)
-        `, [orderResult.id, item.product_id, item.quantity, unit_price, total_price], function(err) {
+        `, [orderResult.id, item.product_id, item.quantity, unit_price, total_price], function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID });
         });
       });
     }
-    
+
     logAudit('CREATE_ORDER', 'orders', orderResult.id.toString(), { order_number, total_amount }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.status(201).json({ message: 'Order created successfully', orderId: orderResult.id, order_number });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create order' });
@@ -1544,7 +1594,7 @@ app.post('/api/orders', authenticateToken, checkPermission('orders', 'create'), 
 app.get('/api/orders/:id', authenticateToken, checkPermission('orders', 'read'), async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const order = await new Promise((resolve, reject) => {
       db.get(`
         SELECT o.*, c.name as customer_name, c.email as customer_email, u.username as created_by_username
@@ -1557,11 +1607,11 @@ app.get('/api/orders/:id', authenticateToken, checkPermission('orders', 'read'),
         else resolve(row);
       });
     });
-    
+
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     // Get order items
     const orderItems = await new Promise((resolve, reject) => {
       db.all(`
@@ -1574,7 +1624,7 @@ app.get('/api/orders/:id', authenticateToken, checkPermission('orders', 'read'),
         else resolve(rows);
       });
     });
-    
+
     res.json({ ...order, items: orderItems });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch order' });
@@ -1624,7 +1674,7 @@ app.put('/api/orders/:id', authenticateToken, checkPermission('orders', 'update'
         return;
       }
 
-      db.run(`UPDATE orders SET ${updates.join(', ')} WHERE id = ?`, values, function(err) {
+      db.run(`UPDATE orders SET ${updates.join(', ')} WHERE id = ?`, values, function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1635,7 +1685,7 @@ app.put('/api/orders/:id', authenticateToken, checkPermission('orders', 'update'
     }
 
     logAudit('UPDATE_ORDER', 'orders', id, { status, payment_status }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Order updated successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update order' });
@@ -1660,7 +1710,7 @@ app.delete('/api/orders/:id', authenticateToken, checkPermission('orders', 'dele
 
     // Delete order items first
     await new Promise((resolve, reject) => {
-      db.run('DELETE FROM order_items WHERE order_id = ?', [id], function(err) {
+      db.run('DELETE FROM order_items WHERE order_id = ?', [id], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1668,7 +1718,7 @@ app.delete('/api/orders/:id', authenticateToken, checkPermission('orders', 'dele
 
     // Delete order
     const result = await new Promise((resolve, reject) => {
-      db.run('DELETE FROM orders WHERE id = ?', [id], function(err) {
+      db.run('DELETE FROM orders WHERE id = ?', [id], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1679,7 +1729,7 @@ app.delete('/api/orders/:id', authenticateToken, checkPermission('orders', 'dele
     }
 
     logAudit('DELETE_ORDER', 'orders', id, { order_number: existingOrder.order_number, total_amount: existingOrder.total_amount }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Order deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete order' });
@@ -1690,26 +1740,26 @@ app.delete('/api/orders/:id', authenticateToken, checkPermission('orders', 'dele
 app.get('/api/customers', authenticateToken, checkPermission('customers', 'read'), async (req, res) => {
   try {
     const { search, page = 1, limit = 20 } = req.query;
-    
+
     let query = `
       SELECT c.*, 
              (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) as order_count
       FROM customers c 
       WHERE c.is_active = 1
     `;
-    
+
     const params = [];
-    
+
     if (search) {
       query += ' AND (c.name LIKE ? OR c.name_ar LIKE ? OR c.email LIKE ?)';
       const searchTerm = `%${search}%`;
       params.push(searchTerm, searchTerm, searchTerm);
     }
-    
+
     query += ' ORDER BY c.created_at DESC LIMIT ? OFFSET ?';
     const offset = (parseInt(page) - 1) * parseInt(limit);
     params.push(parseInt(limit), offset);
-    
+
     const customers = await new Promise((resolve, reject) => {
       db.all(query, params, (err, rows) => {
         if (err) reject(err);
@@ -1726,7 +1776,7 @@ app.get('/api/customers', authenticateToken, checkPermission('customers', 'read'
 app.get('/api/customers/:id', authenticateToken, checkPermission('customers', 'read'), async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const customer = await new Promise((resolve, reject) => {
       db.get(`
         SELECT c.*, 
@@ -1738,11 +1788,11 @@ app.get('/api/customers/:id', authenticateToken, checkPermission('customers', 'r
         else resolve(row);
       });
     });
-    
+
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    
+
     res.json(customer);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch customer' });
@@ -1777,14 +1827,14 @@ app.post('/api/customers', authenticateToken, checkPermission('customers', 'crea
         name, name_ar, email, phone, address, address_ar,
         city, city_ar, country, country_ar, company_name,
         company_name_ar, tax_id, commercial_register, customer_type || 'retail', credit_limit
-      ], function(err) {
+      ], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
 
     logAudit('CREATE_CUSTOMER', 'customers', result.id.toString(), { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.status(201).json({ message: 'Customer created successfully', customerId: result.id });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -1855,7 +1905,7 @@ app.put('/api/customers/:id', authenticateToken, checkPermission('customers', 'u
         return;
       }
 
-      db.run(`UPDATE customers SET ${updates.join(', ')} WHERE id = ?`, values, function(err) {
+      db.run(`UPDATE customers SET ${updates.join(', ')} WHERE id = ?`, values, function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1866,7 +1916,7 @@ app.put('/api/customers/:id', authenticateToken, checkPermission('customers', 'u
     }
 
     logAudit('UPDATE_CUSTOMER', 'customers', id, { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Customer updated successfully' });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
@@ -1906,7 +1956,7 @@ app.delete('/api/customers/:id', authenticateToken, checkPermission('customers',
     }
 
     const result = await new Promise((resolve, reject) => {
-      db.run('DELETE FROM customers WHERE id = ?', [id], function(err) {
+      db.run('DELETE FROM customers WHERE id = ?', [id], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -1917,7 +1967,7 @@ app.delete('/api/customers/:id', authenticateToken, checkPermission('customers',
     }
 
     logAudit('DELETE_CUSTOMER', 'customers', id, { name: existingCustomer.name, name_ar: existingCustomer.name_ar }, req.ip, req.get('User-Agent'), req.user.id);
-    
+
     res.json({ message: 'Customer deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete customer' });
@@ -2103,7 +2153,7 @@ app.post('/api/auth/register', [
   body('full_name').notEmpty().withMessage('Full name is required')
 ], async (req, res) => {
   console.log('Register request received:', req.body);
-  
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log('Validation errors:', errors.array());
@@ -2113,7 +2163,7 @@ app.post('/api/auth/register', [
   const { username, email, password, full_name } = req.body;
   const ipAddress = req.ip;
   const userAgent = req.get('User-Agent');
-  
+
   console.log('Attempting registration for:', email);
 
   try {
@@ -2138,7 +2188,7 @@ app.post('/api/auth/register', [
       db.run(`
         INSERT INTO users (username, email, password, full_name, access_level, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `, [username, email, hashedPassword, full_name, 'basic', 'pending'], function(err) {
+      `, [username, email, hashedPassword, full_name, 'basic', 'pending'], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
@@ -2149,9 +2199,9 @@ app.post('/api/auth/register', [
     // Temporarily disable audit logging
     // logAudit('USER_REGISTER', 'auth', result.id.toString(), { username, email }, ipAddress, userAgent, result.id);
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: 'Registration successful! Please wait for account activation.',
-      userId: result.id 
+      userId: result.id
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -2159,11 +2209,66 @@ app.post('/api/auth/register', [
   }
 });
 
+// Dashboard Overview API
+app.get('/api/dashboard/overview', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Run all queries simultaneously
+    const [productsResult, ordersResult, revenueResult] = await Promise.all([
+      // Total Products (Active belonging to user)
+      new Promise((resolve, reject) => {
+        db.get('SELECT COUNT(*) as count FROM products WHERE user_id = ? AND is_active = 1', [userId], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      }),
+      // Active Orders (Not delivered, cancelled, returned - where user's products are ordered)
+      new Promise((resolve, reject) => {
+        db.get(`
+          SELECT COUNT(DISTINCT o.id) as count 
+          FROM orders o 
+          JOIN order_items oi ON o.id = oi.order_id 
+          JOIN products p ON oi.product_id = p.id 
+          WHERE p.user_id = ? AND o.status NOT IN ('delivered', 'cancelled', 'returned')
+        `, [userId], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      }),
+      // Total Revenue (From all non-cancelled orders of user's products)
+      new Promise((resolve, reject) => {
+        db.get(`
+          SELECT SUM(oi.total_price) as total 
+          FROM order_items oi 
+          JOIN orders o ON oi.order_id = o.id 
+          JOIN products p ON oi.product_id = p.id 
+          WHERE p.user_id = ? AND o.status != 'cancelled'
+        `, [userId], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      })
+    ]);
+
+    res.json({
+      totalProducts: productsResult?.count || 0,
+      activeOrders: ordersResult?.count || 0,
+      totalRevenue: revenueResult?.total || 0,
+      profileViews: 0 // Currently not tracked in DB
+    });
+
+  } catch (error) {
+    console.error('Failed to fetch dashboard overview:', error);
+    res.status(500).json({ error: 'Failed to fetch overview data' });
+  }
+});
+
 // Dashboard Products API
 app.get('/api/dashboard/products', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    
+
     const products = await new Promise((resolve, reject) => {
       db.all(`
         SELECT p.*, c.name as category_name, c.name_ar as category_name_ar
@@ -2193,7 +2298,7 @@ app.get('/api/dashboard/products/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
-    
+
     const product = await new Promise((resolve, reject) => {
       db.get(`
         SELECT p.*, c.name as category_name, c.name_ar as category_name_ar
@@ -2228,23 +2333,23 @@ app.post('/api/dashboard/products', authenticateToken, [
   body('category').notEmpty().withMessage('Category is required'),
   body('image').optional().custom((value) => {
     if (!value) return true;
-    
+
     // Check if it's a data URL (base64)
     if (typeof value === 'string' && value.startsWith('data:image/')) {
       // Remove data:image/ prefix and get the base64 part
       const base64Data = value.split(',')[1];
       if (!base64Data) return false;
-      
+
       // Calculate size in bytes
       const sizeInBytes = Math.floor(base64Data.length * 0.75);
       const sizeInMB = sizeInBytes / (1024 * 1024);
-      
+
       // Limit to 2MB
       if (sizeInMB > 2) {
         throw new Error('Image size must be less than 2MB');
       }
     }
-    
+
     return true;
   }).withMessage('Image must be less than 2MB')
 ], async (req, res) => {
@@ -2256,7 +2361,7 @@ app.post('/api/dashboard/products', authenticateToken, [
   try {
     const userId = req.user.id;
     const productData = req.body;
-    
+
     // Find category ID
     const category = await new Promise((resolve, reject) => {
       db.get('SELECT id FROM categories WHERE name = ? OR name_ar = ?', [productData.category, productData.category], (err, row) => {
@@ -2266,11 +2371,18 @@ app.post('/api/dashboard/products', authenticateToken, [
     });
 
     const result = await new Promise((resolve, reject) => {
+      const sku = 'PRD-' + Date.now() + Math.floor(Math.random() * 1000);
       db.run(`
-        INSERT INTO products (name, price, description, category_id, user_id, images, moq, brand, model, color, size, weight, warranty, material, features, origin, packaging, is_active, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO products (
+          name, name_ar, sku, price, wholesale_price, description, category_id, user_id, 
+          images, moq, brand, model, color, size, weight, warranty, material, 
+          features, origin, packaging, is_active, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `, [
         productData.name,
+        productData.name,
+        sku,
+        productData.price,
         productData.price,
         productData.desc || '',
         category?.id || null,
@@ -2287,15 +2399,15 @@ app.post('/api/dashboard/products', authenticateToken, [
         productData.features || '',
         productData.origin || '',
         productData.packaging || ''
-      ], function(err) {
+      ], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: 'Product created successfully',
-      productId: result.id 
+      productId: result.id
     });
   } catch (error) {
     console.error('Failed to create product:', error);
@@ -2317,7 +2429,7 @@ app.put('/api/dashboard/products/:id', authenticateToken, [
     const { id } = req.params;
     const userId = req.user.id;
     const productData = req.body;
-    
+
     // Find category ID
     const category = await new Promise((resolve, reject) => {
       db.get('SELECT id FROM categories WHERE name = ? OR name_ar = ?', [productData.category, productData.category], (err, row) => {
@@ -2329,13 +2441,15 @@ app.put('/api/dashboard/products/:id', authenticateToken, [
     const result = await new Promise((resolve, reject) => {
       db.run(`
         UPDATE products SET 
-          name = ?, price = ?, description = ?, category_id = ?, 
+          name = ?, name_ar = ?, price = ?, wholesale_price = ?, description = ?, category_id = ?, 
           images = ?, moq = ?, brand = ?, model = ?, color = ?, 
           size = ?, weight = ?, warranty = ?, material = ?, features = ?,
           origin = ?, packaging = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ? AND user_id = ?
       `, [
         productData.name,
+        productData.name,
+        productData.price,
         productData.price,
         productData.desc || '',
         category?.id || null,
@@ -2353,7 +2467,7 @@ app.put('/api/dashboard/products/:id', authenticateToken, [
         productData.packaging || '',
         id,
         userId
-      ], function(err) {
+      ], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });
@@ -2374,9 +2488,9 @@ app.delete('/api/dashboard/products/:id', authenticateToken, async (req, res) =>
   try {
     const { id } = req.params;
     const userId = req.user.id;
-    
+
     const result = await new Promise((resolve, reject) => {
-      db.run('UPDATE products SET is_active = 0 WHERE id = ? AND user_id = ?', [id, userId], function(err) {
+      db.run('UPDATE products SET is_active = 0 WHERE id = ? AND user_id = ?', [id, userId], function (err) {
         if (err) reject(err);
         else resolve({ changes: this.changes });
       });

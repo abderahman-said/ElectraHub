@@ -49,7 +49,7 @@ const Login = () => {
                 <div className="p-10 sm:p-14 relative z-10">
                     <div className="text-center mb-12">
                         <img src="/logo.png" alt="" className=' rounded-xl w-auto h-auto max-w-[180px] mx-auto' />
-                        <h2 className="text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
+                        <h2 className="pt-2 text-4xl font-black text-blue-950 uppercase tracking-tighter mb-4 leading-tight">
                             مرحباً بك <br />
                             <span className="text-gradient">مرة أخرى</span>
                         </h2>

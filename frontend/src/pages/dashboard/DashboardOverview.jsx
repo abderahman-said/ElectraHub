@@ -1,17 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { dashboardProductsAPI } from '../../services/api';
+import { toast } from 'react-hot-toast';
 
 const DashboardOverview = () => {
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const [overviewData, setOverviewData] = useState({
+        totalProducts: 0,
+        activeOrders: 0,
+        totalRevenue: 0,
+        profileViews: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchOverviewData();
+        }
+    }, [isAuthenticated]);
+
+    const fetchOverviewData = async () => {
+        try {
+            setLoading(true);
+            const response = await dashboardProductsAPI.getOverview();
+            setOverviewData(response.data);
+        } catch (error) {
+            console.error('Failed to fetch overview data:', error);
+            toast.error('فشل في جلب بيانات النظرة العامة');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const stats = [
-        { label: 'إجمالي المنتجات', value: user.products?.length || 0, icon: Box, color: 'text-blue-600', bg: 'bg-blue-50' },
-        { label: 'الطلبات النشطة', value: '0', icon: ShoppingCart, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        { label: 'إجمالي الإيرادات', value: '0$', icon: TrendingUp, color: 'text-blue-700', bg: 'bg-blue-100' },
-        { label: 'مشاهدات الملف', value: '0', icon: Users, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+        { label: 'إجمالي المنتجات', value: overviewData.totalProducts || 0, icon: Box, color: 'text-blue-600', bg: 'bg-blue-50' },
+        { label: 'الطلبات النشطة', value: overviewData.activeOrders || 0, icon: ShoppingCart, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        { label: 'إجمالي الإيرادات', value: `$${overviewData.totalRevenue || 0}`, icon: TrendingUp, color: 'text-blue-700', bg: 'bg-blue-100' },
+        { label: 'مشاهدات الملف', value: overviewData.profileViews || 0, icon: Users, color: 'text-yellow-600', bg: 'bg-yellow-50' },
     ];
 
     if (!isAuthenticated) {
