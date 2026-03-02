@@ -16,7 +16,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:5173',
+    /\.vercel\.app$/ // Allow all vercel subdomains for testing/production
+  ],
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -31,7 +34,9 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Database setup
-const db = new sqlite3.Database('./pam.db');
+// Database setup
+const dbUrl = process.env.DATABASE_URL || './pam.db';
+const db = new sqlite3.Database(dbUrl);
 
 // Initialize database tables
 db.serialize(() => {
@@ -2541,11 +2546,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 PAM Server running on http://localhost:${PORT}`);
-  console.log(`📊 Admin panel: http://localhost:${PORT}/api/health`);
-  console.log(`🔑 Default admin credentials: admin / admin123`);
-});
+// Start server only if not running as a serverless function
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 PAM Server running on http://localhost:${PORT}`);
+    console.log(`📊 Admin panel: http://localhost:${PORT}/api/health`);
+    console.log(`🔑 Default admin credentials: admin / admin123`);
+  });
+}
 
 module.exports = app;
