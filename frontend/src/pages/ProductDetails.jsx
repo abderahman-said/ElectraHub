@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { productsAPI } from '../services/api';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../contexts/CartContext';
+import { getProductImage, handleImageError } from '../utils/imageUtils';
 import {
     ArrowLeft, ShoppingBag, Truck, ShieldCheck, Star,
     Heart, Share2, Zap, Cpu, Settings, Package,
@@ -66,7 +67,10 @@ const ProductDetails = () => {
     }
 
     const handleAddToCart = () => {
-        addToCart(product, quantity);
+        // Add the product multiple times based on quantity
+        for (let i = 0; i < quantity; i++) {
+            addToCart(product);
+        }
     };
 
     const handleQuantityChange = (newQuantity) => {
@@ -83,10 +87,10 @@ const ProductDetails = () => {
 
     // Generate image variations for gallery
     const productImages = [
-        product.image,
-        `${product.image}&auto=format&fit=crop&w=800&q=80`,
-        `${product.image}&auto=format&fit=crop&w=800&q=80&sat=2`,
-        `${product.image}&auto=format&fit=crop&w=800&q=80&bright=1.1`
+        getProductImage(product),
+        '/placeholder-product.webp',
+        '/placeholder-product.webp',
+        '/placeholder-product.webp'
     ];
 
     return (
@@ -104,7 +108,7 @@ const ProductDetails = () => {
             </div>
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                     {/* ── Gallery Section ── */}
                     <div className="space-y-4">
@@ -114,6 +118,7 @@ const ProductDetails = () => {
                                     src={productImages[selectedImageIndex]}
                                     alt={product.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    onError={handleImageError}
                                 />
                             </div>
 
@@ -155,6 +160,7 @@ const ProductDetails = () => {
                                         src={image}
                                         alt={`${product.name} view ${index + 1}`}
                                         className="w-full h-full object-cover"
+                                        onError={handleImageError}
                                     />
                                 </div>
                             ))}
@@ -200,7 +206,7 @@ const ProductDetails = () => {
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                                    {product.category}
+                                    {product.category_name}
                                 </span>
                                 <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
@@ -224,8 +230,8 @@ const ProductDetails = () => {
                             </p>
 
                             <div className="flex items-baseline gap-3">
-                                <span className="text-3xl font-bold text-gray-900">${product.averagePrice}</span>
-                                <span className="text-lg text-gray-500 line-through">${(product.averagePrice * 1.3).toFixed(2)}</span>
+                                <span className="text-3xl font-bold text-gray-900">${product.price || 0}</span>
+                                <span className="text-lg text-gray-500 line-through">${((product.price || 0) * 1.3).toFixed(2)}</span>
                                 <span className="px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded">وفر 23%</span>
                             </div>
 
@@ -273,9 +279,9 @@ const ProductDetails = () => {
                             <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">أسعار الكميات</p>
                                 {[
-                                    { range: '1 – 9 وحدات', price: product.averagePrice, active: quantity < 10 },
-                                    { range: '10 – 49 وحدة', price: (product.averagePrice * 0.9).toFixed(2), active: quantity >= 10 && quantity < 50 },
-                                    { range: '50+ وحدة', price: (product.averagePrice * 0.8).toFixed(2), active: quantity >= 50 },
+                                    { range: '1 – 9 وحدات', price: product.price || 0, active: quantity < 10 },
+                                    { range: '10 – 49 وحدة', price: ((product.price || 0) * 0.9).toFixed(2), active: quantity >= 10 && quantity < 50 },
+                                    { range: '50+ وحدة', price: ((product.price || 0) * 0.8).toFixed(2), active: quantity >= 50 },
                                 ].map((tier, i) => (
                                     <div
                                         key={i}
@@ -295,12 +301,9 @@ const ProductDetails = () => {
                                 className="w-full bg-[#0f172a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:bg-[#031a79] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3"
                             >
                                 <ShoppingBag size={24} />
-                                أضف للسلة — ${(product.averagePrice * quantity).toFixed(2)}
+                                أضف للسلة — ${((product.price || 0) * quantity).toFixed(2)}
                             </button>
-                            <button className="w-full border-2 border-[#0f172a] text-[#0f172a] py-3 px-6 rounded-xl font-semibold text-base hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-3">
-                                <FileText size={20} />
-                                طلب عرض سعر رسمي
-                            </button>
+                         
                         </div>
 
                         {/* Verified Suppliers Section */}

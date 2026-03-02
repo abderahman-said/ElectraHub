@@ -1,13 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, User, Menu, X, ShoppingBag, ArrowLeft, LayoutDashboard, LogOut, Package, ChevronRight } from 'lucide-react';
-import { useCart } from '../context/CartContext';
 import { useAuth } from '../hooks/useAuth';
 import { productsAPI } from '../services/api';
 import OptimizedImage from './OptimizedImage';
 
-const Navbar = ({ cartCount = 0 }) => {
-  const { setIsCartOpen } = useCart();
+const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -105,9 +103,9 @@ const Navbar = ({ cartCount = 0 }) => {
             )}
           </div>
 
-          <button
+          <Link
+            to="/cart"
             className="h-11 w-11 bg-[#2650fc] text-white rounded-xl flex items-center justify-center relative hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
-            onClick={() => setIsCartOpen(true)}
             aria-label={`عربة التسوق${cartCount > 0 ? ` - ${cartCount} منتج` : ''}`}
           >
             <ShoppingBag size={20} />
@@ -116,7 +114,7 @@ const Navbar = ({ cartCount = 0 }) => {
                 {cartCount}
               </span>
             )}
-          </button>
+          </Link>
 
           <button
             className="lg:hidden h-11 w-11 glass rounded-xl flex items-center justify-center text-blue-950"
@@ -227,6 +225,14 @@ const Navbar = ({ cartCount = 0 }) => {
               <ArrowLeft size={16} className="text-blue-200 rotate-180" />
             </Link>
           ))}
+          <Link
+            to="/cart"
+            className="text-sm font-black uppercase tracking-widest text-blue-950 py-4 px-6 rounded-2xl hover:bg-blue-50 transition-all flex items-center justify-between"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            عربة التسوق
+            <ShoppingBag size={16} className="text-blue-200" />
+          </Link>
           <div className="pt-4 border-t border-blue-50 flex flex-col gap-3">
             {isAuthenticated ? (
               <>

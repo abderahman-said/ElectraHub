@@ -180,7 +180,7 @@ const ProductManagement = () => {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
       <div className="relative">
         <img 
-          src={product.images?.[0] || '/placeholder-product.jpg'} 
+          src={product.images?.[0] || '/placeholder-product.webp'} 
           alt={product.name_ar}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -399,7 +399,7 @@ const ProductManagement = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <img 
-                              src={product.images?.[0] || '/placeholder-product.jpg'} 
+                              src={product.images?.[0] || '/placeholder-product.webp'} 
                               alt={product.name_ar}
                               className="w-10 h-10 rounded-lg object-cover ml-3"
                             />

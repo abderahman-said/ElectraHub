@@ -862,6 +862,21 @@ app.get('/api/products/:id', async (req, res) => {
       tags: product.tags ? JSON.parse(product.tags) : []
     };
 
+    // Convert base64 images to proper URLs if needed
+    if (formattedProduct.images && formattedProduct.images.length > 0) {
+      formattedProduct.images = formattedProduct.images.map((img, index) => {
+        // If image is base64, convert to data URL
+        if (typeof img === 'string' && img.startsWith('data:image/')) {
+          return img; // Keep base64 as is for now
+        }
+        // If image doesn't look like a URL, make it a proper URL
+        if (typeof img === 'string' && !img.startsWith('http') && !img.startsWith('/')) {
+          return `/images/product-${product.id}-${index}.jpg`;
+        }
+        return img;
+      });
+    }
+
     res.json(formattedProduct);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch product' });
@@ -2507,15 +2522,23 @@ app.delete('/api/dashboard/products/:id', authenticateToken, async (req, res) =>
   }
 });
 
+// Serve static files from frontend
+app.use(express.static('frontend/dist'));
+
+// Handle frontend routing - serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  // If it's an API route, return 404
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
+  // Otherwise serve the frontend index.html
+  res.sendFile('index.html', { root: 'frontend/dist' });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
 });
 
 // Start server

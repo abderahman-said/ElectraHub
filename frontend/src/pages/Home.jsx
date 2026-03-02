@@ -58,7 +58,7 @@ const Home = () => {
           <Hero />
 
           {/* Categories Grid - High End SaaS Look */}
-          <section id="categories" className="py-24 relative overflow-hidden">
+          <section id="categories" className=" relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-full bg-blue-50/20 -z-10" />
             <div className="container mx-auto px-4 md:px-8">
               <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -73,17 +73,16 @@ const Home = () => {
 
               <div className="categories-slider">
                 <Swiper
-                  modules={[Autoplay, Pagination]}
+                  modules={[Autoplay]}
                   spaceBetween={24}
                   slidesPerView={2}
                   pagination={{ clickable: true }}
-                  autoplay={{ delay: 3000, disableOnInteraction: false }}
                   breakpoints={{
                     640: { slidesPerView: 3 },
                     1024: { slidesPerView: 4 },
                     1280: { slidesPerView: 6 },
                   }}
-                  className="pb-16"
+                  className="pb-4"
                 >
                   {categories.map((cat, i) => (
                     <SwiperSlide key={cat.id} className='py-5'>
@@ -111,7 +110,7 @@ const Home = () => {
           </section>
 
           {/* Marketplace Section */}
-          <section id="marketplace" className="py-32 relative">
+          <section id="marketplace" className="py-20 relative">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-50/30 -z-10 blur-3xl opacity-50" />
             <div className="container mx-auto px-4 md:px-8">
               <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20">

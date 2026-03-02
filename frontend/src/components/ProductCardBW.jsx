@@ -1,26 +1,47 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Eye, Heart, Check, Star, Truck, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../contexts/CartContext';
 
 const ProductCardBW = ({ product, priority = false }) => {
-  const { id, name, price, category, image, stock = 10, rating = 4.5 } = product;
-  const { addToCart, isInCart } = useCart();
+  const { id, name, price, category, image, images, stock = 10, rating = 4.5 } = product;
+  const { addToCart } = useCart();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Helper function to get product image
+  const getProductImage = () => {
+    // Check if product has images array
+    if (images && images.length > 0) {
+      const firstImage = images[0];
+      // Check if it's a base64 image
+      if (typeof firstImage === 'string' && firstImage.startsWith('data:image/')) {
+        return firstImage;
+      }
+      // Check if it's a relative path
+      if (typeof firstImage === 'string' && !firstImage.startsWith('http')) {
+        return firstImage;
+      }
+    }
+    // Check if product has image property
+    if (image) {
+      return image;
+    }
+    // Return placeholder
+    return '/placeholder-product.webp';
+  };
+
   // Calculate discount
   const discount = 20;
   const oldPrice = (price * (100 / (100 - discount))).toFixed(2);
-  const inCart = isInCart?.(id);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (addingToCart || inCart) return;
+    if (addingToCart) return;
 
     setAddingToCart(true);
 
@@ -81,7 +102,7 @@ const ProductCardBW = ({ product, priority = false }) => {
 
           {/* Product Image */}
           <img
-            src={image}
+            src={getProductImage()}
             alt={name}
             className={`
               w-full h-full object-cover 
@@ -91,6 +112,9 @@ const ProductCardBW = ({ product, priority = false }) => {
             `}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              e.target.src = '/placeholder-product.webp';
+            }}
           />
 
           {/* Floating Badges */}
@@ -233,34 +257,27 @@ const ProductCardBW = ({ product, priority = false }) => {
             {/* Action Button */}
             <button
               onClick={handleAddToCart}
-              disabled={addingToCart || inCart || stock === 0}
+              disabled={addingToCart || stock === 0}
               className={`
                 w-full py-2.5 px-4 rounded-xl font-medium text-sm 
                 transition-all duration-300 ease-out
                 flex items-center justify-center gap-2
                 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-1
                 relative overflow-hidden
-                ${inCart
-                  ? 'bg-gray-900 text-white hover:bg-gray-800'
-                  : addingToCart
-                    ? 'bg-gray-900 text-white cursor-wait'
-                    : stock === 0
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                ${addingToCart
+                  ? 'bg-gray-900 text-white cursor-wait'
+                  : stock === 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-900 text-white hover:bg-gray-800'
                 }
               `}
-              title={inCart ? 'In Cart' : addingToCart ? 'Adding...' : stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-              aria-label={inCart ? 'Already in cart' : 'Add to cart'}
+              title={addingToCart ? 'Adding...' : stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+              aria-label="Add to cart"
             >
               {/* Button Ripple Effect */}
               <span className="absolute inset-0 bg-white opacity-0 transition-opacity duration-300"></span>
 
-              {inCart ? (
-                <>
-                  <Check size={16} />
-                  <span>In Cart</span>
-                </>
-              ) : addingToCart ? (
+              {addingToCart ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Adding...</span>

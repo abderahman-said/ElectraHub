@@ -71,7 +71,7 @@ const Products = () => {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
       <div className="relative">
         <img 
-          src={product.images?.[0] || '/placeholder-product.jpg'} 
+          src={product.images?.[0] || '/placeholder-product.webp'} 
           alt={product.name_ar}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -136,7 +136,7 @@ const Products = () => {
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4">
       <div className="flex gap-4">
         <img 
-          src={product.images?.[0] || '/placeholder-product.jpg'} 
+          src={product.images?.[0] || '/placeholder-product.webp'} 
           alt={product.name_ar}
           className="w-24 h-24 object-cover rounded-lg"
         />

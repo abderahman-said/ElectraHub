@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Minus, Plus, ShoppingBag, Trash2, Sparkles, Truck, Shield, CreditCard, Package, Star, Heart, Zap, Check, Eye, ArrowLeft } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
 
-const CartDrawer = () => {
-    const { cart, removeFromCart, updateQuantity, cartTotal, isCartOpen, setIsCartOpen } = useCart();
+const CartDrawer = ({ isOpen, onOpenChange }) => {
+    const { items: cart, removeFromCart, updateQuantity, getTotalPrice: cartTotal } = useCart();
     const [isAnimating, setIsAnimating] = useState(false);
+    const isCartOpen = isOpen || false;
+    const setIsCartOpen = onOpenChange || (() => {});
     const [expandedItems, setExpandedItems] = useState(new Set());
     const [removingItems, setRemovingItems] = useState(new Set());
     const [addedToCart, setAddedToCart] = useState(new Set());
@@ -219,7 +221,7 @@ const CartDrawer = () => {
                     {cart.length > 0 && (
                         <div className="mt-6 flex items-baseline gap-2">
                             <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">الإجمالي:</span>
-                            <span className="text-2xl font-black text-white">{formatPrice(cartTotal)}</span>
+                            <span className="text-2xl font-black text-white">{formatPrice(cartTotal())}</span>
                         </div>
                     )}
                 </div>
@@ -269,11 +271,11 @@ const CartDrawer = () => {
                         <div className="flex items-center justify-between">
                             <span className="text-gray-600 font-medium">المجموع الفرعي</span>
                             <span className="text-3xl font-bold text-primary">
-                                {formatPrice(cartTotal)}
+                                {formatPrice(cartTotal())}
                             </span>
                         </div>
 
-                        {cartTotal > 100 && (
+                        {cartTotal() > 100 && (
                             <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl">
                                 <Truck className="w-5 h-5" />
                                 <span className="text-sm font-semibold">لقد تأهلت للشحن المجاني!</span>

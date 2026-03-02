@@ -177,7 +177,7 @@ export const CycleCard = ({
 export const ProductCycleCard = ({ products, ...props }) => {
   const items = products.map(product => ({
     type: 'image',
-    src: product.images?.[0] || '/placeholder-product.jpg',
+    src: product.images?.[0] || '/placeholder-product.webp',
     alt: product.name_ar || product.name,
     overlay: {
       title: product.name_ar || product.name,

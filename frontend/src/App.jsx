@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -9,7 +9,7 @@ import Home from './pages/Home';
 import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import NotFound from './pages/NotFound';
-import { useCart } from './context/CartContext';
+import { useCart } from './contexts/CartContext';
 import { AuthProvider } from './hooks/useAuth';
 import './App.css';
 
@@ -31,16 +31,23 @@ import SupplierManagement from './pages/SupplierManagement';
 import OrderManagement from './pages/OrderManagement';
 import AdminMerchants from './pages/admin/AdminMerchants';
 import AdminCategories from './pages/admin/AdminCategories';
+import Cart from './pages/Cart';
 
 function App() {
-  const { cartCount } = useCart();
+  const { getTotalItems } = useCart();
+  const [cartCount, setCartCount] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    setCartCount(getTotalItems());
+  }, [getTotalItems]);
 
   return (
     <AuthProvider>
       <ErrorBoundary>
         <div className="flex flex-col min-h-screen bg-white text-gray-900" dir="rtl">
-          <Navbar cartCount={cartCount} />
-          <CartDrawer />
+          <Navbar cartCount={cartCount} setIsCartOpen={setIsCartOpen} />
+          <CartDrawer isOpen={isCartOpen} onOpenChange={setIsCartOpen} />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -66,6 +73,7 @@ function App() {
               <Route path="/importers" element={<Importers />} />
               <Route path="/importer/:id" element={<ImporterProfile />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/cart" element={<Cart />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
