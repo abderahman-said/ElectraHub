@@ -6,7 +6,7 @@ const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
@@ -34,15 +34,73 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Database setup
-// Database setup
-const dbUrl = process.env.DATABASE_URL || './pam.db';
-const db = new sqlite3.Database(dbUrl);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+// Helper to convert SQL with ? placeholders to $1, $2, etc. (Postgres syntax)
+const convertSql = (sql) => {
+  let count = 1;
+  return sql.replace(/\?/g, () => `$${count++}`);
+};
+
+// Database Shim to maintain compatibility with existing sqlite3 calls
+const db = {
+  serialize: (callback) => callback(),
+  run: (sql, params, callback) => {
+    if (typeof params === 'function') {
+      callback = params;
+      params = [];
+    }
+    const convertedSql = convertSql(sql);
+    pool.query(convertedSql, params)
+      .then(res => callback && callback(null))
+      .catch(err => {
+        // Suppress "already exists" errors during initialization
+        if (err.code === '42P07' || err.code === '42701') {
+          callback && callback(null);
+        } else {
+          console.error('DB Run Error:', err.message, '| SQL:', convertedSql);
+          callback && callback(err);
+        }
+      });
+  },
+  get: (sql, params, callback) => {
+    if (typeof params === 'function') {
+      callback = params;
+      params = [];
+    }
+    const convertedSql = convertSql(sql);
+    pool.query(convertedSql, params)
+      .then(res => callback(null, res.rows[0]))
+      .catch(err => {
+        console.error('DB Get Error:', err.message, '| SQL:', convertedSql);
+        callback(err);
+      });
+  },
+  all: (sql, params, callback) => {
+    if (typeof params === 'function') {
+      callback = params;
+      params = [];
+    }
+    const convertedSql = convertSql(sql);
+    pool.query(convertedSql, params)
+      .then(res => callback(null, res.rows))
+      .catch(err => {
+        console.error('DB All Error:', err.message, '| SQL:', convertedSql);
+        callback(err);
+      });
+  }
+};
 
 // Initialize database tables
 db.serialize(() => {
   // Users table
   db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     full_name TEXT NOT NULL,
@@ -52,15 +110,15 @@ db.serialize(() => {
     access_level TEXT DEFAULT 'basic',
     status TEXT DEFAULT 'pending',
     password TEXT NOT NULL,
-    last_login DATETIME,
+    last_login TIMESTAMP,
     login_attempts INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
   // Categories table
   db.run(`CREATE TABLE IF NOT EXISTS categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     name_ar TEXT NOT NULL,
     description TEXT,
@@ -68,15 +126,15 @@ db.serialize(() => {
     image_url TEXT,
     parent_id INTEGER,
     sort_order INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES categories(id)
   )`);
 
   // Products table
   db.run(`CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     name_ar TEXT NOT NULL,
     description TEXT,
@@ -107,23 +165,16 @@ db.serialize(() => {
     material TEXT,
     features TEXT,
     moq INTEGER DEFAULT 1,
-    is_active BOOLEAN DEFAULT 1,
-    is_featured BOOLEAN DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    is_featured BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
-  // Add user_id column if it doesn't exist
-  db.run(`ALTER TABLE products ADD COLUMN user_id INTEGER`, (err) => {
-    if (err && !err.message.includes('duplicate column name')) {
-      console.error('Error adding user_id column:', err);
-    }
-  });
-
-  // Add additional columns for home appliances
+  // Add additional columns if they don't exist (Suppress errors in shim)
   const additionalColumns = [
     'brand TEXT',
     'model TEXT',
@@ -139,16 +190,12 @@ db.serialize(() => {
   ];
 
   additionalColumns.forEach(column => {
-    db.run(`ALTER TABLE products ADD COLUMN ${column}`, (err) => {
-      if (err && !err.message.includes('duplicate column name')) {
-        console.error(`Error adding column ${column}:`, err);
-      }
-    });
+    db.run(`ALTER TABLE products ADD COLUMN IF NOT EXISTS ${column}`);
   });
 
   // Suppliers table
   db.run(`CREATE TABLE IF NOT EXISTS suppliers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     name_ar TEXT NOT NULL,
     email TEXT UNIQUE,
@@ -162,15 +209,15 @@ db.serialize(() => {
     tax_id TEXT,
     commercial_register TEXT,
     rating DECIMAL(3,2) DEFAULT 0,
-    is_verified BOOLEAN DEFAULT 0,
-    is_active BOOLEAN DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    is_verified BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
   // Customers table
   db.run(`CREATE TABLE IF NOT EXISTS customers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     name_ar TEXT NOT NULL,
     email TEXT UNIQUE,
@@ -187,14 +234,14 @@ db.serialize(() => {
     commercial_register TEXT,
     customer_type TEXT DEFAULT 'retail',
     credit_limit DECIMAL(10,2),
-    is_active BOOLEAN DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
   // Orders table
   db.run(`CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     order_number TEXT UNIQUE NOT NULL,
     customer_id INTEGER,
     total_amount DECIMAL(10,2) NOT NULL,
@@ -208,45 +255,45 @@ db.serialize(() => {
     shipping_address TEXT,
     billing_address TEXT,
     created_by INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customers(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
   )`);
 
   // Order items table
   db.run(`CREATE TABLE IF NOT EXISTS order_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     order_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
     discount_amount DECIMAL(10,2) DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
   )`);
 
   // Roles table
   db.run(`CREATE TABLE IF NOT EXISTS roles (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     description TEXT,
     level TEXT NOT NULL,
-    is_system BOOLEAN DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    is_system BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
   // Permissions table
   db.run(`CREATE TABLE IF NOT EXISTS permissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
     description TEXT,
     resource TEXT NOT NULL,
     action TEXT NOT NULL,
-    is_system BOOLEAN DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    is_system BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
   // User roles junction table
@@ -269,28 +316,28 @@ db.serialize(() => {
 
   // Sessions table
   db.run(`CREATE TABLE IF NOT EXISTS sessions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     token TEXT UNIQUE NOT NULL,
     user_id INTEGER,
     ip_address TEXT,
     user_agent TEXT,
-    is_active BOOLEAN DEFAULT 1,
-    expires_at DATETIME,
-    last_activity DATETIME,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    expires_at TIMESTAMP,
+    last_activity TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
   // Audit logs table
   db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     action TEXT NOT NULL,
     resource TEXT,
     resource_id TEXT,
     details TEXT,
     ip_address TEXT,
     user_agent TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT DEFAULT 'success',
     user_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -391,7 +438,7 @@ function insertDefaultData() {
     ];
 
     products.forEach(product => {
-      db.run('INSERT OR IGNORE INTO products (name, name_ar, description, description_ar, sku, barcode, price, wholesale_price, cost_price, min_order_quantity, max_order_quantity, stock_quantity, unit, weight, dimensions, images, specifications, tags, category_id, supplier_id, is_active, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', product);
+      db.run('INSERT INTO products (name, name_ar, description, description_ar, sku, barcode, price, wholesale_price, cost_price, min_order_quantity, max_order_quantity, stock_quantity, unit, weight, dimensions, images, specifications, tags, category_id, supplier_id, is_active, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE, FALSE)', product.slice(0, 20));
     });
   }, 1000);
 }
