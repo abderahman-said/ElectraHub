@@ -59,8 +59,8 @@ const db = {
     pool.query(convertedSql, params)
       .then(res => callback && callback(null))
       .catch(err => {
-        // Suppress "already exists" errors during initialization
-        if (err.code === '42P07' || err.code === '42701') {
+        // Suppress "already exists" and "unique violation" errors during initialization
+        if (err.code === '42P07' || err.code === '42701' || err.code === '23505') {
           callback && callback(null);
         } else {
           console.error('DB Run Error:', err.message, '| SQL:', convertedSql);
@@ -351,81 +351,81 @@ db.serialize(() => {
 function insertDefaultData() {
   // Default roles
   const roles = [
-    ['Super Admin', 'Full system access', 'super_admin', 1],
-    ['Admin', 'Administrative access', 'admin', 1],
-    ['Manager', 'Manager level access', 'advanced', 1],
-    ['Operator', 'Basic operational access', 'intermediate', 1],
-    ['Viewer', 'Read-only access', 'basic', 1]
+    ['Super Admin', 'Full system access', 'super_admin', true],
+    ['Admin', 'Administrative access', 'admin', true],
+    ['Manager', 'Manager level access', 'advanced', true],
+    ['Operator', 'Basic operational access', 'intermediate', true],
+    ['Viewer', 'Read-only access', 'basic', true]
   ];
 
   roles.forEach(role => {
-    db.run('INSERT OR IGNORE INTO roles (name, description, level, is_system) VALUES (?, ?, ?, ?)', role);
+    db.run('INSERT INTO roles (name, description, level, is_system) VALUES (?, ?, ?, ?) ON CONFLICT (name) DO NOTHING', role);
   });
 
   // Default permissions
   const permissions = [
-    ['create_users', 'Create new users', 'users', 'create', 1],
-    ['read_users', 'View users', 'users', 'read', 1],
-    ['update_users', 'Update users', 'users', 'update', 1],
-    ['delete_users', 'Delete users', 'users', 'delete', 1],
-    ['create_roles', 'Create new roles', 'roles', 'create', 1],
-    ['read_roles', 'View roles', 'roles', 'read', 1],
-    ['update_roles', 'Update roles', 'roles', 'update', 1],
-    ['delete_roles', 'Delete roles', 'roles', 'delete', 1],
-    ['create_products', 'Create new products', 'products', 'create', 1],
-    ['read_products', 'View products', 'products', 'read', 0],
-    ['update_products', 'Update products', 'products', 'update', 1],
-    ['delete_products', 'Delete products', 'products', 'delete', 1],
-    ['create_categories', 'Create new categories', 'categories', 'create', 1],
-    ['read_categories', 'View categories', 'categories', 'read', 0],
-    ['update_categories', 'Update categories', 'categories', 'update', 1],
-    ['delete_categories', 'Delete categories', 'categories', 'delete', 1],
-    ['create_suppliers', 'Create new suppliers', 'suppliers', 'create', 1],
-    ['read_suppliers', 'View suppliers', 'suppliers', 'read', 0],
-    ['update_suppliers', 'Update suppliers', 'suppliers', 'update', 1],
-    ['delete_suppliers', 'Delete suppliers', 'suppliers', 'delete', 1],
-    ['create_customers', 'Create new customers', 'customers', 'create', 1],
-    ['read_customers', 'View customers', 'customers', 'read', 0],
-    ['update_customers', 'Update customers', 'customers', 'update', 1],
-    ['delete_customers', 'Delete customers', 'customers', 'delete', 1],
-    ['create_orders', 'Create new orders', 'orders', 'create', 1],
-    ['read_orders', 'View orders', 'orders', 'read', 1],
-    ['update_orders', 'Update orders', 'orders', 'update', 1],
-    ['delete_orders', 'Delete orders', 'orders', 'delete', 1],
-    ['read_sessions', 'View active sessions', 'sessions', 'read', 1],
-    ['delete_sessions', 'Revoke sessions', 'sessions', 'delete', 1],
-    ['read_audit_logs', 'View audit logs', 'audit_logs', 'read', 1]
+    ['create_users', 'Create new users', 'users', 'create', true],
+    ['read_users', 'View users', 'users', 'read', true],
+    ['update_users', 'Update users', 'users', 'update', true],
+    ['delete_users', 'Delete users', 'users', 'delete', true],
+    ['create_roles', 'Create new roles', 'roles', 'create', true],
+    ['read_roles', 'View roles', 'roles', 'read', true],
+    ['update_roles', 'Update roles', 'roles', 'update', true],
+    ['delete_roles', 'Delete roles', 'roles', 'delete', true],
+    ['create_products', 'Create new products', 'products', 'create', true],
+    ['read_products', 'View products', 'products', 'read', false],
+    ['update_products', 'Update products', 'products', 'update', true],
+    ['delete_products', 'Delete products', 'products', 'delete', true],
+    ['create_categories', 'Create new categories', 'categories', 'create', true],
+    ['read_categories', 'View categories', 'categories', 'read', false],
+    ['update_categories', 'Update categories', 'categories', 'update', true],
+    ['delete_categories', 'Delete categories', 'categories', 'delete', true],
+    ['create_suppliers', 'Create new suppliers', 'suppliers', 'create', true],
+    ['read_suppliers', 'View suppliers', 'suppliers', 'read', false],
+    ['update_suppliers', 'Update suppliers', 'suppliers', 'update', true],
+    ['delete_suppliers', 'Delete suppliers', 'suppliers', 'delete', true],
+    ['create_customers', 'Create new customers', 'customers', 'create', true],
+    ['read_customers', 'View customers', 'customers', 'read', false],
+    ['update_customers', 'Update customers', 'customers', 'update', true],
+    ['delete_customers', 'Delete customers', 'customers', 'delete', true],
+    ['create_orders', 'Create new orders', 'orders', 'create', true],
+    ['read_orders', 'View orders', 'orders', 'read', true],
+    ['update_orders', 'Update orders', 'orders', 'update', true],
+    ['delete_orders', 'Delete orders', 'orders', 'delete', true],
+    ['read_sessions', 'View active sessions', 'sessions', 'read', true],
+    ['delete_sessions', 'Revoke sessions', 'sessions', 'delete', true],
+    ['read_audit_logs', 'View audit logs', 'audit_logs', 'read', true]
   ];
 
   permissions.forEach(permission => {
-    db.run('INSERT OR IGNORE INTO permissions (name, description, resource, action, is_system) VALUES (?, ?, ?, ?, ?)', permission);
+    db.run('INSERT INTO permissions (name, description, resource, action, is_system) VALUES (?, ?, ?, ?, ?) ON CONFLICT (name) DO NOTHING', permission);
   });
 
   // Create default admin user
   const adminPassword = bcrypt.hashSync('admin123', 10);
-  db.run('INSERT OR IGNORE INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+  db.run('INSERT INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (username) DO NOTHING',
     ['admin', 'admin@belgomla.com', 'System Administrator', 'ADMIN001', 'IT', 'System Administrator', 'super_admin', 'active', adminPassword]);
 
   // Insert sample categories
   const categories = [
-    ['Electronics', 'إلكترونيات', 'Electronic devices and accessories', 'أجهزة إلكترونية وملحقاتها', null, 1, 1],
-    ['Home Appliances', 'أجهزة منزلية', 'Home and kitchen appliances', 'أجهزة منزلية ومطبخ', null, 2, 1],
-    ['Furniture', 'أثاث', 'Home and office furniture', 'أثاث منزلي ومكتبي', null, 3, 1],
-    ['Lighting', 'إضاءة', 'Lighting fixtures and bulbs', 'مصابيح ومصادر الإضاءة', null, 4, 1]
+    ['Electronics', 'إلكترونيات', 'Electronic devices and accessories', 'أجهزة إلكترونية وملحقاتها', null, 1, true],
+    ['Home Appliances', 'أجهزة منزلية', 'Home and kitchen appliances', 'أجهزة منزلية ومطبخ', null, 2, true],
+    ['Furniture', 'أثاث', 'Home and office furniture', 'أثاث منزلي ومكتبي', null, 3, true],
+    ['Lighting', 'إضاءة', 'Lighting fixtures and bulbs', 'مصابيح ومصادر الإضاءة', null, 4, true]
   ];
 
   categories.forEach(category => {
-    db.run('INSERT OR IGNORE INTO categories (name, name_ar, description, description_ar, parent_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)', category);
+    db.run('INSERT INTO categories (name, name_ar, description, description_ar, parent_id, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)', category);
   });
 
   // Insert sample suppliers
   const suppliers = [
-    ['Tech Supplier', 'مورد التقنية', 'contact@techsupplier.com', '+201234567890', '123 Tech St, Cairo', '١٢٣ شارع التكنولوجيا، القاهرة', 'Cairo', 'القاهرة', 'Egypt', 'مصر', '123456789', 'CR12345', 4.5, 1, 1],
-    ['Home Goods Co', 'شركة السلع المنزلية', 'info@homegoods.com', '+201987654321', '456 Home Ave, Alexandria', '٤٥٦ شارع المنزل، الإسكندرية', 'Alexandria', 'الإسكندرية', 'Egypt', 'مصر', '987654321', 'CR67890', 4.2, 1, 1]
+    ['Tech Supplier', 'مورد التقنية', 'contact@techsupplier.com', '+201234567890', '123 Tech St, Cairo', '١٢٣ شارع التكنولوجيا، القاهرة', 'Cairo', 'القاهرة', 'Egypt', 'مصر', '123456789', 'CR12345', 4.5, true, true],
+    ['Home Goods Co', 'شركة السلع المنزلية', 'info@homegoods.com', '+201987654321', '456 Home Ave, Alexandria', '٤٥٦ شارع المنزل، الإسكندرية', 'Alexandria', 'الإسكندرية', 'Egypt', 'مصر', '987654321', 'CR67890', 4.2, true, true]
   ];
 
   suppliers.forEach(supplier => {
-    db.run('INSERT OR IGNORE INTO suppliers (name, name_ar, email, phone, address, address_ar, city, city_ar, country, country_ar, tax_id, commercial_register, rating, is_verified, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', supplier);
+    db.run('INSERT INTO suppliers (name, name_ar, email, phone, address, address_ar, city, city_ar, country, country_ar, tax_id, commercial_register, rating, is_verified, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (email) DO NOTHING', supplier);
   });
 
   // Insert sample products
