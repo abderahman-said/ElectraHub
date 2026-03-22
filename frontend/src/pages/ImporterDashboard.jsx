@@ -44,7 +44,6 @@ const ImporterDashboard = () => {
     ];
 
     if (hasAccessLevel && (hasAccessLevel('admin') || hasAccessLevel('super_admin'))) {
-        menuItems.push({ path: '/dashboard/admin/merchants', label: 'إدارة التجار', icon: Users, end: false });
         menuItems.push({ path: '/dashboard/admin/categories', label: 'إدارة التصنيفات', icon: Tags, end: false });
     }
 
@@ -54,7 +53,7 @@ const ImporterDashboard = () => {
             <aside className="w-72 bg-white/80 backdrop-blur-2xl border-l border-blue-100/50 hidden md:flex flex-col sticky top-0 h-screen">
                 <div className="p-8">
                     <img src="/logo.png" alt="" className="w-24 h-24  rounded-xl" />
-                    <p className="text-[16px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 text-right">لوحة تحكم المستورد</p>
+                    <p className="text-[16px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 text-right">لوحة التحكم</p>
                 </div>
 
                 <nav className="flex-grow px-4 pb-8 space-y-2">
@@ -91,7 +90,7 @@ const ImporterDashboard = () => {
                 <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
                         <h1 className="text-4xl font-black text-blue-950 tracking-tighter">لوحة التحكم</h1>
-                        <p className="text-slate-500 font-medium mt-1">مرحباً بك مجدداً، <span className="text-blue-700 font-bold">{user.companyName}</span> 👋</p>
+                        <p className="text-slate-500 font-medium mt-1">مرحباً بك مجدداً، <span className="text-blue-700 font-bold">{user.full_name || user.username || user.companyName}</span> 👋</p>
                     </div>
 
                     <div className="flex items-center gap-4">

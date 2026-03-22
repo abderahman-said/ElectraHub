@@ -404,7 +404,7 @@ const ManageProduct = () => {
                                 <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 text-right">وصف تفصيلي للمنتج</label>
                                 <textarea
                                     className="w-full px-6 py-4 rounded-[2rem] border border-blue-100 bg-white/50 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-bold text-blue-950 text-right h-40 resize-none"
-                                    placeholder="اكتب هنا كافة تفاصيل المنتج... الاستخدامات، المواصفات الكاملة، ملاحظات الاستخدام، وأي معلومات تفيد التاجر"
+                                    placeholder="اكتب هنا كافة تفاصيل المنتج... الاستخدامات، المواصفات الكاملة، ملاحظات الاستخدام، وأي معلومات تفيد العميل"
                                     value={productFormData.desc}
                                     onChange={handleChange('desc')}
                                 />

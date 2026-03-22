@@ -15,8 +15,8 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
 
   const navLinks = [
     { name: 'السوق', href: '/shop' },
-    { name: 'الشركاء', href: '/importers' },
-    { name: 'الأسعار', href: '/pricing' }
+    { name: 'من نحن', href: '/about' },
+    { name: 'تواصل معنا', href: '/contact' }
   ];
 
   const handleSearch = async (query) => {
@@ -136,7 +136,7 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
                 <input
                   autoFocus
                   type="text"
-                  placeholder="ابحث عن أدوات منزلية، مستوردين..."
+                  placeholder="ابحث عن أدوات منزلية، منتجات..."
                   className="w-full bg-white/90 backdrop-blur-xl border border-white/20 px-8 py-6 rounded-[2rem] text-xl font-bold text-slate-900 outline-none focus:ring-4 focus:ring-brand/20 shadow-2xl transition-all"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -264,7 +264,7 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
                   className="w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  أصبح مستورداً
+                  إنشاء حساب
                 </Link>
               </>
             )}

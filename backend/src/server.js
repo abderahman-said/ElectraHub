@@ -33,13 +33,50 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Database setup
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+// Database setup with fallback
+let pool;
+let sqliteDb;
+let usePostgres = false; // Force SQLite for now
+
+// Try PostgreSQL first
+try {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
+  
+  // Test connection
+  pool.query('SELECT NOW()')
+    .then(() => {
+      console.log('PostgreSQL connected successfully');
+      usePostgres = true;
+    })
+    .catch(err => {
+      console.log('PostgreSQL connection failed, falling back to SQLite:', err.message);
+      usePostgres = false;
+      setupSQLite();
+    });
+} catch (err) {
+  console.log('PostgreSQL setup failed, using SQLite:', err.message);
+  usePostgres = false;
+  setupSQLite();
+}
+
+// Always setup SQLite as fallback
+if (!sqliteDb) {
+  setupSQLite();
+}
+
+function setupSQLite() {
+  const dbPath = path.join(__dirname, '../../database.sqlite');
+  sqliteDb = new sqlite3.Database(dbPath);
+  console.log('SQLite database initialized at:', dbPath);
+}
 
 // Helper to convert SQL with ? placeholders to $1, $2, etc. (Postgres syntax)
 const convertSql = (sql) => {
@@ -47,132 +84,203 @@ const convertSql = (sql) => {
   return sql.replace(/\?/g, () => `$${count++}`);
 };
 
+// Helper to generate compatible table creation SQL
+const getCompatibleTableSQL = (tableName, columns) => {
+  const primaryKey = usePostgres ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+  const boolean = usePostgres ? 'BOOLEAN' : 'INTEGER';
+  const timestamp = usePostgres ? 'TIMESTAMP' : 'DATETIME';
+  const decimal = usePostgres ? 'DECIMAL' : 'REAL';
+  
+  let sql = `CREATE TABLE IF NOT EXISTS ${tableName} (`;
+  
+  columns.forEach(col => {
+    if (col.includes('SERIAL PRIMARY KEY')) {
+      sql += col.replace('SERIAL PRIMARY KEY', primaryKey);
+    } else if (col.includes('BOOLEAN')) {
+      sql += col.replace(/BOOLEAN/g, boolean);
+    } else if (col.includes('TIMESTAMP')) {
+      sql += col.replace(/TIMESTAMP/g, timestamp);
+    } else if (col.includes('DECIMAL')) {
+      sql += col.replace(/DECIMAL\([^)]+\)/g, decimal);
+    } else {
+      sql += col;
+    }
+    sql += ', ';
+  });
+  
+  // Remove trailing comma and space, add closing parenthesis
+  sql = sql.slice(0, -2) + ')';
+  
+  // Remove FOREIGN KEY constraints for SQLite (they work but can be problematic)
+  if (!usePostgres) {
+    sql = sql.replace(/, FOREIGN KEY \([^)]+\) REFERENCES [^(]+\([^)]+\)/g, '');
+  }
+  
+  return sql;
+};
+
 // Database Shim to maintain compatibility with existing sqlite3 calls
 const db = {
-  serialize: (callback) => callback(),
+  serialize: (callback) => {
+    if (usePostgres) {
+      callback();
+    } else {
+      sqliteDb.serialize(callback);
+    }
+  },
   run: (sql, params, callback) => {
     if (typeof params === 'function') {
       callback = params;
       params = [];
     }
-    const convertedSql = convertSql(sql);
-    pool.query(convertedSql, params)
-      .then(res => callback && callback(null))
-      .catch(err => {
-        // Suppress "already exists" and "unique violation" errors during initialization
-        if (err.code === '42P07' || err.code === '42701' || err.code === '23505') {
-          callback && callback(null);
-        } else {
-          console.error('DB Run Error:', err.message, '| SQL:', convertedSql);
-          callback && callback(err);
+    
+    if (usePostgres) {
+      const convertedSql = convertSql(sql);
+      pool.query(convertedSql, params)
+        .then(res => callback && callback(null))
+        .catch(err => {
+          // Suppress "already exists" and "unique violation" errors during initialization
+          if (err.code === '42P07' || err.code === '42701' || err.code === '23505') {
+            callback && callback(null);
+          } else {
+            console.error('DB Run Error:', err.message, '| SQL:', convertedSql);
+            callback && callback(err);
+          }
+        });
+    } else {
+      sqliteDb.run(sql, params, function(err) {
+        if (err) {
+          console.error('SQLite Run Error:', err.message, '| SQL:', sql);
         }
+        callback && callback(err);
       });
+    }
   },
   get: (sql, params, callback) => {
     if (typeof params === 'function') {
       callback = params;
       params = [];
     }
-    const convertedSql = convertSql(sql);
-    pool.query(convertedSql, params)
-      .then(res => callback(null, res.rows[0]))
-      .catch(err => {
-        console.error('DB Get Error:', err.message, '| SQL:', convertedSql);
-        callback(err);
+    
+    if (usePostgres) {
+      const convertedSql = convertSql(sql);
+      pool.query(convertedSql, params)
+        .then(res => callback(null, res.rows[0]))
+        .catch(err => {
+          console.error('DB Get Error:', err.message, '| SQL:', convertedSql);
+          callback(err);
+        });
+    } else {
+      sqliteDb.get(sql, params, (err, row) => {
+        if (err) {
+          console.error('SQLite Get Error:', err.message, '| SQL:', sql);
+        }
+        callback(err, row);
       });
+    }
   },
   all: (sql, params, callback) => {
     if (typeof params === 'function') {
       callback = params;
       params = [];
     }
-    const convertedSql = convertSql(sql);
-    pool.query(convertedSql, params)
-      .then(res => callback(null, res.rows))
-      .catch(err => {
-        console.error('DB All Error:', err.message, '| SQL:', convertedSql);
-        callback(err);
+    
+    if (usePostgres) {
+      const convertedSql = convertSql(sql);
+      pool.query(convertedSql, params)
+        .then(res => callback(null, res.rows))
+        .catch(err => {
+          console.error('DB All Error:', err.message, '| SQL:', convertedSql);
+          callback(err);
+        });
+    } else {
+      sqliteDb.all(sql, params, (err, rows) => {
+        if (err) {
+          console.error('SQLite All Error:', err.message, '| SQL:', sql);
+        }
+        callback(err, rows);
       });
+    }
   }
 };
 
 // Initialize database tables
 db.serialize(() => {
   // Users table
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    full_name TEXT NOT NULL,
-    employee_id TEXT UNIQUE,
-    department TEXT,
-    position TEXT,
-    access_level TEXT DEFAULT 'basic',
-    status TEXT DEFAULT 'pending',
-    password TEXT NOT NULL,
-    last_login TIMESTAMP,
-    login_attempts INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )`);
+  db.run(getCompatibleTableSQL('users', [
+    'id SERIAL PRIMARY KEY',
+    'username TEXT UNIQUE NOT NULL',
+    'email TEXT UNIQUE NOT NULL',
+    'full_name TEXT NOT NULL',
+    'employee_id TEXT UNIQUE',
+    'department TEXT',
+    'position TEXT',
+    'access_level TEXT DEFAULT \'basic\'',
+    'status TEXT DEFAULT \'pending\'',
+    'password TEXT NOT NULL',
+    'last_login TIMESTAMP',
+    'login_attempts INTEGER DEFAULT 0',
+    'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  ]));
 
   // Categories table
-  db.run(`CREATE TABLE IF NOT EXISTS categories (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    name_ar TEXT NOT NULL,
-    description TEXT,
-    description_ar TEXT,
-    image_url TEXT,
-    parent_id INTEGER,
-    sort_order INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (parent_id) REFERENCES categories(id)
-  )`);
+  db.run(getCompatibleTableSQL('categories', [
+    'id SERIAL PRIMARY KEY',
+    'name TEXT NOT NULL',
+    'name_ar TEXT NOT NULL',
+    'description TEXT',
+    'description_ar TEXT',
+    'image_url TEXT',
+    'parent_id INTEGER',
+    'sort_order INTEGER DEFAULT 0',
+    'is_active BOOLEAN DEFAULT TRUE',
+    'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'FOREIGN KEY (parent_id) REFERENCES categories(id)'
+  ]));
 
   // Products table
-  db.run(`CREATE TABLE IF NOT EXISTS products (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    name_ar TEXT NOT NULL,
-    description TEXT,
-    description_ar TEXT,
-    sku TEXT UNIQUE NOT NULL,
-    barcode TEXT,
-    price DECIMAL(10,2) NOT NULL,
-    wholesale_price DECIMAL(10,2) NOT NULL,
-    cost_price DECIMAL(10,2),
-    min_order_quantity INTEGER DEFAULT 1,
-    max_order_quantity INTEGER,
-    stock_quantity INTEGER DEFAULT 0,
-    unit TEXT DEFAULT 'piece',
-    weight DECIMAL(8,3),
-    dimensions TEXT,
-    images TEXT,
-    specifications TEXT,
-    tags TEXT,
-    category_id INTEGER,
-    supplier_id INTEGER,
-    user_id INTEGER,
-    brand TEXT,
-    model TEXT,
-    color TEXT,
-    size TEXT,
-    weight_unit TEXT,
-    warranty TEXT,
-    material TEXT,
-    features TEXT,
-    moq INTEGER DEFAULT 1,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_featured BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id),
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
-  )`);
+  db.run(getCompatibleTableSQL('products', [
+    'id SERIAL PRIMARY KEY',
+    'name TEXT NOT NULL',
+    'name_ar TEXT NOT NULL',
+    'description TEXT',
+    'description_ar TEXT',
+    'sku TEXT UNIQUE NOT NULL',
+    'barcode TEXT',
+    'price DECIMAL(10,2) NOT NULL',
+    'wholesale_price DECIMAL(10,2) NOT NULL',
+    'cost_price DECIMAL(10,2)',
+    'min_order_quantity INTEGER DEFAULT 1',
+    'max_order_quantity INTEGER',
+    'stock_quantity INTEGER DEFAULT 0',
+    'unit TEXT DEFAULT \'piece\'',
+    'weight DECIMAL(8,3)',
+    'dimensions TEXT',
+    'images TEXT',
+    'specifications TEXT',
+    'tags TEXT',
+    'category_id INTEGER',
+    'supplier_id INTEGER',
+    'user_id INTEGER',
+    'brand TEXT',
+    'model TEXT',
+    'color TEXT',
+    'size TEXT',
+    'weight_unit TEXT',
+    'warranty TEXT',
+    'material TEXT',
+    'features TEXT',
+    'moq INTEGER DEFAULT 1',
+    'is_active BOOLEAN DEFAULT TRUE',
+    'is_featured BOOLEAN DEFAULT FALSE',
+    'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'FOREIGN KEY (category_id) REFERENCES categories(id)',
+    'FOREIGN KEY (supplier_id) REFERENCES suppliers(id)',
+    'FOREIGN KEY (user_id) REFERENCES users(id)'
+  ]));
 
   // Add additional columns if they don't exist (Suppress errors in shim)
   const additionalColumns = [
@@ -190,30 +298,43 @@ db.serialize(() => {
   ];
 
   additionalColumns.forEach(column => {
-    db.run(`ALTER TABLE products ADD COLUMN IF NOT EXISTS ${column}`);
+    if (usePostgres) {
+      db.run(`ALTER TABLE products ADD COLUMN IF NOT EXISTS ${column}`);
+    } else {
+      // SQLite doesn't support IF NOT EXISTS for ALTER TABLE, so we check first
+      db.all(`PRAGMA table_info(products)`, (err, columns) => {
+        if (!err && columns) {
+          const columnNames = columns.map(col => col.name);
+          const columnName = column.split(' ')[0]; // Extract column name
+          if (!columnNames.includes(columnName)) {
+            db.run(`ALTER TABLE products ADD COLUMN ${column}`);
+          }
+        }
+      });
+    }
   });
 
   // Suppliers table
-  db.run(`CREATE TABLE IF NOT EXISTS suppliers (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    name_ar TEXT NOT NULL,
-    email TEXT UNIQUE,
-    phone TEXT,
-    address TEXT,
-    address_ar TEXT,
-    city TEXT,
-    city_ar TEXT,
-    country TEXT,
-    country_ar TEXT,
-    tax_id TEXT,
-    commercial_register TEXT,
-    rating DECIMAL(3,2) DEFAULT 0,
-    is_verified BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )`);
+  db.run(getCompatibleTableSQL('suppliers', [
+    'id SERIAL PRIMARY KEY',
+    'name TEXT NOT NULL',
+    'name_ar TEXT NOT NULL',
+    'email TEXT UNIQUE',
+    'phone TEXT',
+    'address TEXT',
+    'address_ar TEXT',
+    'city TEXT',
+    'city_ar TEXT',
+    'country TEXT',
+    'country_ar TEXT',
+    'tax_id TEXT',
+    'commercial_register TEXT',
+    'rating DECIMAL(3,2) DEFAULT 0',
+    'is_verified BOOLEAN DEFAULT FALSE',
+    'is_active BOOLEAN DEFAULT TRUE',
+    'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+  ]));
 
   // Customers table
   db.run(`CREATE TABLE IF NOT EXISTS customers (
@@ -1265,17 +1386,13 @@ app.delete('/api/categories/:id', authenticateToken, checkPermission('categories
       return res.status(404).json({ error: 'Category not found' });
     }
 
-    // Check if category has products
-    const productCount = await new Promise((resolve, reject) => {
-      db.get('SELECT COUNT(*) as count FROM products WHERE category_id = ?', [id], (err, row) => {
+    // Delete associated products first
+    await new Promise((resolve, reject) => {
+      db.run('DELETE FROM products WHERE category_id = ?', [id], function (err) {
         if (err) reject(err);
-        else resolve(row.count);
+        else resolve({ changes: this.changes });
       });
     });
-
-    if (productCount > 0) {
-      return res.status(400).json({ error: 'Cannot delete category with existing products' });
-    }
 
     const result = await new Promise((resolve, reject) => {
       db.run('DELETE FROM categories WHERE id = ?', [id], function (err) {

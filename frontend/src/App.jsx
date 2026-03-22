@@ -16,9 +16,8 @@ import './App.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ImporterDashboard from './pages/ImporterDashboard';
-import ImporterProfile from './pages/ImporterProfile';
-import Importers from './pages/Importers';
-import Pricing from './pages/Pricing';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
 import ManageProduct from './pages/ManageProduct';
 import DashboardOverview from './pages/dashboard/DashboardOverview';
 import DashboardInventory from './pages/dashboard/DashboardInventory';
@@ -29,7 +28,6 @@ import ProductManagement from './pages/ProductManagement';
 import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import OrderManagement from './pages/OrderManagement';
-import AdminMerchants from './pages/admin/AdminMerchants';
 import AdminCategories from './pages/admin/AdminCategories';
 import Cart from './pages/Cart';
 
@@ -65,14 +63,12 @@ function App() {
                 <Route index element={<DashboardOverview />} />
                 <Route path="inventory" element={<DashboardInventory />} />
                 <Route path="profile" element={<DashboardProfile />} />
-                <Route path="admin/merchants" element={<AdminMerchants />} />
                 <Route path="admin/categories" element={<AdminCategories />} />
               </Route>
               <Route path="/dashboard/add-product" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
               <Route path="/dashboard/edit-product/:id" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
-              <Route path="/importers" element={<Importers />} />
-              <Route path="/importer/:id" element={<ImporterProfile />} />
-              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/contact" element={<ContactUs />} />
               <Route path="/cart" element={<Cart />} />
 
               <Route path="*" element={<NotFound />} />
