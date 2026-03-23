@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, createContext } from 'react';
 import { authAPI } from '../services/api';
+import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -61,6 +62,18 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  useEffect(() => {
+    if (user?.theme_color) {
+      document.documentElement.style.setProperty('--primary-color', user.theme_color);
+      if (user.theme_color.startsWith('#')) {
+        document.documentElement.style.setProperty('--primary-color-light', `${user.theme_color}26`);
+      }
+    } else {
+      document.documentElement.style.setProperty('--primary-color', '#1d4ed8');
+      document.documentElement.style.setProperty('--primary-color-light', 'rgba(29, 78, 216, 0.15)');
+    }
+  }, [user?.theme_color]);
+
   const login = async (credentials) => {
     try {
       console.log('Attempting login with:', credentials);
@@ -97,7 +110,7 @@ export const AuthProvider = ({ children }) => {
       // Auto-login after registration for pending users
       // For pending users, they can login but might have limited access
       const loginResult = await login({
-        username: userData.username,
+        phone: userData.phone,
         password: userData.password
       });
       
@@ -149,6 +162,32 @@ export const AuthProvider = ({ children }) => {
     return levels[user.access_level] >= levels[requiredLevel];
   };
 
+    const updateProfile = async (profileData) => {
+        try {
+            const response = await authAPI.updateProfile(profileData);
+            const updatedUser = response.data.user;
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            toast.success('تم تحديث الملف الشخصي بنجاح');
+            return true;
+        } catch (error) {
+            console.error('Update profile error:', error);
+            toast.error(error.response?.data?.error || 'فشل تحديث الملف الشخصي');
+            return false;
+        }
+    };
+
+    const uploadLogo = async (file) => {
+        try {
+            const response = await authAPI.uploadLogo(file);
+            return response.data.logoUrl;
+        } catch (error) {
+            console.error('Upload logo error:', error);
+            toast.error('فشل رفع الشعار');
+            return null;
+        }
+    };
+
   const value = {
     user,
     token,
@@ -156,6 +195,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateProfile,
+    uploadLogo,
     hasPermission,
     hasAccessLevel,
     isAuthenticated: !!user,

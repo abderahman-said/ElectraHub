@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        heading: ['Outfit', 'sans-serif'],
+        sans: ['Cairo', 'Noto Sans Arabic', 'sans-serif'],
+        heading: ['Cairo', 'Noto Sans Arabic', 'sans-serif'],
       },
       colors: {
         primary: {
@@ -29,9 +29,9 @@ export default {
           light: '#fdfaf3',
           dark: '#b08d45',
         },
-        brand: '#2650fc',
-        'brand-light': '#4f72ff',
-        'brand-dark': '#1a3ecb',
+        brand: 'var(--primary-color, #2650fc)',
+        'brand-light': 'var(--primary-color-light, #4f72ff)',
+        'brand-dark': 'var(--primary-color-dark, #1a3ecb)',
         muted: '#64748b',
         border: '#e2e8f0',
       }

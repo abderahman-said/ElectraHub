@@ -30,7 +30,7 @@ const SEO = ({
             element.setAttribute('content', content);
         };
 
-        // [#2650fc] Meta Tags
+        // [var(--primary-color)] Meta Tags
         updateMetaTag('description', description);
         updateMetaTag('keywords', keywords);
 

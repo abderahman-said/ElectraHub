@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {   ArrowLeft, Mail, Lock,   } from 'lucide-react';
+import {   ArrowLeft, Phone, Lock,   } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useForm } from 'react-hook-form';
@@ -24,7 +24,7 @@ const Login = () => {
             console.log('Login result:', result);
             
             if (result.success) {
-                toast.success('Login successful!');
+                toast.success('تم تسجيل الدخول بنجاح!');
                 console.log('Navigating to dashboard...');
                 // Token is already stored in useAuth hook, no need to set manually
                 navigate('/dashboard');
@@ -34,7 +34,7 @@ const Login = () => {
             }
         } catch (error) {
             console.error('Login error:', error);
-            toast.error('Login failed. Please try again.');
+            toast.error('فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.');
         } finally {
             setIsLoading(false);
         }
@@ -61,25 +61,25 @@ const Login = () => {
                     <form className="space-y-8 animate-slideInUp" onSubmit={handleSubmit(onSubmit)}>
                         <div className="space-y-6">
                             <div className="group">
-                                <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">اسم المستخدم أو البريد الإلكتروني</label>
+                                <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">رقم الهاتف</label>
                                 <div className="relative">
                                     <input
-                                        {...register('username', { required: 'Username is required' })}
+                                        {...register('phone', { required: 'رقم الهاتف مطلوب' })}
                                         type="text"
                                         className="w-full px-6 py-4 pr-14 rounded-2xl  border  border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
-                                        placeholder="اسم المستخدم أو البريد الإلكتروني"
+                                        placeholder="أدخل رقم الهاتف"
                                     />
-                                    <Mail className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-700 transition-colors" size={20} />
+                                    <Phone className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-700 transition-colors" size={20} />
                                 </div>
-                                {errors.username && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
+                                {errors.phone && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
                                 )}
                             </div>
                             <div className="group">
                                 <label className="block text-[16px] font-black text-blue-950 uppercase tracking-[0.2em] mb-3 ml-2">كلمة المرور</label>
                                 <div className="relative">
                                     <input
-                                        {...register('password', { required: 'Password is required' })}
+                                        {...register('password', { required: 'كلمة المرور مطلوبة' })}
                                         type="password"
                                         className="w-full px-6 py-4 pr-14 rounded-2xl border   border-[#17255421] focus:ring-4 focus:ring-blue-100 focus:border-blue-700/50 outline-none transition-all duration-500 font-bold text-blue-950 placeholder:text-slate-300 text-right"
                                         placeholder="••••••••"
@@ -109,7 +109,7 @@ const Login = () => {
                                 </Link>
                             </p>
                             <p className="text-xs text-gray-500 mt-2">
-                                بيانات الافتراضية: <span className="font-mono bg-gray-100 px-2 py-1 rounded">admin / admin123</span>
+                                بيانات الافتراضية: <span className="font-mono bg-gray-100 px-2 py-1 rounded">01000000000 / admin123</span>
                             </p>
                         </div>
                     </form>

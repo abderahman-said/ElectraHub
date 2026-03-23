@@ -17,7 +17,7 @@ const GlowOrb = ({ className = '', style }) => (
 );
 
 const SectionLabel = ({ children }) => (
-  <span className="inline-block text-[11px] font-black text-[#2650fc] uppercase tracking-[0.4em] mb-3 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100">
+  <span className="inline-block text-[11px] font-black text-[var(--primary-color)] uppercase tracking-[0.4em] mb-3 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100">
     {children}
   </span>
 );
@@ -25,7 +25,7 @@ const SectionLabel = ({ children }) => (
 const CounterBadge = ({ value, label, icon: Icon }) => (
   <div className="flex flex-col items-center gap-1 px-8 py-6 bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-300">
     <div className="h-10 w-10 bg-blue-50 rounded-xl flex items-center justify-center mb-1">
-      <Icon size={20} className="text-[#2650fc]" />
+      <Icon size={20} className="text-[var(--primary-color)]" />
     </div>
     <span className="text-3xl font-black text-slate-900 tracking-tighter">{value}</span>
     <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{label}</span>
@@ -120,7 +120,7 @@ const Home = () => {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2650fc] mx-auto mb-4" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary-color)] mx-auto mb-4" />
         <p className="text-gray-600 font-medium">جاري تحميل البيانات…</p>
       </div>
     </div>
@@ -145,7 +145,7 @@ const Home = () => {
           <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
             <SectionLabel>استكشف الفئات</SectionLabel>
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight">
-              تسوّق حسب <span className="text-[#2650fc]">الفئة</span>
+              تسوّق حسب <span className="text-[var(--primary-color)]">الفئة</span>
             </h2>
             <p className="text-slate-500 font-medium text-lg">أجهزة ومنتجات منزلية مختارة بعناية من أشهر الماركات العالمية</p>
           </div>
@@ -161,7 +161,7 @@ const Home = () => {
           >
             {categories.map((cat) => (
               <SwiperSlide key={cat.id} className="py-2">
-                <div className="group relative overflow-hidden rounded-3xl shadow-md aspect-[3/4] cursor-pointer ring-0 hover:ring-2 hover:ring-[#2650fc]/40 transition-all duration-300">
+                <div className="group relative overflow-hidden rounded-3xl shadow-md aspect-[3/4] cursor-pointer ring-0 hover:ring-2 hover:ring-[var(--primary-color)]/40 transition-all duration-300">
                   <OptimizedImage
                     src={cat.image_url || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80'}
                     alt={cat.name_ar || cat.name}
@@ -176,7 +176,7 @@ const Home = () => {
                   </span>
                   <div className="absolute bottom-0 inset-x-0 p-4 text-right">
                     <h3 className="text-white font-black text-lg mb-3 leading-tight">{cat.name_ar || cat.name}</h3>
-                    <button className="w-full rounded-xl bg-[#2650fc] py-2 text-sm font-bold text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                    <button className="w-full rounded-xl bg-[var(--primary-color)] py-2 text-sm font-bold text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
                       عرض الكل
                       <ArrowRight size={14} className="rotate-180" />
                     </button>
@@ -200,7 +200,7 @@ const Home = () => {
             <div className="space-y-3 text-right">
               <SectionLabel>المنتجات</SectionLabel>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight">
-                أحدث <span className="text-[#2650fc]">المنتجات</span>
+                أحدث <span className="text-[var(--primary-color)]">المنتجات</span>
               </h2>
             </div>
             {/* tabs */}
@@ -211,7 +211,7 @@ const Home = () => {
                   onClick={() => setActiveTab(t)}
                   className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-200 ${
                     activeTab === t
-                      ? 'bg-white text-[#2650fc] shadow-sm'
+                      ? 'bg-white text-[var(--primary-color)] shadow-sm'
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
@@ -230,7 +230,7 @@ const Home = () => {
           <div className="text-center mt-12">
             <Link
               to="/shop"
-              className="inline-flex items-center gap-3 px-10 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-[#2650fc] transition-colors duration-300 text-sm"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-[var(--primary-color)] transition-colors duration-300 text-sm"
             >
               عرض جميع المنتجات
               <ArrowUpRight size={18} />
@@ -257,7 +257,7 @@ const Home = () => {
         <div className="container mx-auto px-4 md:px-8 relative z-20 mb-10">
           <div className="text-center mb-14 space-y-3">
             <SectionLabel>تسوق أكبر الماركات العالمية</SectionLabel>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">تسوق أكبر <span className="text-[#2650fc]">الماركات العالمية</span></h2>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">تسوق أكبر <span className="text-[var(--primary-color)]">الماركات العالمية</span></h2>
           </div>  
         </div>
         
@@ -284,7 +284,7 @@ const Home = () => {
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center mb-14 space-y-3">
             <SectionLabel>لماذا نحن؟</SectionLabel>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">مميزات <span className="text-[#2650fc]">متجرنا</span></h2>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">مميزات <span className="text-[var(--primary-color)]">متجرنا</span></h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {trustBadges.map((badge) => {
@@ -294,7 +294,7 @@ const Home = () => {
                 return <Icon size={28} />;
               };
               const colors = [
-                { bg: 'bg-blue-50', icon: 'text-[#2650fc]', border: 'border-blue-100', accent: 'bg-[#2650fc]' },
+                { bg: 'bg-blue-50', icon: 'text-[var(--primary-color)]', border: 'border-blue-100', accent: 'bg-[var(--primary-color)]' },
                 { bg: 'bg-amber-50',  icon: 'text-amber-600',  border: 'border-amber-100', accent: 'bg-amber-500' },
                 { bg: 'bg-green-50',  icon: 'text-green-600',  border: 'border-green-100', accent: 'bg-green-500' },
               ];

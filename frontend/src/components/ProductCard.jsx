@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { ShoppingBag, Star, Users, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import OptimizedImage from './OptimizedImage';
+import { getProductImage } from '../utils/imageUtils';
+import { formatPrice, getDisplayPrice } from '../utils/priceUtils';
 
 const ProductCard = ({ product }) => {
-  const { id, name, averagePrice, price, category, image, suppliers = [], rating = 4.8 } = product;
-  const displayPrice = averagePrice || price;
+  const { id, name, category, suppliers = [], rating = 4.8 } = product;
+  const image = getProductImage(product);
+  const displayPrice = getDisplayPrice(product);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -57,7 +60,7 @@ const ProductCard = ({ product }) => {
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-sm font-bold text-slate-400 uppercase tracking-widest text-right">سعر الجملة</span>
-              <span className="text-3xl font-black text-[#2650fc] tracking-tighter">{(displayPrice * 50).toLocaleString()} ج.م</span>
+              <span className="text-3xl font-black text-[var(--primary-color)] tracking-tighter">{formatPrice(displayPrice)}</span>
             </div>
             <div className="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
               <span className="text-sm font-black text-yellow-700">{rating}</span>
@@ -71,7 +74,7 @@ const ProductCard = ({ product }) => {
 
           <div className="pt-4 border-t border-slate-50">
             <div className="flex items-center gap-2 mb-4">
-              <span className="bg-[#2650fc]/10 text-[#2650fc] text-xs font-black px-2.5 py-1 rounded-lg border border-brand/20">الحد الأدنى: 5 قطع</span>
+              <span className="bg-[var(--primary-color)]/10 text-[var(--primary-color)] text-xs font-black px-2.5 py-1 rounded-lg border border-brand/20">الحد الأدنى: 5 قطع</span>
               <span className="text-sm font-black text-slate-400">|</span>
               <span className="text-sm font-black text-slate-600">متوفر من {suppliers.length} موردين</span>
             </div>
@@ -95,7 +98,7 @@ const ProductCard = ({ product }) => {
               ))}
             </div>
 
-            <button className="mt-6 w-full py-4 bg-[#2650fc] text-white font-black rounded-2xl hover:bg-brand-dark transition-all uppercase text-sm tracking-widest shadow-lg shadow-brand/20">
+            <button className="mt-6 w-full py-4 bg-[var(--primary-color)] text-white font-black rounded-2xl hover:bg-brand-dark transition-all uppercase text-sm tracking-widest shadow-lg shadow-brand/20">
               أضف للطلب
             </button>
           </div>

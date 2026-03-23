@@ -7,14 +7,58 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const { Pool } = require('pg');
+const multer = require('multer');
+const xlsx = require('xlsx');
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 1337;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
+// Multer storage for Excel files
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      file.mimetype === 'application/vnd.ms-excel') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only Excel files are allowed!'), false);
+    }
+  }
+});
+
+// Multer storage for Logos
+const logoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../public/uploads/logos'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'logo-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const uploadLogo = multer({ 
+  storage: logoStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|webp|svg/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('Only images are allowed!'));
+  }
+});
+
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -25,6 +69,7 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan('combined'));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -32,9 +77,6 @@ const limiter = rateLimit({
   max: 100 // limit each IP to 100 requests per windowMs
 });
 app.use('/api/', limiter);
-
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
 
 // Database setup with fallback
 let pool;
@@ -49,7 +91,7 @@ try {
       rejectUnauthorized: false
     }
   });
-  
+
   // Test connection
   pool.query('SELECT NOW()')
     .then(() => {
@@ -90,9 +132,9 @@ const getCompatibleTableSQL = (tableName, columns) => {
   const boolean = usePostgres ? 'BOOLEAN' : 'INTEGER';
   const timestamp = usePostgres ? 'TIMESTAMP' : 'DATETIME';
   const decimal = usePostgres ? 'DECIMAL' : 'REAL';
-  
+
   let sql = `CREATE TABLE IF NOT EXISTS ${tableName} (`;
-  
+
   columns.forEach(col => {
     if (col.includes('SERIAL PRIMARY KEY')) {
       sql += col.replace('SERIAL PRIMARY KEY', primaryKey);
@@ -107,15 +149,15 @@ const getCompatibleTableSQL = (tableName, columns) => {
     }
     sql += ', ';
   });
-  
+
   // Remove trailing comma and space, add closing parenthesis
   sql = sql.slice(0, -2) + ')';
-  
+
   // Remove FOREIGN KEY constraints for SQLite (they work but can be problematic)
   if (!usePostgres) {
     sql = sql.replace(/, FOREIGN KEY \([^)]+\) REFERENCES [^(]+\([^)]+\)/g, '');
   }
-  
+
   return sql;
 };
 
@@ -133,7 +175,7 @@ const db = {
       callback = params;
       params = [];
     }
-    
+
     if (usePostgres) {
       const convertedSql = convertSql(sql);
       pool.query(convertedSql, params)
@@ -148,11 +190,11 @@ const db = {
           }
         });
     } else {
-      sqliteDb.run(sql, params, function(err) {
+      sqliteDb.run(sql, params, function (err) {
         if (err) {
           console.error('SQLite Run Error:', err.message, '| SQL:', sql);
         }
-        callback && callback(err);
+        if (callback) callback.call(this, err);
       });
     }
   },
@@ -161,7 +203,7 @@ const db = {
       callback = params;
       params = [];
     }
-    
+
     if (usePostgres) {
       const convertedSql = convertSql(sql);
       pool.query(convertedSql, params)
@@ -184,7 +226,7 @@ const db = {
       callback = params;
       params = [];
     }
-    
+
     if (usePostgres) {
       const convertedSql = convertSql(sql);
       pool.query(convertedSql, params)
@@ -210,7 +252,8 @@ db.serialize(() => {
   db.run(getCompatibleTableSQL('users', [
     'id SERIAL PRIMARY KEY',
     'username TEXT UNIQUE NOT NULL',
-    'email TEXT UNIQUE NOT NULL',
+    'email TEXT UNIQUE',
+    'phone TEXT UNIQUE',
     'full_name TEXT NOT NULL',
     'employee_id TEXT UNIQUE',
     'department TEXT',
@@ -218,6 +261,8 @@ db.serialize(() => {
     'access_level TEXT DEFAULT \'basic\'',
     'status TEXT DEFAULT \'pending\'',
     'password TEXT NOT NULL',
+    'first_name TEXT',
+    'last_name TEXT',
     'last_login TIMESTAMP',
     'login_attempts INTEGER DEFAULT 0',
     'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
@@ -297,6 +342,23 @@ db.serialize(() => {
     'packaging TEXT'
   ];
 
+  // Add phone column to users if it doesn't exist
+  if (usePostgres) {
+    db.run(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT UNIQUE`);
+  } else {
+    db.all(`PRAGMA table_info(users)`, (err, columns) => {
+      if (!err && columns) {
+        const columnNames = columns.map(col => col.name);
+        if (!columnNames.includes('phone')) {
+          db.run(`ALTER TABLE users ADD COLUMN phone TEXT`);
+        }
+        // Also make email optional in SQLite if it was NOT NULL
+        // Note: SQLite doesn't support ALTER TABLE DROP NOT NULL easily, 
+        // but since we are moving to phone login, we just handle it in app logic.
+      }
+    });
+  }
+
   additionalColumns.forEach(column => {
     if (usePostgres) {
       db.run(`ALTER TABLE products ADD COLUMN IF NOT EXISTS ${column}`);
@@ -308,6 +370,32 @@ db.serialize(() => {
           const columnName = column.split(' ')[0]; // Extract column name
           if (!columnNames.includes(columnName)) {
             db.run(`ALTER TABLE products ADD COLUMN ${column}`);
+          }
+        }
+      });
+    }
+  });
+  
+  // Migration for customer and user columns
+  const customerUserColumns = [
+    { table: 'users', column: 'first_name TEXT' },
+    { table: 'users', column: 'last_name TEXT' },
+    { table: 'customers', column: 'user_id INTEGER' },
+    { table: 'customers', column: 'address TEXT' },
+    { table: 'customers', column: 'city TEXT' },
+    { table: 'customers', column: 'country TEXT' }
+  ];
+
+  customerUserColumns.forEach(item => {
+    if (usePostgres) {
+      db.run(`ALTER TABLE ${item.table} ADD COLUMN IF NOT EXISTS ${item.column.split(' ')[0]} ${item.column.split(' ')[1]}`);
+    } else {
+      db.all(`PRAGMA table_info(${item.table})`, (err, columns) => {
+        if (!err && columns) {
+          const columnNames = columns.map(col => col.name);
+          const columnName = item.column.split(' ')[0];
+          if (!columnNames.includes(columnName)) {
+            db.run(`ALTER TABLE ${item.table} ADD COLUMN ${item.column}`);
           }
         }
       });
@@ -339,6 +427,7 @@ db.serialize(() => {
   // Customers table
   db.run(`CREATE TABLE IF NOT EXISTS customers (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER UNIQUE,
     name TEXT NOT NULL,
     name_ar TEXT NOT NULL,
     email TEXT UNIQUE,
@@ -357,7 +446,8 @@ db.serialize(() => {
     credit_limit DECIMAL(10,2),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
 
   // Orders table
@@ -460,9 +550,34 @@ db.serialize(() => {
     user_agent TEXT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT DEFAULT 'success',
-    user_id INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+
+  // Importers table
+  db.run(getCompatibleTableSQL('importers', [
+    'id SERIAL PRIMARY KEY',
+    'user_id INTEGER UNIQUE',
+    'company_name TEXT',
+    'whatsapp TEXT',
+    'contact_email TEXT',
+    'category TEXT',
+    'description TEXT',
+    'website TEXT',
+    'address TEXT',
+    'city TEXT',
+    'country TEXT',
+    'logo_url TEXT',
+    'established_year INTEGER',
+    'business_license TEXT',
+    'theme_color TEXT DEFAULT \'#1d4ed8\'',
+    'tax_id TEXT',
+    'commercial_register TEXT',
+    'is_verified BOOLEAN DEFAULT FALSE',
+    'products_count INTEGER DEFAULT 0',
+    'created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    'FOREIGN KEY (user_id) REFERENCES users(id)'
+  ]));
 
   // Insert default data
   insertDefaultData();
@@ -524,8 +639,8 @@ function insertDefaultData() {
 
   // Create default admin user
   const adminPassword = bcrypt.hashSync('admin123', 10);
-  db.run('INSERT INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (username) DO NOTHING',
-    ['admin', 'admin@belgomla.com', 'System Administrator', 'ADMIN001', 'IT', 'System Administrator', 'super_admin', 'active', adminPassword]);
+  db.run('INSERT INTO users (username, email, phone, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (username) DO NOTHING',
+    ['admin', 'admin@belgomla.com', '01000000000', 'System Administrator', 'ADMIN001', 'IT', 'System Administrator', 'super_admin', 'active', adminPassword]);
 
   // Insert sample categories
   const categories = [
@@ -643,8 +758,8 @@ const logAudit = (action, resource, resourceId, details, ipAddress, userAgent, u
 
 // Authentication
 app.post('/api/auth/login', [
-  body('username').notEmpty().withMessage('Username is required'),
-  body('password').notEmpty().withMessage('Password is required')
+  body('phone').notEmpty().withMessage('رقم الهاتف مطلوب'),
+  body('password').notEmpty().withMessage('كلمة المرور مطلوبة')
 ], async (req, res) => {
   console.log('Login request received:', req.body);
 
@@ -654,16 +769,16 @@ app.post('/api/auth/login', [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, password } = req.body;
+  const { phone, password } = req.body;
   const ipAddress = req.ip;
   const userAgent = req.get('User-Agent');
 
-  console.log('Attempting login for:', username);
+  console.log('Attempting login for phone:', phone);
 
   try {
-    // Find user
+    // Find user by phone
     const user = await new Promise((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE username = ? OR email = ?', [username, username], (err, row) => {
+      db.get('SELECT * FROM users WHERE phone = ? OR username = ?', [phone, phone], (err, row) => {
         if (err) reject(err);
         else resolve(row);
       });
@@ -671,12 +786,12 @@ app.post('/api/auth/login', [
 
     if (!user) {
       // logAudit('LOGIN_FAILED', 'auth', null, { username, reason: 'User not found' }, ipAddress, userAgent, null, 'failure');
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
     }
 
     if (user.status !== 'active' && user.status !== 'pending') {
       // logAudit('LOGIN_FAILED', 'auth', user.id, { username, reason: 'User not active', status: user.status }, ipAddress, userAgent, user.id, 'failure');
-      return res.status(401).json({ error: 'Account is not active' });
+      return res.status(401).json({ error: 'الحساب غير نشط أو في انتظار التفعيل' });
     }
 
     // Check password
@@ -685,7 +800,7 @@ app.post('/api/auth/login', [
       // Increment login attempts
       db.run('UPDATE users SET login_attempts = login_attempts + 1 WHERE id = ?', [user.id]);
       // logAudit('LOGIN_FAILED', 'auth', user.id, { username, reason: 'Invalid password' }, ipAddress, userAgent, user.id, 'failure');
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'بيانات الدخول غير صحيحة' });
     }
 
     // Reset login attempts and update last login
@@ -711,7 +826,7 @@ app.post('/api/auth/login', [
     res.json({ user: userWithoutPassword, token });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    res.status(500).json({ error: 'فشل تسجيل الدخول' });
   }
 });
 
@@ -724,6 +839,15 @@ app.post('/api/auth/logout', authenticateToken, (req, res) => {
   res.json({ message: 'Logged out successfully' });
 });
 
+// Upload Logo
+app.post('/api/auth/upload/logo', authenticateToken, uploadLogo.single('logo'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  const logoUrl = `${req.protocol}://${req.get('host')}/uploads/logos/${req.file.filename}`;
+  res.json({ logoUrl });
+});
+
 // Get current user
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
@@ -731,7 +855,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
       db.get(`
         SELECT u.id, u.username, u.email, u.full_name, u.employee_id, u.department, u.position, u.access_level, u.status, u.last_login,
                i.company_name, i.whatsapp, i.contact_email, i.category, i.description, i.website, i.address, i.city, i.country,
-               i.logo_url, i.established_year, i.business_license, i.tax_id, i.is_verified, i.products_count
+               i.logo_url, i.established_year, i.business_license, i.tax_id, i.is_verified, i.products_count, i.theme_color
         FROM users u
         LEFT JOIN importers i ON u.id = i.user_id
         WHERE u.id = ?
@@ -764,11 +888,96 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
   }
 });
 
+// Update profile
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      full_name, password,
+      company_name, whatsapp, contact_email, category, description, website, theme_color, logo_url
+    } = req.body;
+
+    // Begin transaction-like sequence
+    await new Promise((resolve, reject) => {
+      db.serialize(() => {
+        // 1. Update user table
+        const userUpdates = [];
+        const userValues = [];
+        if (full_name) { userUpdates.push('full_name = ?'); userValues.push(full_name); }
+        if (password) {
+          const salt = bcrypt.genSaltSync(10);
+          const hashedPassword = bcrypt.hashSync(password, salt);
+          userUpdates.push('password = ?');
+          userValues.push(hashedPassword);
+        }
+
+        if (userUpdates.length > 0) {
+          userValues.push(userId);
+          db.run(`UPDATE users SET ${userUpdates.join(', ')} WHERE id = ?`, userValues);
+        }
+
+        // 2. Update importers table
+        const importerUpdates = [];
+        const importerValues = [];
+        if (company_name !== undefined) { importerUpdates.push('company_name = ?'); importerValues.push(company_name); }
+        if (whatsapp !== undefined) { importerUpdates.push('whatsapp = ?'); importerValues.push(whatsapp); }
+        if (contact_email !== undefined) { importerUpdates.push('contact_email = ?'); importerValues.push(contact_email); }
+        if (category !== undefined) { importerUpdates.push('category = ?'); importerValues.push(category); }
+        if (description !== undefined) { importerUpdates.push('description = ?'); importerValues.push(description); }
+        if (website !== undefined) { importerUpdates.push('website = ?'); importerValues.push(website); }
+        if (theme_color !== undefined) { importerUpdates.push('theme_color = ?'); importerValues.push(theme_color); }
+        if (logo_url !== undefined) { importerUpdates.push('logo_url = ?'); importerValues.push(logo_url); }
+
+        if (importerUpdates.length > 0) {
+          importerValues.push(userId);
+          db.run(`UPDATE importers SET ${importerUpdates.join(', ')} WHERE user_id = ?`, importerValues, function (err) {
+            // Note: SQLite UPDATE with 0 matches returns no error. Check this.changes to fallback to INSERT.
+            if (err || this.changes === 0) {
+              db.run(`INSERT OR REPLACE INTO importers (user_id, company_name, whatsapp, contact_email, category, description, website, theme_color, logo_url)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [userId, company_name, whatsapp, contact_email, category, description, website, theme_color, logo_url],
+                (insertErr) => {
+                  if (insertErr) reject(insertErr);
+                  else resolve();
+                });
+            } else {
+              resolve();
+            }
+          });
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // Fetch updated user
+    const updatedUser = await new Promise((resolve, reject) => {
+      db.get(`
+        SELECT u.id, u.username, u.email, u.full_name, u.access_level,
+               i.company_name, i.whatsapp, i.contact_email, i.category, i.description, i.website, i.theme_color, i.logo_url
+        FROM users u
+        LEFT JOIN importers i ON u.id = i.user_id
+        WHERE u.id = ?
+      `, [userId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    logAudit('UPDATE_PROFILE', 'users', userId.toString(), { full_name, company_name }, req.ip, req.get('User-Agent'), userId);
+
+    res.json({ message: 'تم تحديث الملف الشخصي بنجاح', user: updatedUser });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ error: 'فشل تحديث الملف الشخصي' });
+  }
+});
+
 // Users CRUD
 app.get('/api/users', authenticateToken, checkPermission('users', 'read'), async (req, res) => {
   try {
     const users = await new Promise((resolve, reject) => {
-      db.all('SELECT id, username, email, full_name, employee_id, department, position, access_level, status, last_login, login_attempts, created_at FROM users ORDER BY created_at DESC', (err, rows) => {
+      db.all('SELECT id, username, email, phone, full_name, employee_id, department, position, access_level, status, last_login, login_attempts, created_at FROM users ORDER BY created_at DESC', (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
@@ -781,8 +990,7 @@ app.get('/api/users', authenticateToken, checkPermission('users', 'read'), async
 });
 
 app.post('/api/users', authenticateToken, checkPermission('users', 'create'), [
-  body('username').notEmpty().withMessage('Username is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
+  body('phone').notEmpty().withMessage('Phone number is required'),
   body('full_name').notEmpty().withMessage('Full name is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
 ], async (req, res) => {
@@ -791,14 +999,15 @@ app.post('/api/users', authenticateToken, checkPermission('users', 'create'), [
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, full_name, employee_id, department, position, access_level, status, password } = req.body;
+  const { username, email, phone, full_name, employee_id, department, position, access_level, status, password } = req.body;
+  const finalUsername = username || phone;
 
   try {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const result = await new Promise((resolve, reject) => {
-      db.run('INSERT INTO users (username, email, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [username, email, full_name, employee_id, department, position, access_level || 'basic', status || 'pending', hashedPassword], function (err) {
+      db.run('INSERT INTO users (username, email, phone, full_name, employee_id, department, position, access_level, status, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [finalUsername, email, phone, full_name, employee_id, department, position, access_level || 'basic', status || 'pending', hashedPassword], function (err) {
           if (err) reject(err);
           else resolve({ id: this.lastID });
         });
@@ -829,12 +1038,12 @@ app.delete('/api/users/:id', authenticateToken, checkPermission('users', 'delete
     });
 
     if (!existingUser) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'المستخدم غير موجود' });
     }
 
     // Check if user is trying to delete themselves
     if (existingUser.id === req.user.id) {
-      return res.status(400).json({ error: 'You cannot delete your own account' });
+      return res.status(400).json({ error: 'لا يمكنك حذف حسابك الخاص' });
     }
 
     // Check if user has related products
@@ -861,7 +1070,7 @@ app.delete('/api/users/:id', authenticateToken, checkPermission('users', 'delete
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Failed to delete user:', error);
-    res.status(500).json({ error: 'Failed to delete user' });
+    res.status(500).json({ error: 'فشل في حذف المستخدم' });
   }
 });
 
@@ -877,7 +1086,7 @@ app.get('/api/roles', authenticateToken, checkPermission('roles', 'read'), async
 
     res.json(roles);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch roles' });
+    res.status(500).json({ error: 'فشل في جلب الأدوار' });
   }
 });
 
@@ -893,7 +1102,7 @@ app.get('/api/permissions', authenticateToken, checkPermission('permissions', 'r
 
     res.json(permissions);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch permissions' });
+    res.status(500).json({ error: 'فشل في جلب الصلاحيات' });
   }
 });
 
@@ -915,7 +1124,7 @@ app.get('/api/audit-logs', authenticateToken, checkPermission('audit_logs', 'rea
 
     res.json(logs);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch audit logs' });
+    res.status(500).json({ error: 'فشل في جلب سجلات التدقيق' });
   }
 });
 
@@ -937,7 +1146,7 @@ app.get('/api/sessions', authenticateToken, checkPermission('sessions', 'read'),
 
     res.json(sessions);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch sessions' });
+    res.status(500).json({ error: 'فشل في جلب الجلسات' });
   }
 });
 
@@ -1098,13 +1307,154 @@ app.post('/api/products', authenticateToken, checkPermission('products', 'create
 
     logAudit('CREATE_PRODUCT', 'products', result.id.toString(), { name, sku }, req.ip, req.get('User-Agent'), req.user.id);
 
-    res.status(201).json({ message: 'Product created successfully', productId: result.id });
+    res.status(201).json({ message: 'تم إنشاء المنتج بنجاح', productId: result.id });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
-      res.status(400).json({ error: 'SKU already exists' });
+      res.status(400).json({ error: 'كود المنتج (SKU) موجود بالفعل' });
     } else {
-      res.status(500).json({ error: 'Failed to create product' });
+      res.status(500).json({ error: 'فشل في إنشاء المنتج' });
     }
+  }
+});
+
+// Import products from Excel
+app.post('/api/products/import', authenticateToken, checkPermission('products', 'create'), upload.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'لم يتم رفع أي ملف' });
+  }
+
+  try {
+    const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = xlsx.utils.sheet_to_json(sheet);
+
+    if (data.length === 0) {
+      return res.status(400).json({ error: 'ملف Excel فارغ' });
+    }
+
+    const results = {
+      success: 0,
+      failed: 0,
+      errors: []
+    };
+
+    for (const row of data) {
+      try {
+        // Basic mapping and defaults
+        const product = {
+          name: row['الاسم بالعربي'] || row.name_ar || row.name || row['الاسم'] || '',
+          name_ar: row['الاسم بالعربي'] || row.name_ar || row.name || row['الاسم'] || '', // Prioritize Arabic names
+          description: row['الوصف بالعربي'] || row.description_ar || row.description || row['الوصف'] || '',
+          description_ar: row['الوصف بالعربي'] || row.description_ar || row.description || row['الوصف'] || '',
+          sku: row['كود المنتج (SKU)'] || row['كود المنتج'] || row.sku || '',
+          barcode: row['الباركود'] || row.barcode || '',
+          price: parseFloat(row['السعر'] || row.price) || 0,
+          wholesale_price: parseFloat(row['سعر الجملة'] || row.wholesale_price) || 0,
+          cost_price: parseFloat(row['التكلفة'] || row.cost_price) || 0,
+          min_order_quantity: parseInt(row['أقل كمية للطلب'] || row['أقل كمية'] || row.min_order_quantity) || 1,
+          max_order_quantity: parseInt(row['أقصى كمية للطلب'] || row['أقصى كمية'] || row.max_order_quantity) || 999,
+          stock_quantity: parseInt(row['الكمية المتوفرة'] || row.stock_quantity) || 0,
+          unit: row['الوحدة'] || row.unit || 'قطعة',
+          weight: parseFloat(row['الوزن (كجم)'] || row['الوزن'] || row.weight) || 0,
+          dimensions: row['الأبعاد'] || row.dimensions || '',
+          category_id: parseInt(row['رقم الفئة'] || row.category_id) || 1,
+          supplier_id: parseInt(row['رقم المورد'] || row.supplier_id) || 1,
+          brand: row['العلامة التجارية'] || row.brand || '',
+          model: row['الموديل'] || row.model || '',
+          color: row['اللون'] || row.color || '',
+          size: row['المقاس'] || row.size || '',
+          warranty: row['الضمان'] || row.warranty || '',
+          material: row['المادة'] || row.material || '',
+          features: row['المميزات'] || row.features || '',
+          origin: row['بلد المنشأ'] || row.origin || '',
+          packaging: row['التغليف'] || row.packaging || ''
+        };
+
+        if (!product.name || !product.sku) {
+          throw new Error(`حقول مطلوبة ناقصة لـ SKU: ${product.sku || 'غير معروف'}`);
+        }
+
+        // Check if SKU exists to perform UPSERT
+        const targetProduct = await new Promise((resolve, reject) => {
+          db.get('SELECT id FROM products WHERE sku = ?', [product.sku], (err, row) => {
+            if (err) reject(err);
+            else resolve(row);
+          });
+        });
+
+        if (targetProduct) {
+          // Update existing product
+          await new Promise((resolve, reject) => {
+            db.run(`
+              UPDATE products SET
+                name = ?, name_ar = ?, description = ?, description_ar = ?, barcode = ?,
+                price = ?, wholesale_price = ?, cost_price = ?, min_order_quantity = ?,
+                max_order_quantity = ?, stock_quantity = ?, unit = ?, weight = ?, dimensions = ?,
+                category_id = ?, supplier_id = ?, user_id = ?, moq = ?, brand = ?, model = ?,
+                color = ?, size = ?, warranty = ?, material = ?, features = ?, origin = ?,
+                packaging = ?, updated_at = CURRENT_TIMESTAMP
+              WHERE id = ?
+            `, [
+              product.name, product.name_ar, product.description, product.description_ar,
+              product.barcode, product.price, product.wholesale_price, product.cost_price,
+              product.min_order_quantity, product.max_order_quantity, product.stock_quantity,
+              product.unit, product.weight, product.dimensions, product.category_id,
+              product.supplier_id, req.user.id, product.min_order_quantity, product.brand,
+              product.model, product.color, product.size, product.warranty, product.material,
+              product.features, product.origin, product.packaging, targetProduct.id
+            ], function (err) {
+              if (err) reject(err);
+              else resolve();
+            });
+          });
+        } else {
+          // Insert new product
+          await new Promise((resolve, reject) => {
+            db.run(`
+              INSERT INTO products (
+                name, name_ar, description, description_ar, sku, barcode,
+                price, wholesale_price, cost_price, min_order_quantity,
+                max_order_quantity, stock_quantity, unit, weight, dimensions,
+                images, specifications, tags, category_id, supplier_id, user_id,
+                moq, brand, model, color, size, warranty, material, features, origin, packaging,
+                is_active
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)
+            `, [
+              product.name, product.name_ar, product.description, product.description_ar,
+              product.sku, product.barcode, product.price, product.wholesale_price,
+              product.cost_price, product.min_order_quantity, product.max_order_quantity,
+              product.stock_quantity, product.unit, product.weight, product.dimensions,
+              JSON.stringify([]), JSON.stringify({}), JSON.stringify([]),
+              product.category_id, product.supplier_id, req.user.id,
+              product.min_order_quantity, product.brand, product.model, product.color,
+              product.size, product.warranty, product.material, product.features,
+              product.origin, product.packaging
+            ], function (err) {
+              if (err) reject(err);
+              else resolve();
+            });
+          });
+        }
+
+        results.success++;
+      } catch (err) {
+        results.failed++;
+        // Use mapped sku if available
+        const failedSku = row['كود المنتج (SKU)'] || row['كود المنتج'] || row.sku || 'Unknown';
+        results.errors.push({ sku: failedSku, error: err.message });
+      }
+    }
+
+    logAudit('IMPORT_PRODUCTS', 'products', 'bulk', { count: results.success }, req.ip, req.get('User-Agent'), req.user.id);
+
+    res.json({
+      message: `تم الاستيراد: ${results.success} ناجح، ${results.failed} فشل.`,
+      results
+    });
+  } catch (error) {
+    console.error('Import error:', error);
+    res.status(500).json({ error: 'فشل في معالجة ملف Excel' });
   }
 });
 
@@ -1138,7 +1488,7 @@ app.put('/api/products/:id', authenticateToken, checkPermission('products', 'upd
     });
 
     if (!existingProduct) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'المنتج غير موجود' });
     }
 
     const result = await new Promise((resolve, reject) => {
@@ -1183,17 +1533,17 @@ app.put('/api/products/:id', authenticateToken, checkPermission('products', 'upd
     });
 
     if (result.changes === 0) {
-      return res.status(400).json({ error: 'No changes made' });
+      return res.status(400).json({ error: 'لم يتم إجراء أي تغييرات' });
     }
 
     logAudit('UPDATE_PRODUCT', 'products', id, { name, sku }, req.ip, req.get('User-Agent'), req.user.id);
 
-    res.json({ message: 'Product updated successfully' });
+    res.json({ message: 'تم تحديث المنتج بنجاح' });
   } catch (error) {
     if (error.code === 'SQLITE_CONSTRAINT') {
       res.status(400).json({ error: 'SKU already exists' });
     } else {
-      res.status(500).json({ error: 'Failed to update product' });
+      res.status(500).json({ error: 'فشل في تحديث المنتج' });
     }
   }
 });
@@ -1227,9 +1577,9 @@ app.delete('/api/products/:id', authenticateToken, checkPermission('products', '
 
     logAudit('DELETE_PRODUCT', 'products', id, { name: existingProduct.name, sku: existingProduct.sku }, req.ip, req.get('User-Agent'), req.user.id);
 
-    res.json({ message: 'Product deleted successfully' });
+    res.json({ message: 'تم حذف المنتج بنجاح' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete product' });
+    res.status(500).json({ error: 'فشل في حذف المنتج' });
   }
 });
 
@@ -1251,7 +1601,7 @@ app.get('/api/categories', async (req, res) => {
 
     res.json(categories);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch categories' });
+    res.status(500).json({ error: 'فشل في جلب الفئات' });
   }
 });
 
@@ -1267,7 +1617,7 @@ app.get('/api/categories/:id', async (req, res) => {
     });
 
     if (!category) {
-      return res.status(404).json({ error: 'Category not found' });
+      return res.status(404).json({ error: 'الفئة غير موجودة' });
     }
 
     res.json(category);
@@ -1300,9 +1650,9 @@ app.post('/api/categories', authenticateToken, checkPermission('categories', 'cr
 
     logAudit('CREATE_CATEGORY', 'categories', result.id.toString(), { name, name_ar }, req.ip, req.get('User-Agent'), req.user.id);
 
-    res.status(201).json({ message: 'Category created successfully', categoryId: result.id });
+    res.status(201).json({ message: 'تم إنشاء الفئة بنجاح', categoryId: result.id });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create category' });
+    res.status(500).json({ error: 'فشل في إنشاء الفئة' });
   }
 });
 
@@ -1328,7 +1678,7 @@ app.put('/api/categories/:id', authenticateToken, checkPermission('categories', 
     });
 
     if (!existingCategory) {
-      return res.status(404).json({ error: 'Category not found' });
+      return res.status(404).json({ error: 'الفئة غير موجودة' });
     }
 
     const result = await new Promise((resolve, reject) => {
@@ -1383,7 +1733,7 @@ app.delete('/api/categories/:id', authenticateToken, checkPermission('categories
     });
 
     if (!existingCategory) {
-      return res.status(404).json({ error: 'Category not found' });
+      return res.status(404).json({ error: 'الفئة غير موجودة' });
     }
 
     // Delete associated products first
@@ -2331,37 +2681,36 @@ app.get('/api/trust-badges', async (req, res) => {
 
 // Register API
 app.post('/api/auth/register', [
-  body('username').notEmpty().withMessage('Username is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('full_name').notEmpty().withMessage('Full name is required')
+  body('phone').notEmpty().withMessage('رقم الهاتف مطلوب'),
+  body('password').isLength({ min: 6 }).withMessage('يجب أن تكون كلمة المرور 6 أحرف على الأقل'),
+  body('first_name').notEmpty().withMessage('الاسم الأول مطلوب'),
+  body('last_name').notEmpty().withMessage('الاسم الأخير مطلوب')
 ], async (req, res) => {
   console.log('Register request received:', req.body);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log('Validation errors:', errors.array());
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, password, full_name } = req.body;
-  const ipAddress = req.ip;
-  const userAgent = req.get('User-Agent');
-
-  console.log('Attempting registration for:', email);
+  const { username, email, phone, password, first_name, last_name, address, city, country, role } = req.body;
+  const user_role = role || 'importer'; // Default to importer for now if not specified
+  
+  // Use phone as username if username is not provided
+  const finalUsername = username || phone;
+  const full_name = `${first_name} ${last_name}`;
 
   try {
     // Check if user already exists
     const existingUser = await new Promise((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE username = ? OR email = ?', [username, email], (err, row) => {
+      db.get('SELECT * FROM users WHERE phone = ? OR username = ? OR (email IS NOT NULL AND email = ?)', [phone, finalUsername, email], (err, row) => {
         if (err) reject(err);
         else resolve(row);
       });
     });
 
     if (existingUser) {
-      console.log('User already exists');
-      return res.status(400).json({ error: 'Username or email already exists' });
+      return res.status(400).json({ error: 'رقم الهاتف أو اسم المستخدم مسجل مسبقاً' });
     }
 
     // Hash password
@@ -2370,26 +2719,35 @@ app.post('/api/auth/register', [
     // Create user
     const result = await new Promise((resolve, reject) => {
       db.run(`
-        INSERT INTO users (username, email, password, full_name, access_level, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `, [username, email, hashedPassword, full_name, 'basic', 'pending'], function (err) {
+        INSERT INTO users (username, email, phone, password, full_name, first_name, last_name, access_level, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `, [finalUsername, email, phone, hashedPassword, full_name, first_name, last_name, user_role, 'active'], function (err) {
         if (err) reject(err);
         else resolve({ id: this.lastID });
       });
     });
 
-    console.log('User created successfully:', result.id);
-
-    // Temporarily disable audit logging
-    // logAudit('USER_REGISTER', 'auth', result.id.toString(), { username, email }, ipAddress, userAgent, result.id);
+    // If it's a customer, create a customer record
+    if (user_role === 'customer') {
+      await new Promise((resolve, reject) => {
+        db.run(`
+          INSERT INTO customers (user_id, name, name_ar, email, phone, address, city, country, customer_type, is_active)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        `, [result.id, full_name, full_name, email, phone, address, city, country, 'retail'], function (err) {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+    }
 
     res.status(201).json({
-      message: 'Registration successful! Please wait for account activation.',
-      userId: result.id
+      message: user_role === 'customer' ? 'تم إنشاء حسابك بنجاح!' : 'تم التسجيل بنجاح! يرجى الانتظار لتفعيل الحساب من قبل الإدارة.',
+      userId: result.id,
+      autoLogin: true
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    res.status(500).json({ error: 'فشل عملية التسجيل' });
   }
 });
 
@@ -2715,7 +3073,7 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`🚀 PAM Server running on http://localhost:${PORT}`);
     console.log(`📊 Admin panel: http://localhost:${PORT}/api/health`);
-    console.log(`🔑 Default admin credentials: admin / admin123`);
+    console.log(`🔑 Default admin credentials: 01000000000 / admin123`);
   });
 }
 

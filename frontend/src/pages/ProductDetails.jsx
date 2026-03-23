@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { productsAPI } from '../services/api';
 import { useCart } from '../contexts/CartContext';
 import { getProductImage, handleImageError } from '../utils/imageUtils';
+import { formatPrice } from '../utils/priceUtils';
 import {
     ArrowLeft, ShoppingBag, Truck, ShieldCheck, Star,
     Heart, Share2, Zap, Cpu, Settings, Package,
@@ -230,8 +231,8 @@ const ProductDetails = () => {
                             </p>
 
                             <div className="flex items-baseline gap-3">
-                                <span className="text-3xl font-bold text-gray-900">${product.price || 0}</span>
-                                <span className="text-lg text-gray-500 line-through">${((product.price || 0) * 1.3).toFixed(2)}</span>
+                                <span className="text-3xl font-bold text-gray-900">{formatPrice(product.price || 0)}</span>
+                                <span className="text-lg text-gray-500 line-through">{formatPrice((product.price || 0) * 1.3)}</span>
                                 <span className="px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded">وفر 23%</span>
                             </div>
 
@@ -288,7 +289,7 @@ const ProductDetails = () => {
                                         className={`flex justify-between items-center text-sm px-3 py-2 rounded-lg transition-colors ${tier.active ? 'bg-blue-100 text-blue-800 font-bold' : 'text-gray-600'}`}
                                     >
                                         <span>{tier.range}</span>
-                                        <span>${tier.price} / وحدة</span>
+                                        <span>{formatPrice(tier.price)} / وحدة</span>
                                     </div>
                                 ))}
                             </div>
@@ -301,7 +302,7 @@ const ProductDetails = () => {
                                 className="w-full bg-[#0f172a] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:bg-[#031a79] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3"
                             >
                                 <ShoppingBag size={24} />
-                                أضف للسلة — ${((product.price || 0) * quantity).toFixed(2)}
+                                أضف للسلة — {formatPrice((product.price || 0) * quantity)}
                             </button>
                          
                         </div>

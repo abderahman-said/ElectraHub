@@ -26,11 +26,11 @@
 
     /* Dedicated Glow Color */
     --glow-color: rgba(29, 78, 216, 0.3);
+    --primary-color: #1d4ed8;
   }
 
   body {
     @apply font-sans text-slate-900 bg-white antialiased selection:bg-blue-100 selection:text-blue-900;
-    font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;
     direction: rtl;
   }
 
@@ -41,7 +41,6 @@
   h5,
   h6 {
     @apply font-heading font-extrabold text-blue-950 tracking-tight;
-    font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;
     direction: rtl;
   }
 
@@ -88,9 +87,37 @@
 
   .bg-mesh {
     background-image:
-      radial-gradient(at 0% 0%, rgba(29, 78, 216, 0.15) 0, transparent 50%),
+      radial-gradient(at 0% 0%, var(--primary-color-light, rgba(29, 78, 216, 0.15)) 0, transparent 50%),
       radial-gradient(at 50% 0%, rgba(250, 204, 21, 0.1) 0, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(30, 64, 175, 0.15) 0, transparent 50%);
+      radial-gradient(at 100% 0%, var(--primary-color-light, rgba(30, 64, 175, 0.15)) 0, transparent 50%);
+  }
+
+  /* Theme Overrides - Overriding Tailwind's default blue scale to match merchant's brand */
+  .bg-blue-700, .bg-blue-600, .bg-blue-500, .bg-blue-800, .bg-blue-900, .bg-blue-400, .bg-blue-300,
+  .bg-indigo-700, .bg-indigo-600, .bg-indigo-500 {
+    background-color: var(--primary-color) !important;
+  }
+  
+  .text-blue-700, .text-blue-600, .text-blue-500, .text-blue-800, .text-blue-900, .text-blue-400,
+  .text-indigo-700, .text-indigo-600, .text-indigo-500 {
+    color: var(--primary-color) !important;
+  }
+
+  .border-blue-700, .border-blue-600, .border-blue-500, .border-blue-100, .border-blue-200,
+  .border-indigo-700, .border-indigo-600, .border-indigo-500 {
+    border-color: var(--primary-color) !important;
+    opacity: 0.8;
+  }
+
+  .shadow-blue-200, .shadow-blue-100, .shadow-blue-500, .shadow-blue-700,
+  .shadow-indigo-200, .shadow-indigo-100 {
+    --tw-shadow-color: var(--primary-color) !important;
+    --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color) !important;
+  }
+
+  /* Ring and Focus states */
+  .focus\:ring-blue-100:focus, .focus\:ring-blue-50:focus, .focus\:ring-indigo-100:focus {
+    --tw-ring-color: var(--primary-color-light) !important;
   }
 
   .shadow-premium {

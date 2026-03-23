@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Minus, Plus, ShoppingBag, Trash2, Sparkles, Truck, Shield, CreditCard, Package, Star, Heart, Zap, Check, Eye, ArrowLeft } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
+import { formatPrice } from '../utils/priceUtils';
 
 const CartDrawer = ({ isOpen, onOpenChange }) => {
     const { items: cart, removeFromCart, updateQuantity, getTotalPrice: cartTotal } = useCart();
@@ -88,12 +89,9 @@ const CartDrawer = ({ isOpen, onOpenChange }) => {
         });
     };
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(price);
-    };
+    // Using global formatPrice instead of local formatPrice
+    // const formatPrice = (price) => { ... } 
+    // Removed local definition to use imported one.
 
     const CartItem = ({ item, index }) => {
         const isRemoving = removingItems.has(item.id);
@@ -196,11 +194,11 @@ const CartDrawer = ({ isOpen, onOpenChange }) => {
                 `}
             >
                 {/* Enhanced Header */}
-                <div className="bg-[#2650fc] text-white px-6 py-8 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#2650fc]/10 to-transparent"></div>
+                <div className="bg-[var(--primary-color)] text-white px-6 py-8 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary-color)]/10 to-transparent"></div>
                     <div className="relative flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-[#2650fc]/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10">
+                            <div className="w-12 h-12 bg-[var(--primary-color)]/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/10">
                                 <ShoppingBag className="w-6 h-6 text-[#fff]" />
                             </div>
                             <div>
@@ -234,7 +232,7 @@ const CartDrawer = ({ isOpen, onOpenChange }) => {
                                 <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                     <ShoppingBag className="w-16 h-16 text-gray-300" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-[#2650fc] mb-2">عربة التسوق فارغة</h3>
+                                <h3 className="text-2xl font-bold text-[var(--primary-color)] mb-2">عربة التسوق فارغة</h3>
                                 <p className="text-gray-600 mb-6 max-w-sm">
                                     يبدو أنك لم تضف أي شيء لعربة التسوق بعد. ابدأ التسوق لملئها!
                                 </p>
@@ -242,14 +240,14 @@ const CartDrawer = ({ isOpen, onOpenChange }) => {
                                     <Link
                                         to="/shop"
                                         onClick={() => handleOpenChange(false)}
-                                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#2650fc] text-white rounded-xl hover:bg-primary-hover transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--primary-color)] text-white rounded-xl hover:bg-primary-hover transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                                     >
                                         <ShoppingBag size={18} />
                                         ابدأ التسوق
                                     </Link>
                                     <button
                                         onClick={() => handleOpenChange(false)}
-                                        className="px-6 py-3 border-2 border-[#17255421] text-gray-700 rounded-xl hover:border-[#2650fc] hover:bg-slate-50 transition-colors duration-200 font-semibold"
+                                        className="px-6 py-3 border-2 border-[#17255421] text-gray-700 rounded-xl hover:border-[var(--primary-color)] hover:bg-slate-50 transition-colors duration-200 font-semibold"
                                     >
                                         لاحقاً
                                     </button>
@@ -291,7 +289,7 @@ const CartDrawer = ({ isOpen, onOpenChange }) => {
                             <Link
                                 to="/checkout"
                                 onClick={() => handleOpenChange(false)}
-                                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#2650fc] text-white rounded-xl hover:bg-[#031a79] transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 group"
+                                className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[var(--primary-color)] text-white rounded-xl hover:bg-[#031a79] transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 group"
                             >
                                 <CreditCard className="w-5 h-5" />
                                 المتابعة للدفع
@@ -301,7 +299,7 @@ const CartDrawer = ({ isOpen, onOpenChange }) => {
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => handleOpenChange(false)}
-                                    className="flex-1 px-6 py-3 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-[#2650fc] hover:bg-white transition-all duration-200 font-medium text-sm"
+                                    className="flex-1 px-6 py-3 border-2 border-slate-200 text-slate-700 rounded-xl hover:border-[var(--primary-color)] hover:bg-white transition-all duration-200 font-medium text-sm"
                                 >
                                     استمر في التسوق
                                 </button>

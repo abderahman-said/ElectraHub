@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ShoppingBag, Eye, Heart, Check, Star, Truck, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import { getProductImage } from '../utils/imageUtils';
+import { formatPrice } from '../utils/priceUtils';
 
 const ProductCardBW = ({ product, priority = false }) => {
   const { id, name, price, category, image, images, stock = 10, rating = 4.5 } = product;
@@ -11,27 +13,7 @@ const ProductCardBW = ({ product, priority = false }) => {
   const [addingToCart, setAddingToCart] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Helper function to get product image
-  const getProductImage = () => {
-    // Check if product has images array
-    if (images && images.length > 0) {
-      const firstImage = images[0];
-      // Check if it's a base64 image
-      if (typeof firstImage === 'string' && firstImage.startsWith('data:image/')) {
-        return firstImage;
-      }
-      // Check if it's a relative path
-      if (typeof firstImage === 'string' && !firstImage.startsWith('http')) {
-        return firstImage;
-      }
-    }
-    // Check if product has image property
-    if (image) {
-      return image;
-    }
-    // Return placeholder
-    return '/placeholder-product.webp';
-  };
+  const dispImage = getProductImage(product);
 
   // Calculate discount
   const discount = 20;
@@ -102,7 +84,7 @@ const ProductCardBW = ({ product, priority = false }) => {
 
           {/* Product Image */}
           <img
-            src={getProductImage()}
+            src={dispImage}
             alt={name}
             className={`
               w-full h-full object-cover 
@@ -232,15 +214,15 @@ const ProductCardBW = ({ product, priority = false }) => {
           <div className="space-y-3">
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-bold text-gray-900 transition-all duration-300">
-                ${price}
+                {formatPrice(price)}
               </span>
               {discount > 0 && (
                 <>
                   <span className="text-sm text-gray-400 line-through">
-                    ${oldPrice}
+                    {formatPrice(oldPrice)}
                   </span>
                   <span className="text-xs font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                    Save ${(oldPrice - price).toFixed(2)}
+                    وفر {formatPrice(oldPrice - price)}
                   </span>
                 </>
               )}

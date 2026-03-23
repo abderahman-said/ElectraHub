@@ -11,6 +11,7 @@ import ProductDetails from './pages/ProductDetails';
 import NotFound from './pages/NotFound';
 import { useCart } from './contexts/CartContext';
 import { AuthProvider } from './hooks/useAuth';
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 
 import Login from './pages/Login';
@@ -29,6 +30,7 @@ import CategoryManagement from './pages/CategoryManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import OrderManagement from './pages/OrderManagement';
 import AdminCategories from './pages/admin/AdminCategories';
+import ImportProducts from './pages/admin/ImportProducts';
 import Cart from './pages/Cart';
 
 function App() {
@@ -42,6 +44,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
       <ErrorBoundary>
         <div className="flex flex-col min-h-screen bg-white text-gray-900" dir="rtl">
           <Navbar cartCount={cartCount} setIsCartOpen={setIsCartOpen} />
@@ -64,6 +67,7 @@ function App() {
                 <Route path="inventory" element={<DashboardInventory />} />
                 <Route path="profile" element={<DashboardProfile />} />
                 <Route path="admin/categories" element={<AdminCategories />} />
+                <Route path="import-products" element={<ImportProducts />} />
               </Route>
               <Route path="/dashboard/add-product" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />
               <Route path="/dashboard/edit-product/:id" element={<PrivateRoute><ManageProduct /></PrivateRoute>} />

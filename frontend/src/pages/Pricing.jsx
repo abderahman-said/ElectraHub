@@ -114,7 +114,7 @@ const PlanCard = ({ plan, isYearly }) => {
         >
             {/* Popular badge */}
             {plan.popular && (
-                <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#2650fc] to-[#031a79] text-white text-[11px] font-extrabold tracking-[0.15em] uppercase px-5 py-1.5 rounded-b-[14px] z-10">
+                <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 bg-gradient-to-r from-[var(--primary-color)] to-[#031a79] text-white text-[11px] font-extrabold tracking-[0.15em] uppercase px-5 py-1.5 rounded-b-[14px] z-10">
                     الأكثر طلباً
                 </div>
             )}
@@ -170,7 +170,7 @@ const PlanCard = ({ plan, isYearly }) => {
                 {isYearly && plan.monthlyPrice > 0 && (
                     <div className="mt-1.5 text-xs text-slate-600 font-semibold">
                         بدلاً من <span className="line-through text-slate-700">${plan.monthlyPrice}</span>
-                        <span className="mr-2 bg-[#2650fc]/10 text-[#2650fc] px-2 py-0.5 rounded-full text-[11px] font-extrabold">
+                        <span className="mr-2 bg-[var(--primary-color)]/10 text-[var(--primary-color)] px-2 py-0.5 rounded-full text-[11px] font-extrabold">
                             وفر {Math.round((1 - plan.yearlyPrice / plan.monthlyPrice) * 100)}%
                         </span>
                     </div>
@@ -199,7 +199,7 @@ const PlanCard = ({ plan, isYearly }) => {
             <button
                 className={`w-full p-4 rounded-[14px] text-[15px] font-extrabold tracking-wide cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 border-none
                     ${plan.ctaStyle === 'solid'
-                        ? 'bg-gradient-to-br from-[#2650fc] to-[#031a79] text-white shadow-[0_8px_24px_rgba(38,80,252,0.35)] hover:shadow-[0_12px_30px_rgba(38,80,252,0.45)]'
+                        ? 'bg-gradient-to-br from-[var(--primary-color)] to-[#031a79] text-white shadow-[0_8px_24px_rgba(38,80,252,0.35)] hover:shadow-[0_12px_30px_rgba(38,80,252,0.45)]'
                         : plan.ctaStyle === 'gold'
                             ? 'bg-gradient-to-br from-amber-600 to-amber-500 text-[#0f172a] shadow-[0_8px_24px_rgba(245,158,11,0.3)] hover:shadow-[0_12px_30px_rgba(245,158,11,0.4)]'
                             : 'bg-transparent text-[#94a3b8] border border-white/10 hover:bg-white/5'
@@ -263,7 +263,7 @@ const Pricing = () => {
 
                 {/* ── Header ── */}
                 <div className="text-center mb-24 space-y-6">
-                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-[#2650fc]/10 border border-brand/20 rounded-full text-[#2650fc] text-sm font-black tracking-widest uppercase shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-5 py-2 bg-[var(--primary-color)]/10 border border-brand/20 rounded-full text-[var(--primary-color)] text-sm font-black tracking-widest uppercase shadow-sm">
                         <Sparkles size={14} className="animate-pulse" />
                         نظام الاشتراكات المطور
                     </div>
@@ -285,7 +285,7 @@ const Pricing = () => {
                         <button
                             onClick={() => setIsYearly(!isYearly)}
                             className={`w-[60px] h-[32px] rounded-full border-2 relative p-0 transition-all duration-500 cursor-pointer
-                                ${isYearly ? 'bg-[#2650fc] border-brand-dark' : 'bg-slate-200 border-slate-300'}`}
+                                ${isYearly ? 'bg-[var(--primary-color)] border-brand-dark' : 'bg-slate-200 border-slate-300'}`}
                         >
                             <div className={`absolute top-[2px] w-6 h-6 rounded-full transition-all duration-500 shadow-md
                                 ${isYearly
@@ -296,7 +296,7 @@ const Pricing = () => {
 
                         <span className={`text-[15px] font-black tracking-tight transition-colors ${isYearly ? 'text-brand' : 'text-slate-400'}`}>سنوياً</span>
 
-                        <div className="bg-[#2650fc] text-white px-3 py-1.5 rounded-2xl text-[12px] font-black tracking-wider animate-bounce-subtle shadow-lg">
+                        <div className="bg-[var(--primary-color)] text-white px-3 py-1.5 rounded-2xl text-[12px] font-black tracking-wider animate-bounce-subtle shadow-lg">
                             وفر 20%
                         </div>
                     </div>

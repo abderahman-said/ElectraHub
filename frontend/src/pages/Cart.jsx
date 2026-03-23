@@ -87,7 +87,7 @@ const Cart = () => {
           <p className="text-gray-600 mb-6">لم تقم بإضافة أي منتجات إلى السلة بعد</p>
           <a
             href="/"
-            className="inline-flex items-center px-6 py-3 bg-[#2650fc] text-white font-medium rounded-lg hover:bg-[#1e40d8] transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-[var(--primary-color)] text-white font-medium rounded-lg hover:bg-[#1e40d8] transition-colors"
           >
             العودة للتسوق
           </a>
@@ -120,7 +120,7 @@ const Cart = () => {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{item.name}</h3>
                       <p className="text-sm text-gray-600">{item.weight || 'N/A'}</p>
-                      <p className="font-semibold text-[#2650fc]">{item.price} EGP</p>
+                      <p className="font-semibold text-[var(--primary-color)]">{item.price} EGP</p>
                     </div>
                     
                     <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ const Cart = () => {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                       required
                     />
                   </div>
@@ -180,7 +180,7 @@ const Cart = () => {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                       required
                     />
                   </div>
@@ -195,7 +195,7 @@ const Cart = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                   />
                 </div>
 
@@ -208,7 +208,7 @@ const Cart = () => {
                     name="street"
                     value={formData.street}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                     required
                   />
                 </div>
@@ -223,7 +223,7 @@ const Cart = () => {
                       name="city"
                       value={formData.city}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                       required
                     />
                   </div>
@@ -236,7 +236,7 @@ const Cart = () => {
                       name="country"
                       value={formData.country}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -250,7 +250,7 @@ const Cart = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2650fc] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent"
                     required
                   />
                 </div>
@@ -269,13 +269,13 @@ const Cart = () => {
                   </div>
                   <div className="flex justify-between text-lg font-semibold">
                     <span>الإجمالي</span>
-                    <span className="text-[#2650fc]">{getTotalPrice()} EGP</span>
+                    <span className="text-[var(--primary-color)]">{getTotalPrice()} EGP</span>
                   </div>
                 </div>
 
                 <button
                   onClick={handleCheckout}
-                  className="w-full mt-6 bg-[#2650fc] text-white py-3 rounded-lg font-medium hover:bg-[#1e40d8] transition-colors flex items-center justify-center gap-2"
+                  className="w-full mt-6 bg-[var(--primary-color)] text-white py-3 rounded-lg font-medium hover:bg-[#1e40d8] transition-colors flex items-center justify-center gap-2"
                 >
                   الدفع عبر واتساب
                   <ArrowLeft className="w-5 h-5" />

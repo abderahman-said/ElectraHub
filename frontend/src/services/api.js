@@ -45,6 +45,14 @@ export const authAPI = {
   logout: () => api.post('/auth/logout'),
   getCurrentUser: () => api.get('/auth/me'),
   register: (userData) => api.post('/auth/register', userData),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  uploadLogo: (file) => {
+    const formData = new FormData();
+    formData.append('logo', file);
+    return api.post('/auth/upload/logo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
 };
 
 // Users API
@@ -90,6 +98,11 @@ export const productsAPI = {
   createProduct: (productData) => api.post('/products', productData),
   updateProduct: (id, productData) => api.put(`/products/${id}`, productData),
   deleteProduct: (id) => api.delete(`/products/${id}`),
+  importProducts: (formData) => api.post('/products/import', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }),
 };
 
 // Dashboard Products API

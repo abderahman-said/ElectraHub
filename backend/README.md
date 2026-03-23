@@ -100,7 +100,7 @@ npm start
 
 ## Default Credentials
 
-- **Username**: admin
+- **Username**: 01000000000
 - **Password**: admin123
 - **Access Level**: Super Admin
 

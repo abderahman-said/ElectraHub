@@ -173,7 +173,7 @@ const Shop = () => {
                             <SlidersHorizontal size={16} className="sm:size-18" />
                             <span className="text-sm">المرشحات</span>
                             {activeFiltersCount > 0 && (
-                                <span className="bg-[#2650fc] text-white text-xs px-2 py-1 rounded-full">
+                                <span className="bg-[var(--primary-color)] text-white text-xs px-2 py-1 rounded-full">
                                     {activeFiltersCount}
                                 </span>
                             )}

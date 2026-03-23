@@ -106,7 +106,7 @@ const SLIDES = [
     cta: 'تسوق الآن',
     badge: '٣٠٪ خصم',
     image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=90',
-    palette: { bg: '#f8fafc', accent: '#2650fc', dim: '#e2e8f0', text: '#0f172a' },
+    palette: { bg: '#f8fafc', accent: 'var(--primary-color)', dim: '#e2e8f0', text: '#0f172a' },
     number: '01',
   },
   {
@@ -204,7 +204,6 @@ const Hero = () => {
           minHeight: '100svh',
           background: palette.bg,
           transition: 'background 0.8s ease',
-          fontFamily: "'Tajawal', sans-serif",
         }}
       >
         {/* ── FULL BG IMAGE ── */}
@@ -314,7 +313,6 @@ const Hero = () => {
                       <span style={{
                         fontSize: 'clamp(42px, 10vw, 60px)',
                         fontWeight: 900,
-                        fontFamily: 'Tajawal',
                         color: palette.text,
                         display: 'block',
                       }}>
@@ -332,7 +330,6 @@ const Hero = () => {
                     <span style={{
                       fontSize: 'clamp(42px, 10vw, 60px)',
                       fontWeight: 700,
-                      fontFamily: 'Playfair Display',
                       fontStyle: 'italic',
                       color: palette.accent,
                       display: 'block',

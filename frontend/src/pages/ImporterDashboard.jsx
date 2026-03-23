@@ -7,7 +7,8 @@ import {
     LogOut,
     ShieldAlert,
     Users,
-    Tags
+    Tags,
+    FileSpreadsheet
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, NavLink, Outlet } from 'react-router-dom';
@@ -41,6 +42,7 @@ const ImporterDashboard = () => {
         { path: '/dashboard', label: 'نظرة عامة', icon: LayoutDashboard, end: true },
         { path: '/dashboard/inventory', label: 'إدارة المنتجات', icon: Box },
         { path: '/dashboard/profile', label: 'تعديل البروفايل', icon: Settings },
+        { path: '/dashboard/import-products', label: 'استيراد من Excel', icon: FileSpreadsheet },
     ];
 
     if (hasAccessLevel && (hasAccessLevel('admin') || hasAccessLevel('super_admin'))) {

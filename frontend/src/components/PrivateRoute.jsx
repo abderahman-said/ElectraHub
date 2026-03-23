@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const PrivateRoute = ({ children }) => {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading, user } = useAuth();
 
     if (loading) {
         return (
@@ -14,6 +14,11 @@ const PrivateRoute = ({ children }) => {
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
+    }
+
+    // Block customers from accessing dashboard/admin routes
+    if (user?.access_level === 'customer') {
+        return <Navigate to="/" replace />;
     }
 
     return children;

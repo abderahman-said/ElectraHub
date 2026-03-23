@@ -49,11 +49,11 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
       <div className="container mx-auto px-4 md:px-8 h-18 lg:h-22 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 group">
           <OptimizedImage
-            src="/logo.png"
-            alt="Bel-Gomla Logo"
+            src={user?.logo_url || "/logo.png"}
+            alt="Logo"
             width="150"
             height="150"
-            className="h-auto w-auto max-w-[100px]  rounded-xl"
+            className="h-auto w-auto max-w-[100px] object-contain max-h-[70px]  rounded-xl"
             priority={true}
           />
         </Link>
@@ -64,10 +64,10 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
             <Link
               key={item.name}
               to={item.href}
-              className="text-xl font-black uppercase tracking-widest text-slate-900 hover:text-[#2650fc] transition-colors relative group py-2"
+              className="text-xl font-black uppercase tracking-widest text-slate-900 hover:text-[var(--primary-color)] transition-colors relative group py-2"
             >
               {item.name}
-              <span className="absolute right-0 -bottom-1 w-0 h-0.5 bg-[#2650fc] transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute right-0 -bottom-1 w-0 h-0.5 bg-[var(--primary-color)] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </nav>
@@ -83,10 +83,12 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
             </button>
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <Link to="/dashboard" className="h-11 px-6 bg-[#2650fc]/10 rounded-xl flex items-center justify-center text-xs font-black uppercase tracking-widest text-[#2650fc] hover:bg-white transition-all gap-2">
-                  <LayoutDashboard size={16} />
-                  لوحة التحكم
-                </Link>
+                {user?.access_level !== 'customer' && (
+                  <Link to="/dashboard" className="h-11 px-6 bg-[var(--primary-color)]/10 rounded-xl flex items-center justify-center text-xs font-black uppercase tracking-widest text-[var(--primary-color)] hover:bg-white transition-all gap-2">
+                    <LayoutDashboard size={16} />
+                    لوحة التحكم
+                  </Link>
+                )}
                 <button
                   onClick={logout}
                   className="h-11 w-11 glass rounded-xl flex items-center justify-center text-red-500 hover:bg-white transition-all"
@@ -105,7 +107,7 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
 
           <Link
             to="/cart"
-            className="h-11 w-11 bg-[#2650fc] text-white rounded-xl flex items-center justify-center relative hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
+            className="h-11 w-11 bg-[var(--primary-color)] text-white rounded-xl flex items-center justify-center relative hover:bg-brand-dark transition-all shadow-lg shadow-brand/20"
             aria-label={`عربة التسوق${cartCount > 0 ? ` - ${cartCount} منتج` : ''}`}
           >
             <ShoppingBag size={20} />
@@ -141,7 +143,7 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button type="submit" className="absolute left-6 top-1/2 -translate-y-1/2 text-[#2650fc] hover:scale-110 transition-transform" aria-label="بحث">
+                <button type="submit" className="absolute left-6 top-1/2 -translate-y-1/2 text-[var(--primary-color)] hover:scale-110 transition-transform" aria-label="بحث">
                   <Search size={28} />
                 </button>
               </form>
@@ -174,11 +176,11 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
                         )}
                       </div>
                       <div className="flex-grow flex flex-col gap-1">
-                        <span className="font-black text-slate-900 text-lg group-hover:text-[#2650fc] transition-colors uppercase tracking-tight">{product.name}</span>
+                        <span className="font-black text-slate-900 text-lg group-hover:text-[var(--primary-color)] transition-colors uppercase tracking-tight">{product.name}</span>
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{product.category}</span>
                       </div>
                       <div className="text-left">
-                        <span className="font-black text-[#2650fc] text-xl tracking-tighter">${product.averagePrice}</span>
+                        <span className="font-black text-[var(--primary-color)] text-xl tracking-tighter">${product.averagePrice}</span>
                       </div>
                       <div className="h-11 w-11 glass rounded-xl flex items-center justify-center text-blue-950 group-hover:bg-white transition-all">
                         <ChevronRight size={18} />
@@ -189,7 +191,7 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
                 <div className="p-4 border-t border-blue-50/50">
                   <button
                     onClick={handleSearchSubmit}
-                    className="w-full py-5 bg-[#2650fc] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand/20 flex items-center justify-center gap-3"
+                    className="w-full py-5 bg-[var(--primary-color)] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-dark transition-all shadow-xl shadow-brand/20 flex items-center justify-center gap-3"
                   >
                     عرض جميع النتائج
                     <ArrowLeft size={16} />
@@ -236,13 +238,15 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
           <div className="pt-4 border-t border-blue-50 flex flex-col gap-3">
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/dashboard"
-                  className="w-full py-5 bg-blue-50 text-blue-700 text-center rounded-2xl font-black text-xs uppercase tracking-widest"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  لوحة التحكم
-                </Link>
+                {user?.access_level !== 'customer' && (
+                  <Link
+                    to="/dashboard"
+                    className="w-full py-5 bg-blue-50 text-blue-700 text-center rounded-2xl font-black text-xs uppercase tracking-widest"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    لوحة التحكم
+                  </Link>
+                )}
                 <button
                   onClick={() => { logout(); setIsMobileMenuOpen(false); }}
                   className="w-full py-5 bg-red-50 text-red-500 text-center rounded-2xl font-black text-xs uppercase tracking-widest"
@@ -261,7 +265,7 @@ const Navbar = ({ cartCount = 0, setIsCartOpen }) => {
                 </Link>
                 <Link
                   to="/register"
-                  className="w-full py-5 bg-[#2650fc] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
+                  className="w-full py-5 bg-[var(--primary-color)] text-white text-center rounded-2xl font-black text-xs uppercase tracking-widest"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   إنشاء حساب
